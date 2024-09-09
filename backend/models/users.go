@@ -51,11 +51,17 @@ func GetUserByUsername(username string) *types.User {
 }
 
 // 根据token获取用户信息
-func GetUserByToken(token string) *types.Jwt {
+func GetUserByToken(token string) *types.User {
     if token != "" {
         token = strings.TrimPrefix(token, "Bearer ")
+		err := db.Where("token = ?", token).First(&user).Error
+		if err != nil {
+			return nil
+		}
 		claims, _ := utils.DecryptJWTToken(token)
-		return claims
+		if claims != nil {
+			return &user
+		}
     }
 	return nil
 }
@@ -71,19 +77,22 @@ func LockIP(ip string, duration int) {
 }
 
 // 清除token
-func CleanToken(token string) error {
-	err := db.Where("token = ?", token).First(&user).Error
+func CleanToken(username string) error {
+	err := db.Where("username = ?", username).First(&user).Error
 	if err != nil {
 		return err
 	}
-	db.Model(&user).Update("token", "")
+	err = db.Model(&user).Update("token", "").Error
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 // 创建用户
 func CreateUser(username string, password string, role int) error {
-    result := db.Where("username = ?", username).First(&user)
-    if result.Error != nil {
+	err := db.Where("username = ?", username).First(&user).Error
+	if err != nil {
         passwdHash := utils.GenPasswordHash(password)
         userData := types.User{
             Username:   username,
