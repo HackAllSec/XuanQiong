@@ -16,7 +16,7 @@ var (
 // 检查IP是否被锁定
 func IsLocked(ip string) bool {
 	var lockip types.Lockip
-	if err := db.Where("client_ip = ?", ip).First(&lockip).Error; err == nil {
+	if err := db.Raw("SELECT * FROM lockip WHERE client_ip = ?", ip).Scan(&lockip).Error; err == nil {
 		if lockip.LockoutUntil != nil && time.Now().Before(*lockip.LockoutUntil) {
 			return true
 		}
@@ -26,7 +26,7 @@ func IsLocked(ip string) bool {
 
 // 检查登录凭据
 func CheckLogin(username string, password string) *types.User {
-    err := db.Where("username = ?", username).First(&user).Error
+    err := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).Error
 	if err != nil {
 		return nil
 	}
@@ -43,7 +43,7 @@ func CheckLogin(username string, password string) *types.User {
 
 // 根据用户名获取用户信息
 func GetUserByUsername(username string) *types.User {
-    err := db.Where("username = ?", username).First(&user).Error
+    err := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).Error
 	if err != nil {
 		return nil
 	}
@@ -54,7 +54,7 @@ func GetUserByUsername(username string) *types.User {
 func GetUserByToken(token string) *types.User {
     if token != "" {
         token = strings.TrimPrefix(token, "Bearer ")
-		err := db.Where("token = ?", token).First(&user).Error
+		err := db.Raw("SELECT * FROM users WHERE token = ?", token).Scan(&user).Error
 		if err != nil {
 			return nil
 		}
@@ -69,7 +69,7 @@ func GetUserByToken(token string) *types.User {
 // 锁定IP地址
 func LockIP(ip string, duration int) {
 	var lockip types.Lockip
-	db.Where("client_ip = ?", ip).First(&lockip)
+	db.Raw("SELECT * FROM lockip WHERE client_ip = ?", ip).Scan(&lockip)
 	lockoutUntil := time.Now().Add(time.Duration(duration) * time.Minute)
 	lockip.ClientIP = ip
 	lockip.LockoutUntil = &lockoutUntil
@@ -78,7 +78,7 @@ func LockIP(ip string, duration int) {
 
 // 清除token
 func CleanToken(username string) error {
-	err := db.Where("username = ?", username).First(&user).Error
+	err := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).Error
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func CleanToken(username string) error {
 
 // 创建用户
 func CreateUser(username string, password string, role int) error {
-	err := db.Where("username = ?", username).First(&user).Error
+	err := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).Error
 	if err != nil {
         passwdHash := utils.GenPasswordHash(password)
         userData := types.User{
@@ -110,7 +110,7 @@ func CreateUser(username string, password string, role int) error {
 
 // 删除用户
 func DeleteUser(username string) error {
-    result := db.Where("username = ?", username).First(&user)
+    result := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).Error
     if result.Error != nil {
         return fmt.Errorf("User %s not found.", username)
     }
@@ -120,7 +120,7 @@ func DeleteUser(username string) error {
 
 // 启用或禁用用户
 func SetUserStatus(username string, status int) error {
-    result := db.Where("username = ?", username).First(&user)
+    result := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).Error
     if result.Error != nil {
         return fmt.Errorf("User %s not found.", username)
     }
