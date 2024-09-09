@@ -1,0 +1,35 @@
+# 登录配置
+login:
+  max_attempts: 5    # 最大尝试次数
+  lockout_duration: 60    # 锁定时长,单位：分钟
+# 数据库配置
+database:
+  type: sqlite       # 设置数据库类型，可选值: mysql, postgres, sqlite, sqlserver, 暂不支持oracle
+
+  # 数据库连接配置
+  connection:
+    host: "localhost"      # 数据库主机地址（MySQL, PostgreSQL, SQLServer, Oracle）
+    port: 3306             # 数据库端口（MySQL 默认3306，PostgreSQL 默认5432，SQLServer 默认1433，Oracle 默认1521）
+    user: "username"       # 数据库用户名
+    password: "password"   # 数据库密码
+    name: "dbname"         # 数据库名称
+    charset: "utf8mb4"     # MySQL 字符编码，其他数据库类型无效
+    file: "vuln.db"        # SQLite 数据库文件路径（仅对 SQLite 有效）
+
+# JWT 配置
+jwt:
+  secret: "JCVUR1lIKihPMTEyM3JmZTE="      # 设置 JWT 密钥，用于签名和验证令牌
+  expires_in: 2                 # 设置 JWT 过期时间，单位：小时
+
+# 服务器配置
+server:
+  mode: "release"                # 设置运行模式，可选值: debug, release, test
+  host: ""                       # 服务器监听地址，默认监听所有地址
+  port: 8123                     # 服务器监听端口
+  read_timeout: 10               # 读取超时时间，单位：秒
+  write_timeout: 10              # 写入超时时间，单位：秒
+
+# 日志配置
+log:
+  level: "error"                  # 日志级别，可选值: silent、error、warn、info
+  file: "app.log"                # 日志文件路径
