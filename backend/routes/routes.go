@@ -25,14 +25,14 @@ func init() {
             gin.SetMode(gin.DebugMode)
     }
 	route = gin.Default()
-	fmt.Println("Welcome to VulnData")
+	fmt.Println("Welcome to XuanQiong",config.Version)
 	fmt.Println("Server running on " + config.Config.Server.Host + ":" + strconv.Itoa(config.Config.Server.Port))
 }
 
 // 前后端分离的路由
 func InitRoutes() {
-	route.POST("/login", controllers.Login)
-	route.GET("/logout", controllers.Logout)
+	route.POST("/api/v1/login", controllers.Login)
+	route.GET("/api/v1/logout", controllers.Logout)
 	route.Run(config.Config.Server.Host + ":" + strconv.Itoa(config.Config.Server.Port))
 }
 
@@ -48,9 +48,12 @@ func StartServer() {
 	route.GET("/", func(c *gin.Context) {
 		c.HTML(200, "index.html", nil)
 	})
-	route.POST("/login", controllers.Login)
-	route.GET("/logout", controllers.Logout)
-	route.GET("/test", controllers.Index)
+	route.POST("/api/v1/login", controllers.Login)
+	route.GET("/api/v1/logout", controllers.Logout)
+	route.GET("/api/v1/test", controllers.Index)
+	route.POST("/api/v1/useradd", controllers.CreateUser)
+	route.POST("/api/v1/userdel", controllers.DeleteUser)
+	route.POST("/api/v1/userstatus", controllers.SetUserStatus)
 
 	// 通配符路由
 	route.NoRoute(func(c *gin.Context) {
