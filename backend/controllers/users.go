@@ -46,10 +46,12 @@ func Logout(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
 	if currentUser != nil {
-		err := models.CleanToken(token)
+		err := models.CleanToken(currentUser.Username)
 		if err == nil {
 			c.JSON(200, gin.H{"已退出": "显示未登录页面"})
 			return
+		} else {
+			c.JSON(200, gin.H{"error": err})
 		}
 	}
     c.JSON(200, gin.H{"未登录": "显示未登录页面"})
@@ -69,8 +71,45 @@ func CreateUser(c *gin.Context) {
 			c.JSON(400, gin.H{"error": "Invalid input"})
 			return
 		}
+		err := models.CreateUser(logindata.Username, logindata.Password, 0)
+		if err == nil {
+			c.JSON(200, gin.H{"Successful": "创建用户成功"})
+			return
+		} else {
+			c.JSON(200, gin.H{"error": err})
+		}
 	}
-	//c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+	c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+}
+
+// 删除用户
+func DeleteUser(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	currentUser := models.GetUserByToken(token)
+	if currentUser != nil {
+		if currentUser.Role != 1 {
+			c.JSON(200, gin.H{"error": "Permission denied"})
+			return
+		}
+		// 删除用户
+		// models.DeleteUser(username)
+	}
+	c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+}
+
+// 启用或禁用用户
+func SetUserStatus(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+	currentUser := models.GetUserByToken(token)
+	if currentUser != nil {
+		if currentUser.Role != 1 {
+			c.JSON(200, gin.H{"error": "Permission denied"})
+			return
+		}
+		// 设置状态
+		// models.SetUserStatus(username, status)
+	}
+	c.JSON(200, gin.H{"未登录": "显示未登录页面"})
 }
 
 func Index(c *gin.Context) {
@@ -78,6 +117,7 @@ func Index(c *gin.Context) {
 	currentUser := models.GetUserByToken(token)
 	if currentUser != nil {
 		c.JSON(200, gin.H{"message": currentUser})
+		return
 	}
 	c.JSON(200, gin.H{"message": "未登录"})
 }
