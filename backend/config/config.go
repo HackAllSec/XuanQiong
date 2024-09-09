@@ -9,6 +9,7 @@ import (
 
 var (
 	Config ConfigStruct
+	Version = "v1.0.0"
 )
 
 // ConfigStruct 结构体定义
