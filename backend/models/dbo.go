@@ -33,7 +33,6 @@ func init() {
     gormLogger := logger.New(
         log.New(lumberjackLogger, "\r\n", log.LstdFlags),
         logger.Config{
-            LogLevel: logger.Info,
             IgnoreRecordNotFoundError: true,  // 忽略记录未找到错误
         },
     )
@@ -45,6 +44,8 @@ func init() {
             gormLogger = gormLogger.LogMode(logger.Error)
         case "warn":
             gormLogger = gormLogger.LogMode(logger.Warn)
+        case "info":
+            gormLogger = gormLogger.LogMode(logger.Info)
     }
     dsn := generateDSN(config.Config)
     var err error
@@ -65,7 +66,7 @@ func init() {
         log.Fatalf("Error opening database: %v", err)
     }
 
-    err = db.Where("username = ?", "admin").First(&user).Error
+    err = db.Raw("SELECT * FROM users WHERE username = ?", "admin").Scan(&user).Error
     if err != nil {
         log.Println("Initializing Database...")
         db.AutoMigrate(&types.User{}, &types.Vulnerability{}, &types.Lockip{})
