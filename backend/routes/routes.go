@@ -25,14 +25,14 @@ func init() {
     }
     route = gin.Default()
     fmt.Println("Welcome to XuanQiong",config.Version)
-    fmt.Println("Server running on " + config.Config.Server.Host + ":" + strconv.Itoa(config.Config.Server.Port))
+    fmt.Println("Server running on " + config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
 }
 
 // 前后端分离的路由
 func InitRoutes() {
     route.POST("/api/v1/login", controllers.Login)
     route.GET("/api/v1/logout", controllers.Logout)
-    route.Run(config.Config.Server.Host + ":" + strconv.Itoa(config.Config.Server.Port))
+    route.Run(config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
 }
 
 // 前后端不分离的路由
@@ -50,9 +50,11 @@ func StartServer() {
     route.POST("/api/v1/login", controllers.Login)
     route.GET("/api/v1/logout", controllers.Logout)
     route.GET("/api/v1/test", controllers.Index)
-    route.POST("/api/v1/useradd", controllers.CreateUser)
-    route.POST("/api/v1/userdel", controllers.DeleteUser)
+    route.POST("/api/v1/adduser", controllers.CreateUser)
+    route.POST("/api/v1/deluser", controllers.DeleteUser)
     route.POST("/api/v1/userstatus", controllers.SetUserStatus)
+    route.GET("/api/v1/getusers", controllers.GetUsers)
+    route.POST("/api/v1/updateuser", controllers.UpdateUser)
 
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {
@@ -64,5 +66,5 @@ func StartServer() {
             c.HTML(404, "404.html", nil)
         }
     })
-    route.Run(config.Config.Server.Host + ":" + strconv.Itoa(config.Config.Server.Port))
+    route.Run(config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
 }
