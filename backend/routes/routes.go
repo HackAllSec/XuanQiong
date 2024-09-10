@@ -49,12 +49,12 @@ func StartServer() {
     })
     route.POST("/api/v1/login", controllers.Login)
     route.GET("/api/v1/logout", controllers.Logout)
-    route.GET("/api/v1/test", controllers.Index)
     route.POST("/api/v1/adduser", controllers.CreateUser)
     route.POST("/api/v1/deluser", controllers.DeleteUser)
     route.POST("/api/v1/userstatus", controllers.SetUserStatus)
     route.GET("/api/v1/getusers", controllers.GetUsers)
     route.POST("/api/v1/updateuser", controllers.UpdateUser)
+    route.GET("/api/v1/getvulnabs", controllers.GetVulnAbstract)
 
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {
