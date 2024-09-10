@@ -25,7 +25,7 @@ func GenerateRandomPassword(length int) (string, error) {
 }
 
 func GenJWTToken(username string, role int) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+    token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "username": username,
         "role":     role,
         "exp":      time.Now().Add(time.Hour * time.Duration(config.Config.JWT.ExpiresIn)).Unix(),
