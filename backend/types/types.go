@@ -14,7 +14,7 @@ type User struct {
     Role       int
     CreateTime time.Time
     Status     int
-    Token      string    `gorm:"unique"`
+    Token      string
 }
 
 // Vulnerability 漏洞表
