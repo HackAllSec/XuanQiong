@@ -11,7 +11,7 @@ import (
 )
 
 // generateRandomPassword 生成包含特殊字符的随机密码
-func GenerateRandomPassword(length int) (string, error) {
+func GenerateRandomPassword(length int64) (string, error) {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/"
     password := make([]byte, length)
     _, err := rand.Read(password)
@@ -24,7 +24,7 @@ func GenerateRandomPassword(length int) (string, error) {
     return string(password), nil
 }
 
-func GenJWTToken(username string, role int) (string, error) {
+func GenJWTToken(username string, role int64) (string, error) {
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "username": username,
         "role":     role,
