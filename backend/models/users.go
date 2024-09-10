@@ -67,7 +67,7 @@ func GetUserByToken(token string) *types.User {
 }
 
 // 锁定IP地址
-func LockIP(ip string, duration int) {
+func LockIP(ip string, duration int64) {
     var lockip types.Lockip
     db.Raw("SELECT * FROM lockips WHERE client_ip = ?", ip).Scan(&lockip)
     lockoutUntil := time.Now().Add(time.Duration(duration) * time.Minute)
@@ -90,7 +90,7 @@ func CleanToken(username string) error {
 }
 
 // 创建用户
-func CreateUser(username string, password string, role int) error {
+func CreateUser(username string, password string, role int64) error {
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         passwdHash := utils.GenPasswordHash(password)
@@ -118,12 +118,44 @@ func DeleteUser(username string) error {
     return nil
 }
 
-// 启用或禁用用户
-func SetUserStatus(username string, status int) error {
+// 修改用户信息
+func UpdateUser(username string, password string, role int64, status int64) error {
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return fmt.Errorf("User %s not found.", username)
     }
-    db.Model(&user).Update("status", status)
+    updates := make(map[string]interface{})
+    if password != "" {
+        password = utils.GenPasswordHash(password)
+        updates["password"] = password
+    }
+    if role != -1 {
+        updates["role"] = role
+    }
+    if status != -1 {
+        updates["status"] = status
+    }
+    db.Model(&user).Where("username = ?", username).Updates(updates)
     return nil
+}
+
+// 启用或禁用用户
+func SetUserStatus(username string) error {
+    res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
+    if res == 0 {
+        return fmt.Errorf("User %s not found.", username)
+    }
+    if user.Status == 0 {
+        db.Model(&user).Update("status", 1)
+    } else {
+        db.Model(&user).Update("status", 0)
+    }
+    return nil
+}
+
+// 获取所有用户
+func GetUsers() ([]types.User) {
+    var users []types.User
+    db.Select("id, username, role, create_time, status").Find(&users)
+    return users
 }
