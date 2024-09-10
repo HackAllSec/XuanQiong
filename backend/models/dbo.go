@@ -4,7 +4,7 @@ import (
     "fmt"
     "log"
 
-	"github.com/natefinch/lumberjack"
+    "github.com/natefinch/lumberjack"
     "gorm.io/gorm"
     "gorm.io/gorm/logger"
     "gorm.io/driver/mysql"
@@ -19,11 +19,11 @@ import (
 )
 
 var (
-	db *gorm.DB
+    db *gorm.DB
 )
 
 func init() {
-	lumberjackLogger := &lumberjack.Logger{
+    lumberjackLogger := &lumberjack.Logger{
         Filename:   config.Config.Log.File,
         MaxSize:    10, // megabytes
         MaxBackups: 7,  // number of old log files to retain
