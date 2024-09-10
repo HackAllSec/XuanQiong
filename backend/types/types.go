@@ -1,19 +1,19 @@
 package types
 
 import (
-	"time"
+    "time"
 
-	"github.com/dgrijalva/jwt-go"
+    "github.com/dgrijalva/jwt-go"
 )
 
 // User 用户表
 type User struct {
-    ID         uint      `gorm:"primaryKey"`
-    Username   string    `gorm:"unique"`
+    ID         uint64      `gorm:"primaryKey"`
+    Username   string      `gorm:"unique"`
     Password   string
-    Role       int
+    Role       int64
     CreateTime time.Time
-    Status     int
+    Status     int64
     Token      string
 }
 
@@ -38,18 +38,18 @@ type Vulnerability struct {
 
 // Lockip 锁定IP表
 type Lockip struct {
-    ID         uint    `gorm:"primaryKey"`
+    ID         uint64    `gorm:"primaryKey"`
     ClientIP   string
     LockoutUntil  *time.Time
 }
 
 type Jwt struct {
-	Role       uint `json:"role"`
-	Username string `json:"username"`
-	jwt.StandardClaims
+    Role       uint64    `json:"role"`
+    Username   string    `json:"username"`
+    jwt.StandardClaims
 }
 
 type LoginData struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+    Username string    `json:"username"`
+    Password string    `json:"password"`
 }
