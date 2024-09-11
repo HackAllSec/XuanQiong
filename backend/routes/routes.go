@@ -55,6 +55,10 @@ func StartServer() {
     route.GET("/api/v1/getusers", controllers.GetUsers)
     route.POST("/api/v1/updateuser", controllers.UpdateUser)
     route.GET("/api/v1/getvulnabs", controllers.GetVulnAbstract)
+    route.GET("/api/v1/getvulndtl", controllers.GetVulnDetail)
+    route.POST("/api/v1/addvuln", controllers.AddVuln)
+    route.GET("/api/v1/search", controllers.SearchVuln)
+    route.POST("/api/v1/advsearch", controllers.SearchVulnAdv)
 
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {
