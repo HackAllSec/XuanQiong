@@ -23,3 +23,8 @@ XuanQiong/
 │   ├── index.html
 └── README.md            # 项目说明文件
 ```
+
+## 技术栈
+
+- Gin
+- GORM
