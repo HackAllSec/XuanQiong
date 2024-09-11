@@ -7,7 +7,6 @@ import (
     "golang.org/x/crypto/bcrypt"
 
     "xuanqiong/config"
-    "xuanqiong/types"
 )
 
 // generateRandomPassword 生成包含特殊字符的随机密码
@@ -24,10 +23,9 @@ func GenerateRandomPassword(length int64) (string, error) {
     return string(password), nil
 }
 
-func GenJWTToken(username string, role int64) (string, error) {
+func GenJWTToken(username string) (string, error) {
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "username": username,
-        "role":     role,
         "exp":      time.Now().Add(time.Hour * time.Duration(config.Config.JWT.ExpiresIn)).Unix(),
     })
     return token.SignedString([]byte(config.Config.JWT.Secret))
@@ -48,15 +46,15 @@ func IsHashEqual(hash string, passwd string) bool {
     return true
 }
 
-func DecryptJWTToken(tokenString string) (*types.Jwt, error) {
-    var claims types.Jwt
+func DecryptJWTToken(tokenString string) (*jwt.StandardClaims, error) {
+    var claims jwt.StandardClaims
     token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
         return []byte(config.Config.JWT.Secret), nil
     })
     if err != nil {
         return nil, err
     }
-    if claims, ok := token.Claims.(*types.Jwt); ok && token.Valid {
+    if claims, ok := token.Claims.(*jwt.StandardClaims); ok && token.Valid {
         return claims, nil
     }
     return nil, err
