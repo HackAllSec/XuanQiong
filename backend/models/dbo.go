@@ -47,6 +47,7 @@ func init() {
     }
     dsn := generateDSN(config.Config)
     var err error
+    var user types.User
     switch config.Config.Database.Type {
     case "mysql":
         db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: gormLogger})
