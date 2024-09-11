@@ -19,21 +19,21 @@ type User struct {
 
 // Vulnerability 漏洞表
 type Vulnerability struct {
-    ID             string    `gorm:"primaryKey"`
-    CVE            string
-    CNNVD          string
-    CNVD           string
-    VulnName       string
-    VulnType       string
-    VulnLevel      string
-    Description    string
-    AffectedProduct string
-    Poc            string
-    Exp            string
-    RepairSuggestion string
-    Submit         string
-    CreateTime     time.Time
-    UpdateTime     time.Time
+    ID             string    `gorm:"primaryKey" json:"id"`
+    CVE            string    `json:"cve"`
+    CNNVD          string    `json:"cnnvd"`
+    CNVD           string    `json:"cnvd"`
+    VulnName       string    `json:"vuln_name"`
+    VulnType       string    `json:"vuln_type"`
+    VulnLevel      string    `json:"vuln_level"`
+    Description    string    `json:"description"`
+    AffectedProduct string   `json:"affected_product"`
+    Poc            string    `json:"poc"`
+    Exp            string    `json:"exp"`
+    RepairSuggestion string  `json:"repair_suggestion"`
+    Submit         string    `json:"submit"`
+    CreateTime     time.Time `json:"create_time"`
+    UpdateTime     time.Time `json:"update_time"`
 }
 
 // Lockip 锁定IP表
