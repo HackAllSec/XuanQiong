@@ -198,13 +198,3 @@ func UpdateUser(c *gin.Context) {
     }
     c.JSON(200, gin.H{"message": "未登录"})
 }
-
-func Index(c *gin.Context) {
-    token := c.Request.Header.Get("Authorization")
-    currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        c.JSON(200, gin.H{"message": currentUser})
-        return
-    }
-    c.JSON(200, gin.H{"message": "未登录"})
-}
