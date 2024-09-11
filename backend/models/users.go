@@ -9,10 +9,6 @@ import (
     "xuanqiong/utils"
 )
 
-var (
-    user types.User
-)
-
 // 检查IP是否被锁定
 func IsLocked(ip string) bool {
     var lockip types.Lockip
@@ -26,6 +22,7 @@ func IsLocked(ip string) bool {
 
 // 检查登录凭据
 func CheckLogin(username string, password string) *types.User {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return nil
@@ -43,6 +40,7 @@ func CheckLogin(username string, password string) *types.User {
 
 // 根据用户名获取用户信息
 func GetUserByUsername(username string) *types.User {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return nil
@@ -52,6 +50,7 @@ func GetUserByUsername(username string) *types.User {
 
 // 根据token获取用户信息
 func GetUserByToken(token string) *types.User {
+    var user types.User
     if token != "" {
         token = strings.TrimPrefix(token, "Bearer ")
         res := db.Raw("SELECT * FROM users WHERE token = ?", token).Scan(&user).RowsAffected
@@ -78,6 +77,7 @@ func LockIP(ip string, duration int64) {
 
 // 清除token
 func CleanToken(username string) error {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return nil
@@ -91,6 +91,7 @@ func CleanToken(username string) error {
 
 // 创建用户
 func CreateUser(username string, password string, role int64) error {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         passwdHash := utils.GenPasswordHash(password)
@@ -110,6 +111,7 @@ func CreateUser(username string, password string, role int64) error {
 
 // 删除用户
 func DeleteUser(username string) error {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return fmt.Errorf("User %s not found.", username)
@@ -120,6 +122,7 @@ func DeleteUser(username string) error {
 
 // 修改用户信息
 func UpdateUser(username string, password string, role int64, status int64) error {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return fmt.Errorf("User %s not found.", username)
@@ -139,8 +142,16 @@ func UpdateUser(username string, password string, role int64, status int64) erro
     return nil
 }
 
+// 获取所有用户
+func GetUsers() ([]types.User) {
+    var users []types.User
+    db.Select("id, username, role, create_time, status").Find(&users)
+    return users
+}
+
 // 启用或禁用用户
 func SetUserStatus(username string) error {
+    var user types.User
     res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
         return fmt.Errorf("User %s not found.", username)
@@ -151,11 +162,4 @@ func SetUserStatus(username string) error {
         db.Model(&user).Update("status", 0)
     }
     return nil
-}
-
-// 获取所有用户
-func GetUsers() ([]types.User) {
-    var users []types.User
-    db.Select("id, username, role, create_time, status").Find(&users)
-    return users
 }
