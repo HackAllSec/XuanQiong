@@ -31,7 +31,7 @@ func CheckLogin(username string, password string) *types.User {
         return nil
     }
     if utils.IsHashEqual(user.Password, password) {
-        token, _ := utils.GenJWTToken(user.Username, user.Role)
+        token, _ := utils.GenJWTToken(user.Username)
         db.Model(&user).Update("token", token)
         return &user
     }
