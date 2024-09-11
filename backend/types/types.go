@@ -78,12 +78,6 @@ type Lockip struct {
     LockoutUntil  *time.Time
 }
 
-type Jwt struct {
-    Role       uint64    `json:"role"`
-    Username   string    `json:"username"`
-    jwt.StandardClaims
-}
-
 type LoginData struct {
     Username string    `json:"username"`
     Password string    `json:"password"`
