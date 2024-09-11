@@ -28,3 +28,4 @@ XuanQiong/
 
 - Gin
 - GORM
+- JWT
