@@ -2,8 +2,6 @@ package types
 
 import (
     "time"
-
-    "github.com/dgrijalva/jwt-go"
 )
 
 // Config 结构体定义
