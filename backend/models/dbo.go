@@ -84,7 +84,7 @@ func init() {
 }
 
 // generateDSN 根据配置生成 DSN
-func generateDSN(config config.ConfigStruct) string {
+func generateDSN(config types.Config) string {
     switch config.Database.Type {
     case "mysql":
         return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=%s&parseTime=True&loc=Local",
