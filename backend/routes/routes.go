@@ -2,7 +2,7 @@ package routes
 
 import (
     "fmt"
-    "strings"
+    "os"
     "strconv"
 
     "github.com/gin-gonic/gin"
@@ -38,10 +38,10 @@ func InitRoutes() {
 // 前后端不分离的路由
 func StartServer() {
     // 前端静态文件
-    route.Static("/assets", "../frontend/assets")
+    route.Static(config.StaticUrl, config.FrontendPath + config.StaticUrl)
 
     // 设置前端模板文件的路由
-    route.LoadHTMLGlob("../frontend/*.html")
+    route.LoadHTMLGlob(config.TemplateFile)
 
     // 定义路由
     route.GET("/", func(c *gin.Context) {
@@ -63,12 +63,12 @@ func StartServer() {
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {
         path := c.Request.URL.Path
-        // 检查路径是否以 .html 结尾
-        if strings.HasSuffix(path, ".html") {
-            c.HTML(200, path[1:], nil)
-        } else {
-            c.HTML(404, "404.html", nil)
+        if fileInfo, err := os.Stat(config.FrontendPath + path); err == nil {
+            if !fileInfo.IsDir() {
+                c.File(config.FrontendPath + path)
+            }
         }
+        c.HTML(404, "404.html", nil)
     })
     route.Run(config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
 }
