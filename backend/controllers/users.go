@@ -17,26 +17,26 @@ var (
 // 登录
 func Login(c *gin.Context) {
     if models.IsLocked(c.ClientIP()) {
-        c.JSON(429, gin.H{"error": "Too many login attempts. Please try again later."})
+        c.JSON(200, gin.H{"msg": "Too many login attempts. Please try again later."})
         return
     }
     var logindata types.LoginData
     if err := c.ShouldBindJSON(&logindata); err != nil {
-        c.JSON(400, gin.H{"error": "Invalid input"})
+        c.JSON(400, gin.H{"msg": "Invalid input"})
         return
     }
     loginUser := models.CheckLogin(logindata.Username, logindata.Password)
     if loginUser != nil {
-        c.JSON(200, gin.H{"msg":"Login Successful", "Username":loginUser.Username, "token": loginUser.Token})
+        c.JSON(200, gin.H{"msg":"Login Successful", "username":loginUser.Username, "token": loginUser.Token})
     } else {
         maxAttempts--
         if maxAttempts == 0 {
             models.LockIP(c.ClientIP(), cfg.Login.LockoutDuration)
-            c.JSON(429, gin.H{"error": "Too many login attempts. Please try again later."})
+            c.JSON(200, gin.H{"msg": "Too many login attempts. Please try again later."})
             maxAttempts = cfg.Login.MaxAttempts
             return
         }
-        c.JSON(401, gin.H{"error": "Invalid username or password, you can try " + strconv.FormatInt(maxAttempts, 10) + " times."})
+        c.JSON(200, gin.H{"msg": "Invalid username or password, you can try " + strconv.FormatInt(maxAttempts, 10) + " times."})
         return
     }
 }
@@ -48,13 +48,12 @@ func Logout(c *gin.Context) {
     if currentUser != nil {
         err := models.CleanToken(currentUser.Username)
         if err == nil {
-            c.JSON(200, gin.H{"已退出": "显示未登录页面"})
+            c.JSON(200, gin.H{"msg": "The user has logged out."})
             return
         } else {
-            c.JSON(200, gin.H{"error": err})
+            c.JSON(200, gin.H{"msg": err})
         }
     }
-    c.JSON(200, gin.H{"未登录": "显示未登录页面"})
 }
 
 // 创建用户
@@ -63,24 +62,24 @@ func CreateUser(c *gin.Context) {
     currentUser := models.GetUserByToken(token)
     if currentUser != nil {
         if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"error": "Permission denied"})
+            c.JSON(200, gin.H{"msg": "Permission denied"})
             return
         }
         var logindata types.LoginData
         if err := c.ShouldBindJSON(&logindata); err != nil {
-            c.JSON(400, gin.H{"error": "Invalid input"})
+            c.JSON(400, gin.H{"msg": "Invalid input"})
             return
         }
         err := models.CreateUser(logindata.Username, logindata.Password, 0)
         if err == nil {
-            c.JSON(200, gin.H{"Successful": "创建用户成功"})
+            c.JSON(200, gin.H{"msg": "User created successfully."})
             return
         } else {
-            c.JSON(200, gin.H{"error": err.Error()})
+            c.JSON(200, gin.H{"msg": err.Error()})
             return
         }
     }
-    c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+    c.JSON(302, gin.H{"msg": "显示登录页面"})
 }
 
 // 删除用户
@@ -89,28 +88,28 @@ func DeleteUser(c *gin.Context) {
     currentUser := models.GetUserByToken(token)
     if currentUser != nil {
         if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"error": "Permission denied"})
+            c.JSON(200, gin.H{"msg": "Permission denied"})
             return
         }
         var data map[string]interface{}
         if err := c.ShouldBindJSON(&data); err != nil {
-            c.JSON(200, gin.H{"error": "Invalid input"})
+            c.JSON(400, gin.H{"msg": "Invalid input"})
             return
         }
         username, ok := data["username"].(string)
         if !ok {
-            c.JSON(200, gin.H{"error": "Invalid input"})
+            c.JSON(400, gin.H{"msg": "Invalid input"})
             return
         }
         err := models.DeleteUser(username)
         if err != nil {
-            c.JSON(200, gin.H{"error": err.Error()})
+            c.JSON(200, gin.H{"msg": err.Error()})
             return
         }
-        c.JSON(200, gin.H{"message": "删除用户" + username + "成功"})
+        c.JSON(200, gin.H{"msg": "删除用户" + username + "成功"})
         return
     }
-    c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+    c.JSON(200, gin.H{"msg": "显示未登录页面"})
 }
 
 // 启用或禁用用户
