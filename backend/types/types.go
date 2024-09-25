@@ -23,11 +23,15 @@ type Config struct {
         ExpiresIn  int64 `yaml:"expires_in"`
     } `yaml:"jwt"`
     Server struct {
-        Mode          string `yaml:"mode"`
-        Host          string `yaml:"host"`
-        Port          int64 `yaml:"port"`
-        ReadTimeout   int64 `yaml:"read_timeout"`
-        WriteTimeout  int64 `yaml:"write_timeout"`
+        Mode           string `yaml:"mode"`
+        Host           string `yaml:"host"`
+        Port           int64 `yaml:"port"`
+        ReadTimeout    int64 `yaml:"read_timeout"`
+        WriteTimeout   int64 `yaml:"write_timeout"`
+        FrontendPath   string `yaml:"frontend_path"`
+        StaticUrl      string `yaml:"static_url"`
+        AdminPath      string `yaml:"admin_path"`
+        AdminStaticUrl string `yaml:"admin_static_url"`
     } `yaml:"server"`
     Log struct {
         Level string `yaml:"level"`
