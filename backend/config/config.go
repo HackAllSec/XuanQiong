@@ -12,12 +12,7 @@ var (
     configFile = "config.yaml"
     Config types.Config
     Version = "v1.0.0"
-    FrontendPath = "../frontend/dist"
-    StaticUrl = "/assets"
-    TemplateFile = FrontendPath + "/*.html"
 )
-
-
 
 func init() {
     data, err := os.ReadFile(configFile)
