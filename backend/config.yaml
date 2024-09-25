@@ -23,13 +23,17 @@ jwt:
 
 # 服务器配置
 server:
-  mode: "release"                # 设置运行模式，可选值: debug, release, test
-  host: ""                       # 服务器监听地址，默认监听所有地址
-  port: 8123                     # 服务器监听端口
-  read_timeout: 10               # 读取超时时间，单位：秒
-  write_timeout: 10              # 写入超时时间，单位：秒
+  mode: "release"                     # 设置运行模式，可选值: debug, release, test
+  host: ""                            # 服务器监听地址，默认监听所有地址
+  port: 8123                          # 服务器监听端口
+  read_timeout: 10                    # 读取超时时间，单位：秒
+  write_timeout: 10                   # 写入超时时间，单位：秒
+  frontend_path: "../frontend/dist"   # 前端用户界面静态资源物理路径，存放html和css等资源的路径
+  static_url: "/assets"               # 前端静态资源访问路径，同存放css、js文件的目录一致，如物理路径frontend/dist/assets，通过URL：/assets/xxx.js访问
+  admin_path: "../admin/dist"         # 后台管理页面静态资源物理路径
+  admin_static_url: "/static"         # 后台静态资源访问路径
 
 # 日志配置
 log:
-  level: "error"                  # 日志级别，可选值: silent、error、warn、info
-  file: "error.log"               # 日志文件路径
+  level: "error"                  # gorm sql日志级别，可选值: silent、error、warn、info
+  file: "error.log"               # gorm sql错误日志文件路径
