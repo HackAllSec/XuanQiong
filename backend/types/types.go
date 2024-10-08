@@ -51,6 +51,7 @@ type User struct {
     Avatar     string
     Email      string
     Phone      string
+    Ranking    int64
     Role       int64
     CreateTime time.Time
     UpdateTime time.Time
