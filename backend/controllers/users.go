@@ -27,7 +27,7 @@ func Login(c *gin.Context) {
     }
     loginUser := models.CheckLogin(logindata.Username, logindata.Password)
     if loginUser != nil {
-        c.JSON(200, gin.H{"msg":"Login Successful", "username":loginUser.Username, "token": loginUser.Token})
+        c.JSON(200, gin.H{"msg":"Login Successful", "username":loginUser.Username, "avatar":loginUser.Avatar, "token": loginUser.Token})
     } else {
         maxAttempts--
         if maxAttempts == 0 {
