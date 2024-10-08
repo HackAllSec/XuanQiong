@@ -65,8 +65,8 @@ func init() {
         log.Fatalf("Error opening database: %v", err)
     }
 
-    err = db.Raw("SELECT * FROM users WHERE username = ?", "admin").Scan(&user).Error
-    if err != nil {
+    res := db.Raw("SELECT * FROM users WHERE username = ?", "admin").Scan(&user)
+    if res.Error != nil {
         log.Println("Initializing Database...")
         db.AutoMigrate(&types.User{}, &types.Vulnerability{}, &types.Lockip{})
         password, err := utils.GenerateRandomPassword(12)
@@ -79,6 +79,19 @@ func init() {
             log.Println("Successfully created administrator account:")
             log.Println("Username: admin")
             log.Println("Password:", password)
+        }
+    } else {
+        if res.RowsAffected == 0 {
+            password, err := utils.GenerateRandomPassword(12)
+            if err != nil {
+                log.Fatalf("Error generating password: %v", err)
+            }
+            err = CreateUser("admin", password, 1)
+            if err == nil {
+                log.Println("Successfully created administrator account:")
+                log.Println("Username: admin")
+                log.Println("Password:", password)
+            }
         }
     }
 }
