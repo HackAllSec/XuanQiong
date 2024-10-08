@@ -48,8 +48,12 @@ type User struct {
     ID         uint64      `gorm:"primaryKey"`
     Username   string      `gorm:"unique"`
     Password   string
+    Avatar     string
+    Email      string
+    Phone      string
     Role       int64
     CreateTime time.Time
+    UpdateTime time.Time
     Status     int64
     Token      string
 }
@@ -57,6 +61,7 @@ type User struct {
 // Vulnerability 漏洞表
 type Vulnerability struct {
     ID             string    `gorm:"primaryKey" json:"id"`
+    UserID         uint64    `json:"user_id"`
     CVE            string    `json:"cve"`
     CNNVD          string    `json:"cnnvd"`
     CNVD           string    `json:"cnvd"`
