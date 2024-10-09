@@ -84,46 +84,65 @@ func checkVulnData(vuln types.Vulnerability) error {
 
 // 生成VDBID
 func getVdbid() string {
-    var hvbid string
+    var hvdid string
     var vulnerabilities types.Vulnerability
     currentYear := int64(time.Now().Year())
     result := db.Order("id desc").Last(&vulnerabilities)
     if result.RowsAffected == 0 {
-        hvbid = fmt.Sprintf("HVB-%d-%04d", currentYear, 1)
-        return hvbid
+        hvdid = fmt.Sprintf("HVD-%d-%04d", currentYear, 1)
+        return hvdid
     }
     parts := strings.Split(vulnerabilities.ID, "-")
     if len(parts) != 3 {
-        hvbid = fmt.Sprintf("HVB-%d-%04d", currentYear, 1)
-        return hvbid
+        hvdid = fmt.Sprintf("HVD-%d-%04d", currentYear, 1)
+        return hvdid
     }
 
     year, err := strconv.ParseInt(parts[1], 10, 64)
     if err != nil {
-        hvbid = fmt.Sprintf("HVB-%d-%04d", currentYear, 1)
-        return hvbid
+        hvdid = fmt.Sprintf("HVD-%d-%04d", currentYear, 1)
+        return hvdid
     }
     sequence, err := strconv.ParseInt(parts[2], 10, 64)
     if err != nil {
-        hvbid = fmt.Sprintf("HVB-%d-%04d", currentYear, 1)
-        return hvbid
+        hvdid = fmt.Sprintf("HVD-%d-%04d", currentYear, 1)
+        return hvdid
     }
     if year == currentYear {
-        hvbid = fmt.Sprintf("HVB-%d-%04d", currentYear, sequence + 1)
+        hvdid = fmt.Sprintf("HVD-%d-%04d", currentYear, sequence + 1)
     } else {
-        hvbid = fmt.Sprintf("HVB-%d-%04d", currentYear, 1)
+        hvdid = fmt.Sprintf("HVD-%d-%04d", currentYear, 1)
     }
-    return hvbid
+    return hvdid
 }
 
 // 插入漏洞信息
 func InsertVuln(vuln types.Vulnerability) (*types.Vulnerability, error) {
+    var vulnerability types.Vulnerability
     err := checkVulnData(vuln)
     if err != nil {
         return nil, err
     }
-    hvbid := getVdbid()
-    vuln.ID = hvbid
+    if vuln.CVE != "" {
+        result := db.Where("cve = ?", vuln.CVE).First(&vulnerability)
+        if result.RowsAffected != 0 {
+            return nil, fmt.Errorf("漏洞已存在")
+        }
+    }
+    if vuln.CNNVD != "" {
+        result := db.Where("cnnvd = ?", vuln.CNNVD).First(&vulnerability)
+        if result.RowsAffected != 0 {
+            return nil, fmt.Errorf("漏洞已存在")
+        }
+    }
+    if vuln.CNVD != "" {
+        result := db.Where("cnvd = ?", vuln.CNVD).First(&vulnerability)
+        if result.RowsAffected != 0 {
+            return nil, fmt.Errorf("漏洞已存在")
+        }
+    }
+    hvdid := getVdbid()
+    vuln.ID = hvdid
     vuln.CreateTime = time.Now()
     err = db.Create(&vuln).Error
     if err != nil {
