@@ -9,18 +9,34 @@ import (
 )
 
 // 获取漏洞信息
-func GetVulnAbstract() ([]types.Vulnerability, int64, int64, int64) {
+func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, int64, int64, []types.Vulnerability) {
     var vulnDatas []types.Vulnerability
     var totalCount int64
     var pocCount int64
     var expCount int64
+    var affectedProductCount int64
+    var weeklyCount int64
+    var weeklyPocCount int64
+    var weeklyExpCount int64
+    var weeklyAffectedProductCount int64
     db.Model(&vulnDatas).Count(&totalCount)
     db.Raw("SELECT COUNT(*) FROM vulnerabilities WHERE poc <> ''").Scan(&pocCount)
     db.Raw("SELECT COUNT(*) FROM vulnerabilities WHERE exp <> ''").Scan(&expCount)
-    db.Select("id, vuln_name, vuln_type, vuln_level, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
-    Order("create_time DESC").
-    Limit(20).Find(&vulnDatas)
-    return vulnDatas, totalCount, pocCount, expCount
+    db.Model(&vulnDatas).Where("affected_product <> ''").Count(&affectedProductCount)
+    thisWeek := time.Now().UTC().Truncate(24 * 7 * time.Hour)
+    db.Model(&vulnDatas).Where("create_time >= ?", thisWeek).Count(&weeklyCount)
+    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE poc <> ''").Scan(&weeklyPocCount)
+    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE exp <> ''").Scan(&weeklyExpCount)
+    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE affected_product <> ''").Scan(&weeklyAffectedProductCount)
+    if islogin {
+        db.Select("id, vuln_name, vuln_type, vuln_level, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+        Order("create_time DESC").Find(&vulnDatas)
+    } else {
+        db.Select("id, vuln_name, vuln_type, vuln_level, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+        Order("create_time DESC").
+        Limit(10).Find(&vulnDatas)
+    }
+    return totalCount, pocCount, expCount, affectedProductCount, weeklyCount, weeklyPocCount, weeklyExpCount,weeklyAffectedProductCount, vulnDatas
 }
 
 // 获取漏洞详情，未登录时，返回不包含poc和exp
