@@ -8,8 +8,21 @@ import (
 
 // 获取漏洞摘要，无需登录
 func GetVulnAbstract(c *gin.Context) {
-    res, total, hasPoc, hasExp := models.GetVulnAbstract()
-    c.JSON(200, gin.H{"total": total, "hasPoc": hasPoc, "hasExp": hasExp, "data": res})
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil{
+        total, hasPoc, hasExp, affectedProduct, weeklyAdditionsVuln, weeklyAdditionsPoc, weeklyAdditionsExp, weeklyAdditionsProduct, res := models.GetVulnAbstract(true)
+        c.JSON(200, gin.H{"total": total, "hasPoc": hasPoc, "hasExp": hasExp,
+        "affectedProduct": affectedProduct, "weeklyAdditionsVuln": weeklyAdditionsVuln,
+        "weeklyAdditionsPoc": weeklyAdditionsPoc, "weeklyAdditionsExp": weeklyAdditionsExp,
+        "weeklyAdditionsProduct": weeklyAdditionsProduct, "data": res})
+    } else {
+        total, hasPoc, hasExp, affectedProduct, weeklyAdditionsVuln, weeklyAdditionsPoc, weeklyAdditionsExp, weeklyAdditionsProduct, res := models.GetVulnAbstract(false)
+        c.JSON(200, gin.H{"total": total, "hasPoc": hasPoc, "hasExp": hasExp,
+        "affectedProduct": affectedProduct, "weeklyAdditionsVuln": weeklyAdditionsVuln,
+        "weeklyAdditionsPoc": weeklyAdditionsPoc, "weeklyAdditionsExp": weeklyAdditionsExp,
+        "weeklyAdditionsProduct": weeklyAdditionsProduct, "data": res})
+    }
 }
 
 // 获取漏洞详细信息，登录和未登录情况
