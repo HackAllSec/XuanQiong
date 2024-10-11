@@ -8,7 +8,7 @@ import (
     "xuanqiong/types"
 )
 
-// 获取漏洞信息
+// 获取漏洞摘要
 func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, int64, int64, []types.Vulnerability) {
     var vulnDatas []types.Vulnerability
     var totalCount int64
@@ -42,14 +42,14 @@ func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, in
 // 获取漏洞详情，未登录时，返回不包含poc和exp
 func GetVulnDetail(id string) (types.Vulnerability) {
     var vulnerabilities types.Vulnerability
-    db.Where("id = ?", id).Omit("poc, exp").First(&vulnerabilities)
+    db.Where("id = ? AND status = 1", id).Omit("poc, exp").First(&vulnerabilities)
     return vulnerabilities
 }
 
 // 获取漏洞详情，已登录时，返回漏洞全部信息
 func GetVulnDetailAuthed(id string) (types.Vulnerability) {
     var vulnerabilities types.Vulnerability
-    db.Where("id = ?", id).First(&vulnerabilities)
+    db.Where("id = ? AND status = 1", id).First(&vulnerabilities)
     return vulnerabilities
 }
 
@@ -74,6 +74,9 @@ func checkVulnData(vuln types.Vulnerability) error {
     if vuln.AffectedProduct == "" {
         return fmt.Errorf("受影响产品不能为空")
     }
+    if vuln.AffectedProductVersion == "" {
+        return fmt.Errorf("受影响产品版本不能为空")
+    }
     if vuln.RepairSuggestion == "" {
         return fmt.Errorf("修复建议不能为空")
     }
@@ -81,6 +84,18 @@ func checkVulnData(vuln types.Vulnerability) error {
     if vuln.CVE != "" {
         if parts := strings.Split(vuln.CVE, "-"); len(parts) != 3 || parts[0] != "CVE" || len(parts[1]) != 4 || len(parts[2]) < 4 {
             return fmt.Errorf("CVE格式不正确")
+        }
+    }
+    // 检查NVD格式
+    if vuln.NVD != "" {
+        if parts := strings.Split(vuln.NVD, "-"); len(parts) != 3 || parts[0] != "NVD" || len(parts[1]) != 4 || len(parts[2]) < 4 {
+            return fmt.Errorf("NVD格式不正确")
+        }
+    }
+    // 检查EDBID格式，纯数字，如：50280
+    if vuln.EDB != "" {
+        if _, err := strconv.Atoi(vuln.EDB); err != nil {
+            return fmt.Errorf("EDBID格式不正确")
         }
     }
     // 检查CNNVD格式
@@ -98,7 +113,7 @@ func checkVulnData(vuln types.Vulnerability) error {
     return nil
 }
 
-// 生成VDBID
+// 生成漏洞ID
 func getVdbid() string {
     var hvdid string
     var vulnerabilities types.Vulnerability
@@ -141,6 +156,18 @@ func InsertVuln(vuln types.Vulnerability) (*types.Vulnerability, error) {
     }
     if vuln.CVE != "" {
         result := db.Where("cve = ?", vuln.CVE).First(&vulnerability)
+        if result.RowsAffected != 0 {
+            return nil, fmt.Errorf("漏洞已存在")
+        }
+    }
+    if vuln.NVD != "" {
+        result := db.Where("nvd = ?", vuln.NVD).First(&vulnerability)
+        if result.RowsAffected != 0 {
+            return nil, fmt.Errorf("漏洞已存在")
+        }
+    }
+    if vuln.EDB != "" {
+        result := db.Where("edb = ?", vuln.EDB).First(&vulnerability)
         if result.RowsAffected != 0 {
             return nil, fmt.Errorf("漏洞已存在")
         }
