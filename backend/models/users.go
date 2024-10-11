@@ -12,7 +12,7 @@ import (
 // 检查IP是否被锁定
 func IsLocked(ip string) bool {
     var lockip types.Lockip
-    if res := db.Raw("SELECT * FROM lockips WHERE client_ip = ?", ip).Scan(&lockip).RowsAffected; res == 1 {
+    if res := db.Raw("SELECT * FROM lockips WHERE client_ip = ? AND status = 1", ip).Scan(&lockip).RowsAffected; res == 1 {
         if lockip.LockoutUntil != nil && time.Now().Before(*lockip.LockoutUntil) {
             return true
         }
@@ -71,6 +71,7 @@ func LockIP(ip string, duration int64) {
     db.Raw("SELECT * FROM lockips WHERE client_ip = ?", ip).Scan(&lockip)
     lockoutUntil := time.Now().Add(time.Duration(duration) * time.Minute)
     lockip.ClientIP = ip
+    lockip.Status = 1
     lockip.LockoutUntil = &lockoutUntil
     db.Save(&lockip)
 }
