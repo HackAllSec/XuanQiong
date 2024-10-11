@@ -61,29 +61,44 @@ type User struct {
 
 // Vulnerability 漏洞表
 type Vulnerability struct {
-    ID             string    `gorm:"primaryKey" json:"id"`
-    UserID         uint64    `json:"user_id"`
-    CVE            string    `json:"cve"`
-    CNNVD          string    `json:"cnnvd"`
-    CNVD           string    `json:"cnvd"`
-    VulnName       string    `json:"vuln_name"`
-    VulnType       string    `json:"vuln_type"`
-    VulnLevel      string    `json:"vuln_level"`
-    Description    string    `json:"description"`
-    AffectedProduct string   `json:"affected_product"`
-    Poc            string    `json:"poc"`
-    Exp            string    `json:"exp"`
-    RepairSuggestion string  `json:"repair_suggestion"`
-    Submit         string    `json:"submit"`
-    CreateTime     time.Time `json:"create_time"`
-    UpdateTime     time.Time `json:"update_time"`
+    ID                       string    `gorm:"primaryKey" json:"id"`
+    UserID                   uint64    `json:"user_id"`
+    CVE                      string    `json:"cve"`
+    NVD                      string    `json:"nvd"`
+    EDB                      string    `json:"edb"`
+    CNNVD                    string    `json:"cnnvd"`
+    CNVD                     string    `json:"cnvd"`
+    VulnName                 string    `json:"vuln_name"`
+    VulnType                 string    `json:"vuln_type"`
+    VulnLevel                string    `json:"vuln_level"`
+    Description              string    `json:"description"`
+    AffectedProduct          string    `json:"affected_product"`
+    AffectedProductVersion   string    `json:"affected_product_version"`
+    FofaQuery                string    `json:"fofa_query"`
+    ZoomEyeQuery             string    `json:"zoomeye_query"`
+    QuakeQuery               string    `json:"quake_query"`
+    HunterQuery              string    `json:"hunter_query"`
+    GoogleQuery              string    `json:"google_query"`
+    ShodanQuery              string    `json:"shodan_query"`
+    CensysQuery              string    `json:"censys_query"`
+    GreynoiseQuery           string    `json:"greynoise_query"`
+    Poc                      string    `json:"poc"`
+    Exp                      string    `json:"exp"`
+    RepairSuggestion         string    `json:"repair_suggestion"`
+    Attachment               string    `json:"attachment"`
+    Submitter                string    `json:"submitter"`
+    Status                   int64     `json:"status"`
+    CreateTime               time.Time `json:"create_time"`
+    UpdateTime               time.Time `json:"update_time"`
 }
 
 // Lockip 锁定IP表
 type Lockip struct {
-    ID         uint64    `gorm:"primaryKey"`
-    ClientIP   string
-    LockoutUntil  *time.Time
+    ID             uint64    `gorm:"primaryKey"`
+    ClientIP       string
+    Status         int64
+    CreateTime     time.Time
+    LockoutUntil   *time.Time
 }
 
 type LoginData struct {
