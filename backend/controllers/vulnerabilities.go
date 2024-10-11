@@ -36,7 +36,7 @@ func GetVulnDetail(c *gin.Context) {
         return
     }
     res := models.GetVulnDetail(id)
-    c.JSON(200, gin.H{"message": res})
+    c.JSON(200, gin.H{"data": res})
 }
 
 // 添加漏洞信息
@@ -49,13 +49,13 @@ func AddVuln(c *gin.Context) {
             c.JSON(400, gin.H{"error": "Invalid input"+err.Error()})
             return
         }
-        vulnerabilities.Submit = currentUser.Username
+        vulnerabilities.Submitter = currentUser.Username
         res, err := models.InsertVuln(vulnerabilities)
         if err != nil {
             c.JSON(200, gin.H{"error": err.Error()})
             return
         }
-        c.JSON(200, gin.H{"message": "提交成功","result": res})
+        c.JSON(200, gin.H{"data": "提交成功","result": res})
         return
     }
     c.JSON(200, gin.H{"未登录": "显示未登录页面"})
