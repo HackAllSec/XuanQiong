@@ -1,8 +1,6 @@
 package controllers
 
 import (
-    "strconv"
-
     "xuanqiong/config"
     "xuanqiong/types"
     "xuanqiong/models"
