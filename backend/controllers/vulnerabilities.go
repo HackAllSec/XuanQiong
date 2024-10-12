@@ -32,7 +32,7 @@ func GetVulnDetail(c *gin.Context) {
     currentUser := models.GetUserByToken(token)
     if currentUser != nil{
         res := models.GetVulnDetailAuthed(id)
-        c.JSON(200, gin.H{"message": res})
+        c.JSON(200, gin.H{"data": res})
         return
     }
     res := models.GetVulnDetail(id)
@@ -46,47 +46,35 @@ func AddVuln(c *gin.Context) {
     if currentUser != nil {
         var vulnerabilities types.Vulnerability
         if err := c.ShouldBindJSON(&vulnerabilities); err != nil {
-            c.JSON(400, gin.H{"error": "Invalid input"+err.Error()})
+            c.JSON(400, gin.H{"code": 0, "msg": "Invalid input"+err.Error()})
             return
         }
-        vulnerabilities.Submitter = currentUser.Username
-        res, err := models.InsertVuln(vulnerabilities)
+        vulnerabilities.UserID = currentUser.ID
+        _, err := models.InsertVuln(vulnerabilities)
         if err != nil {
-            c.JSON(200, gin.H{"error": err.Error()})
+            c.JSON(200, gin.H{"code": 0, "msg": err.Error()})
             return
         }
-        c.JSON(200, gin.H{"data": "提交成功","result": res})
+        c.JSON(200, gin.H{"code": 1, "msg": "Submit successfully"})
         return
     }
-    c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 }
 
 // 搜索漏洞
 func SearchVuln(c *gin.Context) {
-    token := c.Request.Header.Get("Authorization")
-    currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        keyword := c.Query("keyword")
-        res := models.SearchVuln(keyword)
-        c.JSON(200, gin.H{"message": res})
-        return
-    }
-    c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+    keyword := c.Query("keyword")
+    res := models.SearchVuln(keyword)
+    c.JSON(200, gin.H{"msg": res})
 }
 
 // 高级搜索
 func SearchVulnAdv(c *gin.Context) {
-    token := c.Request.Header.Get("Authorization")
-    currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        var data map[string]interface{}
-        if err := c.ShouldBindJSON(&data); err != nil {
-            c.JSON(200, gin.H{"error": "Invalid input"})
-            return
-        }
-        res := models.SearchVulnAdv(data)
-        c.JSON(200, gin.H{"message": res})
+    var data map[string]interface{}
+    if err := c.ShouldBindJSON(&data); err != nil {
+        c.JSON(200, gin.H{"code": 2, "msg": "Invalid input"})
         return
     }
-    c.JSON(200, gin.H{"未登录": "显示未登录页面"})
+    res := models.SearchVulnAdv(data)
+    c.JSON(200, gin.H{"code": 1, "msg": res})
 }
