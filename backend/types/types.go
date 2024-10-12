@@ -83,11 +83,13 @@ type Vulnerability struct {
     CensysQuery              string    `json:"censys_query"`
     GreynoiseQuery           string    `json:"greynoise_query"`
     Poc                      string    `json:"poc"`
+    PocType                  string    `json:"poc_type"`
     Exp                      string    `json:"exp"`
+    ExpType                  string    `json:"exp_type"`
     RepairSuggestion         string    `json:"repair_suggestion"`
     Attachment               string    `json:"attachment"`
     Submitter                string    `json:"submitter"`
-    Status                   int64     `json:"status"`
+    Status                   bool      `json:"status"`
     CreateTime               time.Time `json:"create_time"`
     UpdateTime               time.Time `json:"update_time"`
 }
