@@ -42,14 +42,20 @@ func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, in
 // 获取漏洞详情，未登录时，返回不包含poc和exp
 func GetVulnDetail(id string) (types.Vulnerability) {
     var vulnerabilities types.Vulnerability
-    db.Where("id = ? AND status = 1", id).Omit("poc, exp").First(&vulnerabilities)
+    var submitter types.User
+    res := db.Where("id = ? AND status = true", id).Omit("poc, exp").First(&vulnerabilities)
+    if res.RowsAffected != 0 {
+        db.Model(&submitter).Where("id = ?", vulnerabilities.UserID).First(&submitter)
+        vulnerabilities.Submitter = submitter.Username
+        return vulnerabilities
+    }
     return vulnerabilities
 }
 
 // 获取漏洞详情，已登录时，返回漏洞全部信息
 func GetVulnDetailAuthed(id string) (types.Vulnerability) {
     var vulnerabilities types.Vulnerability
-    db.Where("id = ? AND status = 1", id).First(&vulnerabilities)
+    db.Where("id = ? AND status = true", id).First(&vulnerabilities)
     return vulnerabilities
 }
 
