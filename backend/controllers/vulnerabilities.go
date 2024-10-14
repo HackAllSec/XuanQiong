@@ -25,6 +25,14 @@ func GetVulnAbstract(c *gin.Context) {
     }
 }
 
+// 分页获取漏洞列表，登录和未登录情况
+func GetVulnList(c *gin.Context) {
+    page := c.Query("page")
+    limit := c.Query("limit")
+    total, data := models.GetVulnList(page, limit)
+    c.JSON(200, gin.H{"total": total, "data": data})
+}
+
 // 获取漏洞详细信息，登录和未登录情况
 func GetVulnDetail(c *gin.Context) {
     id := c.Query("id")
@@ -32,11 +40,11 @@ func GetVulnDetail(c *gin.Context) {
     currentUser := models.GetUserByToken(token)
     if currentUser != nil{
         res := models.GetVulnDetailAuthed(id)
-        c.JSON(200, gin.H{"data": res})
+        c.JSON(200, gin.H{"code": 1, "data": res})
         return
     }
     res := models.GetVulnDetail(id)
-    c.JSON(200, gin.H{"data": res})
+    c.JSON(200, gin.H{"code": 0, "data": res})
 }
 
 // 添加漏洞信息
@@ -46,13 +54,13 @@ func AddVuln(c *gin.Context) {
     if currentUser != nil {
         var vulnerabilities types.Vulnerability
         if err := c.ShouldBindJSON(&vulnerabilities); err != nil {
-            c.JSON(400, gin.H{"code": 0, "msg": "Invalid input"+err.Error()})
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input" + err.Error()})
             return
         }
         vulnerabilities.UserID = currentUser.ID
         _, err := models.InsertVuln(vulnerabilities)
         if err != nil {
-            c.JSON(200, gin.H{"code": 0, "msg": err.Error()})
+            c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
             return
         }
         c.JSON(200, gin.H{"code": 1, "msg": "Submit successfully"})
@@ -77,4 +85,55 @@ func SearchVulnAdv(c *gin.Context) {
     }
     res := models.SearchVulnAdv(data)
     c.JSON(200, gin.H{"code": 1, "msg": res})
+}
+
+// 上传文件
+func UploadFile(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil {
+        file, err := c.FormFile("file")
+        if err != nil {
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
+            return
+        }
+        res, err := models.StoreFile(file, currentUser.ID)
+        if err != nil {
+            c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "File uploaded successfully", "file_id": res})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 获取文件内容
+func DownloadFile(c *gin.Context) {
+    fileId := c.Query("id")
+    file, err := models.GetFileContent(fileId)
+    if err != nil {
+        c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
+        return
+    }
+    c.Header("Content-Type", file.Type)
+    c.Header("Content-Disposition", "attachment; filename="+file.Name)
+    c.Data(200, "OK", file.Data)
+}
+
+// 管理员删除文件
+func DeleteFile(c *gin.Context) {
+    fileId := c.Query("id")
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil && currentUser.Role == 1 {
+        err := models.DeleteFile(fileId, currentUser.ID)
+        if err != nil {
+            c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "File deleted successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 }
