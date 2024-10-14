@@ -4,6 +4,7 @@ import (
     "fmt"
     "strings"
     "time"
+    "mime/multipart"
 
     "xuanqiong/types"
     "xuanqiong/utils"
@@ -23,7 +24,7 @@ func IsLocked(ip string) bool {
 // 检查登录凭据
 func CheckLogin(username string, password string) *types.User {
     var user types.User
-    res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
+    res := db.Raw("SELECT * FROM users WHERE username = ? AND status = 1", username).Scan(&user).RowsAffected
     if res == 0 {
         return nil
     }
@@ -41,7 +42,7 @@ func CheckLogin(username string, password string) *types.User {
 // 根据用户名获取用户信息
 func GetUserByUsername(username string) *types.User {
     var user types.User
-    res := db.Raw("SELECT * FROM users WHERE username = ?", username).Scan(&user).RowsAffected
+    res := db.Raw("SELECT * FROM users WHERE username = ? AND status = 1", username).Scan(&user).RowsAffected
     if res == 0 {
         return nil
     }
@@ -53,7 +54,7 @@ func GetUserByToken(token string) *types.User {
     var user types.User
     if token != "" {
         token = strings.TrimPrefix(token, "Bearer ")
-        res := db.Raw("SELECT * FROM users WHERE token = ?", token).Scan(&user).RowsAffected
+        res := db.Raw("SELECT * FROM users WHERE token = ? AND status = 1", token).Scan(&user).RowsAffected
         if res == 0 {
             return nil
         }
@@ -163,4 +164,116 @@ func SetUserStatus(username string) error {
         db.Model(&user).Update("status", 0)
     }
     return nil
+}
+
+// 修改头像
+func UpdateAvatar(file *multipart.FileHeader, userid uint64) string {
+    var user types.User
+    db.Where("id = ? AND status = 1", userid).First(&user)
+    fileid, err := StoreFile(file, userid)
+    if err != nil {
+        return ""
+    }
+    if user.Avatar != "" {
+        DeleteFile(user.Avatar, userid)
+    }
+    db.Model(&user).Update("avatar", fileid)
+    return fileid
+}
+
+// 获取用户漏洞情况
+func GetUservulns(userid uint64) (int64, int64, []types.Vulnerability) {
+    var totalCount int64
+    var authCount int64
+    var vulnDatas []types.Vulnerability
+    db.Model(&vulnDatas).Where("user_id = ?", userid).Count(&totalCount)
+    db.Model(&vulnDatas).Where("user_id = ? AND status = 1", userid).Count(&authCount)
+    db.Model(&vulnDatas).Where("user_id = ?", userid).Order("id desc").Find(&vulnDatas)
+    return totalCount, authCount, vulnDatas
+}
+
+// 修改用户个人信息
+func UpdateUserInfo(userid uint64, username string, email string, phone string) error {
+    var user types.User
+    updates := make(map[string]interface{})
+    res := db.Where("id = ? AND status = 1", userid).First(&user)
+    if res.RowsAffected != 1 {
+        return fmt.Errorf("User is not exits.")
+    }
+    if username != "" {
+        res = db.Where("username = ? AND id != ?", username, userid).First(&user)
+        if res.RowsAffected != 0 {
+            return fmt.Errorf("Username is already in use.")
+        }
+        updates["username"] = username
+    }
+    if email != "" {
+        if IsEmailValid(email) == false {
+            return fmt.Errorf("Invalid email address.")
+        }
+        res = db.Where("email = ? AND id != ?", email, userid).First(&user)
+        if res.RowsAffected != 0 {
+            return fmt.Errorf("Email is already in use.")
+        }
+        updates["email"] = email
+    }
+    if phone != "" {
+        updates["phone"] = phone
+    }
+    updates["update_time"] = time.Now()
+    db.Model(&user).Where("id = ?", userid).Updates(updates)
+    return nil
+}
+
+// 修改用户密码
+func UpdateUserPassword(userid uint64, oldpassword string, newpassword string) error {
+    var user types.User
+    updates := make(map[string]interface{})
+    res := db.Where("id = ? AND status = 1", userid).First(&user)
+    if res.RowsAffected != 1 {
+        return fmt.Errorf("User is not exits.")
+    }
+    if oldpassword == "" || newpassword == "" {
+        return fmt.Errorf("oldpassword and newpassword cannot be empty")
+    }
+    if !utils.IsHashEqual(user.Password, oldpassword) {
+        return fmt.Errorf("Old password is incorrect.")
+    }
+    newpassword = utils.GenPasswordHash(newpassword)
+    updates["password"] = newpassword
+    updates["update_time"] = time.Now()
+    db.Model(&user).Where("id = ?", userid).Updates(updates)
+    return nil
+}
+
+// 用户注册
+func Register(username string, password string, email string, phone string) int64 {
+    var user types.User
+    res := db.Where("username = ?", username).First(&user)
+    if res.RowsAffected != 0 {
+        return 2
+    }
+    if username == "" || password == "" {
+        return 3
+    }
+    if email != "" {
+        if IsEmailValid(email) == false {
+            return 4
+        }
+        res = db.Where("email = ?", email).First(&user)
+        if res.RowsAffected != 0 {
+            return 5
+        }
+    }
+    userData := types.User{
+        Username: username,
+        Password: utils.GenPasswordHash(password),
+        Email:    email,
+        Phone:    phone,
+        Role:     0,
+        Status:   1,
+        CreateTime: time.Now(),
+    }
+    db.Create(&userData)
+    return 1
 }
