@@ -68,7 +68,7 @@ func init() {
     res := db.Raw("SELECT * FROM users WHERE username = ?", "admin").Scan(&user)
     if res.Error != nil {
         log.Println("Initializing Database...")
-        db.AutoMigrate(&types.User{}, &types.Vulnerability{}, &types.Lockip{})
+        db.AutoMigrate(&types.User{}, &types.Vulnerability{}, &types.Lockip{}, &types.Attachment{})
         password, err := utils.GenerateRandomPassword(12)
         if err != nil {
             log.Fatalf("Error generating password: %v", err)
