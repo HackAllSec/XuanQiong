@@ -37,35 +37,58 @@ func InitRoutes() {
 
 // 前后端不分离的路由
 func StartServer() {
+    frontendPath := config.Config.Server.FrontendPath
+    frontendStaticUrl := config.Config.Server.StaticUrl
+    adminPath := config.Config.Server.AdminPath
+    AdminStaticUrl := config.Config.Server.AdminStaticUrl
     // 前端静态文件
-    route.Static(config.StaticUrl, config.FrontendPath + config.StaticUrl)
+    route.Static(frontendStaticUrl, frontendPath + frontendStaticUrl)
+    route.Static(AdminStaticUrl, adminPath + AdminStaticUrl)
 
     // 设置前端模板文件的路由
-    route.LoadHTMLGlob(config.TemplateFile)
+    route.LoadHTMLGlob(frontendPath + "/*.html")
+    route.LoadHTMLGlob(adminPath + "/*.html")
 
     // 定义路由
     route.GET("/", func(c *gin.Context) {
+        c.File(frontendPath + "/index.html")
+    })
+    route.GET("/admin", func(c *gin.Context) {
+        c.File(adminPath + "/index.html")
+    })
+    /*
+    route.GET("/", func(c *gin.Context) {
         c.HTML(200, "index.html", nil)
     })
+        */
     route.POST("/api/v1/login", controllers.Login)
     route.GET("/api/v1/logout", controllers.Logout)
     route.POST("/api/v1/adduser", controllers.CreateUser)
     route.POST("/api/v1/deluser", controllers.DeleteUser)
     route.POST("/api/v1/userstatus", controllers.SetUserStatus)
     route.GET("/api/v1/getusers", controllers.GetUsers)
+    route.GET("/api/v1/userinfo", controllers.GetUserInfo)
     route.POST("/api/v1/updateuser", controllers.UpdateUser)
     route.GET("/api/v1/getvulnabs", controllers.GetVulnAbstract)
+    route.GET("/api/v1/getvulnlist", controllers.GetVulnList)
     route.GET("/api/v1/getvulndtl", controllers.GetVulnDetail)
     route.POST("/api/v1/addvuln", controllers.AddVuln)
     route.GET("/api/v1/search", controllers.SearchVuln)
     route.POST("/api/v1/advsearch", controllers.SearchVulnAdv)
+    route.POST("/api/v1/upload", controllers.UploadFile)
+    route.GET("/download/file", controllers.DownloadFile)
+    route.GET("/delete/file", controllers.DeleteFile)
+    route.POST("/api/v1/updateavatar", controllers.UpdateAvatar)
+    route.POST("/api/v1/updateuserinfo", controllers.UpdateUserInfo)
+    route.POST("/api/v1/updatepassword", controllers.UpdateUserPassword)
+    route.POST("/api/v1/register", controllers.Register)
 
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {
         path := c.Request.URL.Path
-        if fileInfo, err := os.Stat(config.FrontendPath + path); err == nil {
+        if fileInfo, err := os.Stat(frontendPath + path); err == nil {
             if !fileInfo.IsDir() {
-                c.File(config.FrontendPath + path)
+                c.File(frontendPath + path)
             }
         }
         c.HTML(404, "404.html", nil)
