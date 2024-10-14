@@ -1,11 +1,14 @@
 package models
 
 import (
+    "io"
+    "mime/multipart"
     "fmt"
     "strings"
     "strconv"
     "time"
     "xuanqiong/types"
+    "xuanqiong/utils"
 )
 
 // 获取漏洞摘要
@@ -19,31 +22,46 @@ func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, in
     var weeklyPocCount int64
     var weeklyExpCount int64
     var weeklyAffectedProductCount int64
-    db.Model(&vulnDatas).Count(&totalCount)
-    db.Raw("SELECT COUNT(*) FROM vulnerabilities WHERE poc <> ''").Scan(&pocCount)
-    db.Raw("SELECT COUNT(*) FROM vulnerabilities WHERE exp <> ''").Scan(&expCount)
-    db.Model(&vulnDatas).Where("affected_product <> ''").Count(&affectedProductCount)
+    db.Model(&vulnDatas).Where("status = 1").Count(&totalCount)
+    db.Raw("SELECT COUNT(*) FROM vulnerabilities WHERE poc <> '' AND status = 1").Scan(&pocCount)
+    db.Raw("SELECT COUNT(*) FROM vulnerabilities WHERE exp <> '' AND status = 1").Scan(&expCount)
+    db.Model(&vulnDatas).Where("affected_product <> '' AND status = 1").Count(&affectedProductCount)
     thisWeek := time.Now().UTC().Truncate(24 * 7 * time.Hour)
-    db.Model(&vulnDatas).Where("create_time >= ?", thisWeek).Count(&weeklyCount)
-    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE poc <> ''").Scan(&weeklyPocCount)
-    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE exp <> ''").Scan(&weeklyExpCount)
-    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE affected_product <> ''").Scan(&weeklyAffectedProductCount)
+    db.Model(&vulnDatas).Where("create_time >= ? AND status = 1", thisWeek).Count(&weeklyCount)
+    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE poc <> '' AND status = 1").Scan(&weeklyPocCount)
+    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE exp <> '' AND status = 1").Scan(&weeklyExpCount)
+    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM vulnerabilities WHERE affected_product <> '' AND status = 1").Scan(&weeklyAffectedProductCount)
     if islogin {
-        db.Select("id, vuln_name, vuln_type, vuln_level, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+        db.Select("id, vuln_name, vuln_type, vuln_level, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+        Where("status = 1").
         Order("create_time DESC").Find(&vulnDatas)
     } else {
-        db.Select("id, vuln_name, vuln_type, vuln_level, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+        db.Select("id, vuln_name, vuln_type, vuln_level, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+        Where("status = 1").
         Order("create_time DESC").
         Limit(10).Find(&vulnDatas)
     }
     return totalCount, pocCount, expCount, affectedProductCount, weeklyCount, weeklyPocCount, weeklyExpCount,weeklyAffectedProductCount, vulnDatas
 }
 
-// 获取漏洞详情，未登录时，返回不包含poc和exp
+// 分页获取漏洞列表
+func GetVulnList(page string, pageSize string) (int64, []types.Vulnerability) {
+    var vulnDatas []types.Vulnerability
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&vulnDatas).Where("status = 1").Count(&totalCount)
+    db.Select("id, vuln_name, vuln_type, vuln_level, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+    Where("status = 1").Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Order("create_time DESC").
+    Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
+    return totalCount, vulnDatas
+}
+
+// 获取漏洞详情，未登录时，返回不包含poc、exp和附件信息
 func GetVulnDetail(id string) (types.Vulnerability) {
     var vulnerabilities types.Vulnerability
     var submitter types.User
-    res := db.Where("id = ? AND status = true", id).Omit("poc, exp").First(&vulnerabilities)
+    res := db.Where("id = ? AND is_public = true AND status = 1", id).Omit("user_id, exp, attachment_id, attachment_name").First(&vulnerabilities)
     if res.RowsAffected != 0 {
         db.Model(&submitter).Where("id = ?", vulnerabilities.UserID).First(&submitter)
         vulnerabilities.Submitter = submitter.Username
@@ -55,7 +73,7 @@ func GetVulnDetail(id string) (types.Vulnerability) {
 // 获取漏洞详情，已登录时，返回漏洞全部信息
 func GetVulnDetailAuthed(id string) (types.Vulnerability) {
     var vulnerabilities types.Vulnerability
-    db.Where("id = ? AND status = true", id).First(&vulnerabilities)
+    db.Where("id = ? AND is_public = true AND status = 1", id).First(&vulnerabilities)
     return vulnerabilities
 }
 
@@ -156,7 +174,9 @@ func getVdbid() string {
 // 插入漏洞信息
 func InsertVuln(vuln types.Vulnerability) (*types.Vulnerability, error) {
     var vulnerability types.Vulnerability
+    var attachment types.Attachment
     err := checkVulnData(vuln)
+    fmt.Println(vuln)
     if err != nil {
         return nil, err
     }
@@ -190,8 +210,13 @@ func InsertVuln(vuln types.Vulnerability) (*types.Vulnerability, error) {
             return nil, fmt.Errorf("漏洞已存在")
         }
     }
+    if vuln.AttachmentID != "" {
+        db.Where("id = ?", vuln.AttachmentID).First(&attachment)
+        vuln.AttachmentName = attachment.Name
+     }
     hvdid := getVdbid()
     vuln.ID = hvdid
+    vuln.Status = 0
     vuln.CreateTime = time.Now()
     err = db.Create(&vuln).Error
     if err != nil {
@@ -203,7 +228,7 @@ func InsertVuln(vuln types.Vulnerability) (*types.Vulnerability, error) {
 // 搜索漏洞信息
 func SearchVuln(keyword string) []types.Vulnerability {
     var vulnDatas []types.Vulnerability
-    db.Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
+    db.Where("status = 1").Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
         "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").Find(&vulnDatas)
     return vulnDatas
 }
@@ -213,6 +238,7 @@ func SearchVulnAdv(data map[string]interface{}) []types.Vulnerability {
     var vulnDatas []types.Vulnerability
     var conditions []string
     var values []interface{}
+    conditions = append(conditions, "status = 1")
     vulnName, _ := data["vuln_name"].(string)
     if vulnName != "" {
         conditions = append(conditions, "vuln_name LIKE ?")
@@ -246,12 +272,62 @@ func SearchVulnAdv(data map[string]interface{}) []types.Vulnerability {
     if exp != "" {
         conditions = append(conditions, "poc IS NOT NULL AND poc <> ''")
     }
-    submit, _ := data["submit"].(string)
-    if submit != "" {
-        conditions = append(conditions, "submit LIKE ?")
-        values = append(values, "%"+submit+"%")
+    submitter, _ := data["submitter"].(string)
+    if submitter != "" {
+        conditions = append(conditions, "submitter LIKE ?")
+        values = append(values, "%"+submitter+"%")
     }
     query := strings.Join(conditions, " AND ")
     db.Where(query, values...).Find(&vulnDatas)
     return vulnDatas
+}
+
+// 存储文件到数据库
+func StoreFile(file *multipart.FileHeader, userid uint64) (string, error) {
+    // 打开文件
+    src, err := file.Open()
+    if err != nil {
+        return "", err
+    }
+    defer src.Close()
+
+    // 读取文件内容
+    bytes, err := io.ReadAll(src)
+    if err != nil {
+        return "", err
+    }
+
+    // 生成唯一的文件ID
+    attachmentID := utils.GenerateUniqueID()
+
+    // 创建一个新的 Attachment 实例
+    attachment := types.Attachment{
+        ID:          attachmentID,
+        UserID:      userid,
+        Name:        file.Filename,
+        Type:        file.Header.Get("Content-Type"),
+        Data:        bytes,
+        Status:      1,
+        CreateTime:  time.Now(),
+        UpdateTime:  time.Now(),
+    }
+
+    // 将文件保存到数据库
+    if err := db.Create(&attachment).Error; err != nil {
+        return "", err
+    }
+
+    return attachmentID, nil
+}
+
+// 获取文件内容
+func GetFileContent(attachmentID string) (types.Attachment, error) {
+    var attachment types.Attachment
+    err := db.Where("id = ?", attachmentID).First(&attachment).Error
+    return attachment, err
+}
+
+// 删除文件
+func DeleteFile(attachmentID string, userid uint64) error {
+    return db.Where("id = ? AND user_id = ?", attachmentID, userid).Delete(&types.Attachment{}).Error
 }
