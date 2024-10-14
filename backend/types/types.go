@@ -87,9 +87,11 @@ type Vulnerability struct {
     Exp                      string    `json:"exp"`
     ExpType                  string    `json:"exp_type"`
     RepairSuggestion         string    `json:"repair_suggestion"`
-    Attachment               string    `json:"attachment"`
+    AttachmentID             string    `json:"attachment_id"`
+    AttachmentName           string    `json:"attachment_name"`
     Submitter                string    `json:"submitter"`
-    Status                   bool      `json:"status"`
+    IsPublic                 bool      `json:"is_public"`
+    Status                   int64     `json:"status"`
     CreateTime               time.Time `json:"create_time"`
     UpdateTime               time.Time `json:"update_time"`
 }
@@ -101,6 +103,18 @@ type Lockip struct {
     Status         int64
     CreateTime     time.Time
     LockoutUntil   *time.Time
+}
+
+// 附件表
+type Attachment struct {
+    ID          string    `gorm:"primaryKey"`
+    UserID      uint64
+    Name        string
+    Type        string
+    Data        []byte
+    Status      int64
+    CreateTime  time.Time
+    UpdateTime  time.Time
 }
 
 type LoginData struct {
