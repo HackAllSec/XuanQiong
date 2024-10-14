@@ -5,6 +5,7 @@ import (
     "crypto/rand"
     "github.com/golang-jwt/jwt"
     "golang.org/x/crypto/bcrypt"
+    "github.com/google/uuid"
 
     "xuanqiong/config"
 )
@@ -58,4 +59,8 @@ func DecryptJWTToken(tokenString string) (*jwt.StandardClaims, error) {
         return claims, nil
     }
     return nil, err
+}
+
+func GenerateUniqueID() string {
+    return uuid.New().String()
 }
