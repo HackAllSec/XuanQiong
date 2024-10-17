@@ -1,7 +1,7 @@
 package models
 
 import (
-	"regexp"
+    "regexp"
 )
 
 // 编译正则表达式以检查电子邮件格式
