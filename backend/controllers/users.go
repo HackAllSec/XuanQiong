@@ -1,41 +1,40 @@
 package controllers
 
 import (
-    "xuanqiong/config"
-    "xuanqiong/types"
     "xuanqiong/models"
     "github.com/gin-gonic/gin"
 )
 
 var (
-    cfg = config.Config
-    maxAttempts = cfg.Login.MaxAttempts
+    maxAttempts int64
 )
 
 // 登录
 func Login(c *gin.Context) {
+    LoginPolicy := models.GetSystemConfig()
     if models.IsLocked(c.ClientIP()) {
         c.JSON(200, gin.H{"code": 0, "msg": "Too many login attempts. Please try again later."})
         return
     }
-    var logindata types.LoginData
-    if err := c.ShouldBindJSON(&logindata); err != nil {
+    var data map[string]interface{}
+    if err := c.ShouldBindJSON(&data); err != nil {
         c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
         return
     }
-    loginUser := models.CheckLogin(logindata.Username, logindata.Password)
+    username, _ := data["username"].(string)
+    password, _ := data["password"].(string)
+    loginUser := models.CheckLogin(username, password)
     if loginUser != nil {
-        maxAttempts = cfg.Login.MaxAttempts
+        maxAttempts = 0
         c.JSON(200, gin.H{"code": 1, "msg":"Login Successful", "username":loginUser.Username, "avatar":loginUser.Avatar, "token": loginUser.Token})
     } else {
-        maxAttempts--
-        if maxAttempts == 0 {
-            models.LockIP(c.ClientIP(), cfg.Login.LockoutDuration)
+        maxAttempts++
+        if maxAttempts >= LoginPolicy.MaxAttempts {
+            models.LockIP(c.ClientIP(), LoginPolicy.LockoutDuration)
             c.JSON(200, gin.H{"code": 0, "msg": "Too many login attempts. Please try again later."})
-            maxAttempts = cfg.Login.MaxAttempts
             return
         }
-        c.JSON(200, gin.H{"code": 3, "times": maxAttempts, "msg": "Invalid username or password"})
+        c.JSON(200, gin.H{"code": 3, "times": LoginPolicy.MaxAttempts - maxAttempts, "msg": "Invalid username or password"})
         return
     }
 }
@@ -64,12 +63,14 @@ func CreateUser(c *gin.Context) {
             c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
             return
         }
-        var logindata types.LoginData
-        if err := c.ShouldBindJSON(&logindata); err != nil {
+        var data map[string]interface{}
+        if err := c.ShouldBindJSON(&data); err != nil {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
             return
         }
-        err := models.CreateUser(logindata.Username, logindata.Password, 0)
+        username, _ := data["username"].(string)
+        password, _ := data["password"].(string)
+        err := models.CreateUser(username, password, 0)
         if err == nil {
             c.JSON(200, gin.H{"code": 1, "msg": "User created successfully."})
             return
@@ -279,6 +280,11 @@ func UpdateUserPassword(c *gin.Context) {
 
 // 注册用户
 func Register(c *gin.Context) {
+    LoginPolicy := models.GetSystemConfig()
+    if LoginPolicy.UserRegister == false {
+        c.JSON(200, gin.H{"code": 0, "msg": "Register function is disabled"})
+        return
+    }
     var data map[string]interface{}
     if err := c.ShouldBindJSON(&data); err != nil {
         c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -306,4 +312,57 @@ func Register(c *gin.Context) {
     }
     // 注册功能禁用返回code 0
     c.JSON(200, gin.H{"code": 1, "msg": "Register successfully"})
+}
+
+// 获取用户提交的漏洞
+func GetUserVulnList(c *gin.Context) {
+    page := c.Query("page")
+    limit := c.Query("limit")
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil {
+        total, data := models.GetUserVulnList(currentUser.ID, page, limit)
+        c.JSON(200, gin.H{"code": 1, "total": total, "data": data})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 获取用户积分排名
+func GetUserTop10(c *gin.Context) {
+    annual, quarterly, monthly := models.GetUserTop10()
+    c.JSON(200, gin.H{"annual": annual, "quarterly": quarterly, "monthly": monthly})
+}
+
+// 审核漏洞-管理员
+func AuditVuln(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil {
+        if currentUser.Role != 1 {
+            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+            return
+        }
+        var data map[string]interface{}
+        if err := c.ShouldBindJSON(&data); err != nil {
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
+            return
+        }
+        id, _ := data["id"].(string)
+        audit, _ := data["audit"].(float64)
+        review, _ := data["review"].(string)
+        cvss, _ := data["cvss"].(float64)
+        prid, _ := data["prid"].(float64)
+        erid, _ := data["erid"].(float64)
+        irid, _ := data["irid"].(float64)
+        orid, _ := data["orid"].(float64)
+        err := models.AuditVuln(id, int64(audit), review, cvss, uint64(prid), uint64(erid), uint64(irid), uint64(orid))
+        if err != nil {
+            c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "Audit successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 }
