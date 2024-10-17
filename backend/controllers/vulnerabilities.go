@@ -6,6 +6,12 @@ import (
     "github.com/gin-gonic/gin"
 )
 
+// 获取漏洞类型列表
+func GetVulnTypeList(c *gin.Context) {
+    res := models.GetVulnTypeList()
+    c.JSON(200, gin.H{"data": res})
+}
+
 // 获取漏洞摘要，无需登录
 func GetVulnAbstract(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
@@ -25,7 +31,7 @@ func GetVulnAbstract(c *gin.Context) {
     }
 }
 
-// 分页获取漏洞列表，登录和未登录情况
+// 分页获取漏洞列表，无需登录
 func GetVulnList(c *gin.Context) {
     page := c.Query("page")
     limit := c.Query("limit")
@@ -39,7 +45,7 @@ func GetVulnDetail(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
     if currentUser != nil{
-        res := models.GetVulnDetailAuthed(id)
+        res := models.GetVulnDetailAuthed(id, currentUser.ID)
         c.JSON(200, gin.H{"code": 1, "data": res})
         return
     }
@@ -52,18 +58,40 @@ func AddVuln(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
     if currentUser != nil {
-        var vulnerabilities types.Vulnerability
+        var vulnerabilities types.XqVulnerability
         if err := c.ShouldBindJSON(&vulnerabilities); err != nil {
-            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input" + err.Error()})
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input:" + err.Error()})
             return
         }
         vulnerabilities.UserID = currentUser.ID
-        _, err := models.InsertVuln(vulnerabilities)
+        vulnerabilities.Submitter = currentUser.Username
+        err := models.InsertVuln(vulnerabilities)
         if err != nil {
             c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
             return
         }
         c.JSON(200, gin.H{"code": 1, "msg": "Submit successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 编辑漏洞
+func EditVuln(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil {
+        var vulnerabilities types.XqVulnerability
+        if err := c.ShouldBindJSON(&vulnerabilities); err != nil {
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input:" + err.Error()})
+            return
+        }
+        err := models.EditVuln(vulnerabilities, currentUser.ID)
+        if err != nil {
+            c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "Edit successfully"})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
