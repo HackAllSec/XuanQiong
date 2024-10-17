@@ -61,28 +61,37 @@ func StartServer() {
         c.HTML(200, "index.html", nil)
     })
         */
+    // 无需登录
+    route.POST("/api/v1/register", controllers.Register)
     route.POST("/api/v1/login", controllers.Login)
+    route.GET("/api/v1/getvulnabs", controllers.GetVulnAbstract)
+    route.GET("/api/v1/getvulntypes", controllers.GetVulnTypeList)
+    route.GET("/api/v1/getvulnlist", controllers.GetVulnList)
+    route.GET("/api/v1/getvulndtl", controllers.GetVulnDetail)
+    route.GET("/api/v1/search", controllers.SearchVuln)
+    route.POST("/api/v1/advsearch", controllers.SearchVulnAdv)
+    route.GET("/download/file", controllers.DownloadFile)
+    route.GET("/api/v1/usertop", controllers.GetUserTop10)
+    // 需要登录
     route.GET("/api/v1/logout", controllers.Logout)
+    route.GET("/api/v1/userinfo", controllers.GetUserInfo)
+    route.GET("/api/v1/uservulnlist", controllers.GetUserVulnList)
+    route.POST("/api/v1/upload", controllers.UploadFile)
+    route.GET("/delete/file", controllers.DeleteFile)
+    route.POST("/api/v1/addvuln", controllers.AddVuln)
+    route.POST("/api/v1/editvuln", controllers.EditVuln)
+    route.POST("/api/v1/updateavatar", controllers.UpdateAvatar)
+    route.POST("/api/v1/updateuserinfo", controllers.UpdateUserInfo)
+    route.POST("/api/v1/updatepassword", controllers.UpdateUserPassword)
+    
+    // 管理员权限
     route.POST("/api/v1/adduser", controllers.CreateUser)
     route.POST("/api/v1/deluser", controllers.DeleteUser)
     route.POST("/api/v1/userstatus", controllers.SetUserStatus)
     route.GET("/api/v1/getusers", controllers.GetUsers)
-    route.GET("/api/v1/userinfo", controllers.GetUserInfo)
     route.POST("/api/v1/updateuser", controllers.UpdateUser)
-    route.GET("/api/v1/getvulnabs", controllers.GetVulnAbstract)
-    route.GET("/api/v1/getvulnlist", controllers.GetVulnList)
-    route.GET("/api/v1/getvulndtl", controllers.GetVulnDetail)
-    route.POST("/api/v1/addvuln", controllers.AddVuln)
-    route.GET("/api/v1/search", controllers.SearchVuln)
-    route.POST("/api/v1/advsearch", controllers.SearchVulnAdv)
-    route.POST("/api/v1/upload", controllers.UploadFile)
-    route.GET("/download/file", controllers.DownloadFile)
-    route.GET("/delete/file", controllers.DeleteFile)
-    route.POST("/api/v1/updateavatar", controllers.UpdateAvatar)
-    route.POST("/api/v1/updateuserinfo", controllers.UpdateUserInfo)
-    route.POST("/api/v1/updatepassword", controllers.UpdateUserPassword)
-    route.POST("/api/v1/register", controllers.Register)
-
+    route.POST("/api/v1/auditvuln", controllers.AuditVuln)
+    
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {
         path := c.Request.URL.Path
