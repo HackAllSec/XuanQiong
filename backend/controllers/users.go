@@ -153,7 +153,7 @@ func GetUsers(c *gin.Context) {
             return
         }
         users := models.GetUsers()
-        c.JSON(200, gin.H{"code": 1, "msg": users})
+        c.JSON(200, gin.H{"code": 1, "data": users})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
@@ -362,6 +362,22 @@ func AuditVuln(c *gin.Context) {
             return
         }
         c.JSON(200, gin.H{"code": 1, "msg": "Audit successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 获取系统状态-管理员
+func GetSystemStatus(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil {
+        if currentUser.Role != 1 {
+            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+            return
+        }
+        data := models.GetSystemStatus()
+        c.JSON(200, gin.H{"code": 1, "data": data})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})

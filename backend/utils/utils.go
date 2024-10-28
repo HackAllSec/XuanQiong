@@ -6,6 +6,9 @@ import (
     "github.com/golang-jwt/jwt"
     "golang.org/x/crypto/bcrypt"
     "github.com/google/uuid"
+    "github.com/shirou/gopsutil/v3/cpu"
+    "github.com/shirou/gopsutil/v3/disk"
+    "github.com/shirou/gopsutil/v3/mem"
 )
 
 // 生成随机Jwt secret
@@ -33,7 +36,7 @@ func GenJWTToken(username string, role int64, expires int64, secret string) (str
     token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
         "username": username,
         "role":     role,
-        "exp":      expires,//time.Now().Add(time.Hour * time.Duration(config.Config.JWT.ExpiresIn)).Unix(),
+        "exp":      expires,
     })
     return token.SignedString([]byte(secret))
 }
@@ -69,4 +72,16 @@ func DecryptJWTToken(tokenString string, secret string) (*jwt.StandardClaims, er
 
 func GenerateUniqueID() string {
     return uuid.New().String()
+}
+
+func GetSystemUsage() (int64, int64, int64) {
+    cpuPercent, _ := cpu.Percent(0, false)
+    cpuUsage := int64(cpuPercent[0])
+
+    memInfo, _ := mem.VirtualMemory()
+    memUsage := int64(memInfo.UsedPercent)
+
+    diskUsageInfo, _ := disk.Usage("/")
+    diskUsage := int64(diskUsageInfo.UsedPercent)
+    return cpuUsage, memUsage, diskUsage
 }

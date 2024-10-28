@@ -91,6 +91,7 @@ func StartServer() {
     route.GET("/api/v1/getusers", controllers.GetUsers)
     route.POST("/api/v1/updateuser", controllers.UpdateUser)
     route.POST("/api/v1/auditvuln", controllers.AuditVuln)
+    route.GET("/api/v1/getsystemstatus", controllers.GetSystemStatus)
     
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {

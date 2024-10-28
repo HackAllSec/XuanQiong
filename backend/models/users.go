@@ -314,6 +314,9 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
     if res.RowsAffected != 1 {
         return fmt.Errorf("Vuln is not exits.")
     }
+    if vuln.Status != 0 {
+        return fmt.Errorf("Vuln has been audited.")
+    }
     if status == 1 {
         var scoreRule types.XqScoreRule
         var vulnScore int64
@@ -437,4 +440,29 @@ func getCurrentMonth() (time.Time, time.Time) {
     startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
     endOfMonth := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location()).Add(-1 * time.Second)
     return startOfMonth, endOfMonth
+}
+
+func GetSystemStatus() (map[string]interface{}) {
+    var userslist []types.XqUser
+    var users types.XqUser
+    var adminCount int64
+    var userCount int64
+    var onlineUsers int64
+    db.Model(&users).Where("role = 1").Count(&adminCount)
+    db.Model(&users).Where("role = 0").Count(&userCount)
+    db.Where("token <> '' AND role = 0").Find(&userslist)
+    for _, user := range userslist {
+        if res := GetUserByToken(user.Token); res != nil {
+            onlineUsers++
+        }
+    }
+    cpuUsage, memUsage, diskUsage := utils.GetSystemUsage()
+    return map[string]interface{}{
+        "cpu":    cpuUsage,
+        "mem":    memUsage,
+        "disk":   diskUsage,
+        "admintotal": adminCount,
+        "usertotal": userCount,
+        "onlineuser": onlineUsers,
+    }
 }

@@ -1,0 +1,30 @@
+
+2024/10/15 14:03:39 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
+[0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"
+
+2024/10/15 19:48:47 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
+[0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"
+
+2024/10/16 02:54:29 D:/CodeProjects/XuanQiong/backend/models/users.go:311 no such column: score
+[0.000ms] [rows:0] SELECT id, username, avatar, score FROM `xq_users` ORDER BY score desc LIMIT 10
+
+2024/10/16 02:57:32 D:/CodeProjects/XuanQiong/backend/models/users.go:311 no such column: score
+[0.000ms] [rows:0] SELECT id, username, avatar, ranking FROM `xq_users` ORDER BY score desc LIMIT 10
+
+2024/10/16 02:57:34 D:/CodeProjects/XuanQiong/backend/models/users.go:311 no such column: score
+[0.000ms] [rows:0] SELECT id, username, avatar, ranking FROM `xq_users` ORDER BY score desc LIMIT 10
+
+2024/10/16 03:02:35 D:/CodeProjects/XuanQiong/backend/models/users.go:311 no such table: user_tops
+[0.000ms] [rows:0] SELECT username, avatar, ranking FROM `user_tops` ORDER BY ranking desc LIMIT 10
+
+2024/10/16 03:02:41 D:/CodeProjects/XuanQiong/backend/models/users.go:311 no such table: user_tops
+[0.667ms] [rows:0] SELECT username, avatar, ranking FROM `user_tops` ORDER BY ranking desc LIMIT 10
+
+2024/10/16 03:03:50 D:/CodeProjects/XuanQiong/backend/models/users.go:311 no such table: user_tops
+[0.194ms] [rows:0] SELECT username, avatar, ranking FROM `user_tops` ORDER BY ranking desc LIMIT 10
+
+2024/10/16 15:00:17 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
+[0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"
+
+2024/10/16 17:31:14 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
+[0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"
