@@ -37,43 +37,44 @@ type Config struct {
 
 // 系统配置表
 type XqSystemConfig struct {
-    ID                  uint64    `gorm:"primaryKey"`
-    UserRegister        bool
-    MaxAttempts         int64
-    LockoutDuration     int64
-    CreateTime          time.Time
-    UpdateTime          time.Time
+    ID                  uint64    `gorm:"primaryKey" json:"id"`
+    UserRegister        bool      `json:"user_register"`
+    UserDisplay         string    `json:"user_display"`
+    MaxAttempts         int64     `json:"max_attempts"`
+    LockoutDuration     int64     `json:"lockout_duration"`
+    CreateTime          time.Time `json:"create_time"`
+    UpdateTime          time.Time `json:"update_time"`
 }
 
 // Jwt配置表
 type XqJwtConfig struct {
-    ID                  uint64    `gorm:"primaryKey"`
-    JwtSecret           string
-    JwtExpires          int64
-    CreateTime          time.Time
-    UpdateTime          time.Time
+    ID                  uint64    `gorm:"primaryKey" json:"id"`
+    JwtSecret           string    `json:"jwt_secret"`
+    JwtExpires          int64     `json:"jwt_expires"`
+    CreateTime          time.Time `json:"create_time"`
+    UpdateTime          time.Time `json:"update_time"`
 }
 
 // 邮箱配置表
 type XqEmailConfig struct {
-    ID                  uint64    `gorm:"primaryKey"`
-    EmailHost           string
-    EmailPort           int64
-    EmailUser           string
-    EmailPassword       string
-    EmailSender         string
-    CreateTime          time.Time
-    UpdateTime          time.Time
+    ID                  uint64    `gorm:"primaryKey" json:"id"`
+    EmailHost           string    `json:"email_host"`
+    EmailPort           int64     `json:"email_port"`
+    EmailUser           string    `json:"email_user"`
+    EmailPassword       string    `json:"email_password"`
+    EmailSender         string    `json:"email_sender"`
+    CreateTime          time.Time `json:"create_time"`
+    UpdateTime          time.Time `json:"update_time"`
 }
 
-// 信息通知表
-type XqNotice struct {
-    ID              uint64      `gorm:"primaryKey"`
-    Type            string
-    Secret          string
-    Webhook         string
-    CreateTime      time.Time
-    UpdateTime      time.Time
+// 通知配置表
+type XqNoticeConfig struct {
+    ID              uint64      `gorm:"primaryKey" json:"id"`
+    Type            int64      `json:"type"`
+    Secret          string      `json:"secret"`
+    Webhook         string      `json:"webhook"`
+    CreateTime      time.Time   `json:"create_time"`
+    UpdateTime      time.Time   `json:"update_time"`
 }
 
 // User 用户表
@@ -94,10 +95,10 @@ type XqUser struct {
 
 // 漏洞类型表
 type XqVulnType struct {
-    ID          uint64    `gorm:"primaryKey"`
-    Name       string
-    CreateTime time.Time
-    UpdateTime time.Time
+    ID          uint64    `gorm:"primaryKey" json:"id"`
+    Name       string     `json:"name"`
+    CreateTime time.Time  `json:"create_time"`
+    UpdateTime time.Time  `json:"update_time"`
 }
 
 // Vulnerability 漏洞表
@@ -181,4 +182,11 @@ type XqScoreRule struct {
     Coefficient     float64
     CreateTime      time.Time
     UpdateTime      time.Time
+}
+
+type SystemConfigData struct {
+    EmailConfig    XqEmailConfig    `json:"emailconf"`
+    JwtConfig      XqJwtConfig      `json:"jwtconf"`
+    NoticeConfig   XqNoticeConfig   `json:"noticeconf"`
+    SysConfig      XqSystemConfig   `json:"sysconf"`
 }

@@ -28,3 +28,291 @@
 
 2024/10/16 17:31:14 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
 [0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"
+
+2024/10/28 14:40:22 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:41:41 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:41:41 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:41:41 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:42:46 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:42:46 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:42:46 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:42:55 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:42:55 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:42:55 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:42:55 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:42:55 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:42:55 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:43:22 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:43:22 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:43:22 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:44:02 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:44:02 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:44:02 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:48:17 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:31 unrecognized token: "` WHERE create_time >= ? AND (poc <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (poc <> '' AND status = 1)
+
+2024/10/28 14:48:17 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 unrecognized token: "` WHERE create_time >= ? AND (exp <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (exp <> '' AND status = 1)
+
+2024/10/28 14:48:17 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 unrecognized token: "` WHERE create_time >= ? AND (affected_product <> '' AND status = 1)"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE create_time >= "2024-10-28 00:00:00" AND (affected_product <> '' AND status = 1)
+
+2024/10/28 14:56:05 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 not enough args to execute query: want 1 got 0
+[0.000ms] [rows:0] SELECT count(*) FROM `xq_vulnerabilities` WHERE create_time >= ? AND affected_product <> '' AND status = 1
+
+2024/10/28 14:59:28 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 not enough args to execute query: want 1 got 0
+[0.000ms] [rows:0] SELECT count(*) FROM `xq_vulnerabilities` WHERE create_time >= ? AND affected_product <> '' AND status = 1
+
+2024/10/28 15:00:22 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:32 sql: expected 36 destination arguments in Scan, not 1
+[0.000ms] [rows:1] SELECT * FROM `xq_vulnerabilities` WHERE create_time >= "2024-10-28 00:00:00" AND exp <> '' AND status = 1
+
+2024/10/28 15:00:22 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:33 not enough args to execute query: want 1 got 0
+[0.000ms] [rows:0] SELECT count(*) FROM `xq_vulnerabilities` WHERE create_time >= ? AND affected_product <> '' AND status = 1
+
+2024/10/28 18:02:04 D:/CodeProjects/XuanQiong/backend/models/users.go:145 unrecognized token: "` WHERE username = ? AND id <> ?"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE username = "system" AND id <> 0
+
+2024/10/28 18:07:02 D:/CodeProjects/XuanQiong/backend/models/users.go:145 unrecognized token: "` WHERE username = ? AND id <> ?"
+[0.000ms] [rows:-] SELECT * FROM ` WHERE username = "system" AND id <> 0
+
+2024/10/29 12:05:02 D:/CodeProjects/XuanQiong/backend/models/vulnerabilities.go:378 no such column: status
+[0.564ms] [rows:0] SELECT count(*) FROM `xq_vuln_types` WHERE status = 1
+
+2024/10/29 16:18:15 D:/CodeProjects/XuanQiong/backend/models/users.go:261 UNIQUE constraint failed: xq_users.username
+[0.000ms] [rows:0] UPDATE `xq_users` SET `email`="Qw@qq.com",`update_time`="2024-10-29 16:18:15.883",`username`="test2" WHERE id = 2 AND `id` = 2
+
+2024/10/29 16:18:21 D:/CodeProjects/XuanQiong/backend/models/users.go:261 UNIQUE constraint failed: xq_users.username
+[0.000ms] [rows:0] UPDATE `xq_users` SET `email`="Qw@qq.com",`update_time`="2024-10-29 16:18:21.335",`username`="test3" WHERE id = 2 AND `id` = 2
+
+2024/10/30 15:28:33 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:34 near "as": syntax error
+[0.000ms] [rows:0] SELECT s.*, e.* as email, j.* as jwt, n.* as notice FROM xq_system_config as s left join xq_email_config as e left join xq_jwt_config as j left join xq_notice_config as n ORDER BY `s`.`id` LIMIT 1
+
+2024/10/30 16:53:48 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 16:54:22 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 16:56:57 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:10:19 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:10:25 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:28 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=5,`lockout_duration`=3600,`create_time`="2024-10-16 17:31:15.032"
+
+2024/10/30 17:10:25 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:30 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=",`jwt_expires`=3600,`create_time`="2024-10-16 17:31:15.114"
+
+2024/10/30 17:12:51 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:12:59 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:15:45 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:15:48 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:32 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=5,`lockout_duration`=3600,`create_time`="2024-10-16 17:31:15.032",`update_time`="2024-10-30 17:15:48.609"
+
+2024/10/30 17:15:48 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:33 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `update_time`="2024-10-30 17:15:48.609"
+
+2024/10/30 17:15:48 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:34 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=",`jwt_expires`=3600,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 17:15:48.609"
+
+2024/10/30 17:15:48 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:35 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_notice_configs` SET `update_time`="2024-10-30 17:15:48.609"
+
+2024/10/30 17:16:10 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:32 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=5,`lockout_duration`=3600,`create_time`="2024-10-16 17:31:15.032",`update_time`="2024-10-30 17:16:10.189"
+
+2024/10/30 17:16:10 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:33 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `update_time`="2024-10-30 17:16:10.189"
+
+2024/10/30 17:16:10 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:34 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=",`jwt_expires`=3600,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 17:16:10.189"
+
+2024/10/30 17:16:10 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:35 WHERE conditions required
+[0.508ms] [rows:0] UPDATE `xq_notice_configs` SET `update_time`="2024-10-30 17:16:10.189"
+
+2024/10/30 17:18:53 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:21:03 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:21:09 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:23:07 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:31:27 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:32:33 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:46:38 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.503ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:51:17 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:51:31 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:32 WHERE conditions required
+[0.517ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=3,`lockout_duration`=1234,`create_time`="2024-10-16 17:31:15.032",`update_time`="2024-10-30 17:51:31.761"
+
+2024/10/30 17:51:31 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:33 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `email_host`="1234",`email_port`=1234,`email_user`="1234",`email_password`="3124",`email_sender`="1234",`update_time`="2024-10-30 17:51:31.761"
+
+2024/10/30 17:51:31 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:34 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=1",`jwt_expires`=1234,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 17:51:31.761"
+
+2024/10/30 17:51:31 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:35 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_notice_configs` SET `type`=1,`secret`="1234",`webhook`="1234",`update_time`="2024-10-30 17:51:31.761"
+
+2024/10/30 17:52:25 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:53:03 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:53:26 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:32 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=3,`lockout_duration`=3600,`create_time`="2024-10-16 17:31:15.032",`update_time`="2024-10-30 17:53:26.774"
+
+2024/10/30 17:53:26 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:33 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `update_time`="2024-10-30 17:53:26.774"
+
+2024/10/30 17:53:26 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:34 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=",`jwt_expires`=3600,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 17:53:26.774"
+
+2024/10/30 17:53:26 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:35 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_notice_configs` SET `update_time`="2024-10-30 17:53:26.774"
+
+2024/10/30 17:54:46 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:21 no such table: xq_notice_configs
+[0.545ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:54:50 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:33 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=3,`lockout_duration`=3600,`create_time`="2024-10-16 17:31:15.032",`update_time`="2024-10-30 17:54:50.602"
+
+2024/10/30 17:54:50 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:34 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `update_time`="2024-10-30 17:54:50.602"
+
+2024/10/30 17:54:50 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:35 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=",`jwt_expires`=3600,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 17:54:50.602"
+
+2024/10/30 17:54:50 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:36 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_notice_configs` SET `update_time`="2024-10-30 17:54:50.602"
+
+2024/10/30 17:56:14 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:21 no such table: xq_notice_configs
+[0.519ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 17:56:28 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:33 WHERE conditions required
+[0.506ms] [rows:0] UPDATE `xq_system_configs` SET `id`=1,`user_register`=true,`user_display`="匿名",`max_attempts`=3,`lockout_duration`=1234,`create_time`="2024-10-16 17:31:15.032",`update_time`="2024-10-30 17:56:28.297"
+
+2024/10/30 17:56:28 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:35 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `email_host`="1234",`email_port`=1234,`email_user`="1234",`email_password`="1234",`email_sender`="1234",`update_time`="2024-10-30 17:56:28.297"
+
+2024/10/30 17:56:28 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:37 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=1",`jwt_expires`=1234,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 17:56:28.297"
+
+2024/10/30 17:56:28 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:39 WHERE conditions required
+[0.524ms] [rows:0] UPDATE `xq_notice_configs` SET `type`=1,`secret`="1234",`webhook`="1234",`update_time`="2024-10-30 17:56:28.297"
+
+2024/10/30 18:00:41 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:21 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:00:56 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:40 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `email_host`="1234",`email_port`=1243,`email_user`="1234",`email_password`="1234",`email_sender`="1324",`update_time`="2024-10-30 18:00:56.789"
+
+2024/10/30 18:00:56 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:42 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_jwt_configs` SET `id`=1,`jwt_secret`="bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=1",`jwt_expires`=1234,`create_time`="2024-10-16 17:31:15.114",`update_time`="2024-10-30 18:00:56.789"
+
+2024/10/30 18:00:56 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:44 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_notice_configs` SET `type`=1,`secret`="1234",`webhook`="1234",`update_time`="2024-10-30 18:00:56.789"
+
+2024/10/30 18:01:49 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:21 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:02:04 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:41 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_email_configs` SET `email_host`="1234",`email_port`=1234,`email_user`="1234",`email_password`="1234",`email_sender`="1234",`update_time`="2024-10-30 18:02:04.011"
+
+2024/10/30 18:02:04 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:46 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:02:04 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:47 WHERE conditions required
+[0.000ms] [rows:0] UPDATE `xq_notice_configs` SET `type`=1,`secret`="1234",`webhook`="1234",`update_time`="2024-10-30 18:02:04.011"
+
+2024/10/30 18:02:11 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:21 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:02:14 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:21 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:06:32 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:06:53 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:51 no such table: xq_notice_configs
+[0.471ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:06:53 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:57 no such table: xq_notice_configs
+[0.000ms] [rows:0] INSERT INTO `xq_notice_configs` (`type`,`secret`,`webhook`,`create_time`,`update_time`) VALUES (1,"1234","1234","2024-10-30 18:06:53.858","0000-00-00 00:00:00") RETURNING `id`
+
+2024/10/30 18:07:13 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:07:19 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:07:21 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:20 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:08:09 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:51 no such table: xq_notice_configs
+[0.000ms] [rows:0] SELECT * FROM `xq_notice_configs` ORDER BY `xq_notice_configs`.`id` LIMIT 1
+
+2024/10/30 18:08:09 D:/CodeProjects/XuanQiong/backend/models/sysconfig.go:57 no such table: xq_notice_configs
+[0.000ms] [rows:0] INSERT INTO `xq_notice_configs` (`type`,`secret`,`webhook`,`create_time`,`update_time`) VALUES (1,"123","123","2024-10-30 18:08:09.213","0000-00-00 00:00:00") RETURNING `id`
+
+2024/10/30 18:10:30 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
+[0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"

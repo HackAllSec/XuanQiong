@@ -8,7 +8,6 @@
     import { onMounted } from 'vue';
     import { useI18n } from 'vue-i18n';
     import api from '../api'
-    import { checkLogin } from '../utils'
 
     const { t } = useI18n()
     const router = useRoute();
@@ -17,7 +16,7 @@
     const poc = ref('xray')
     const exp = ref('xray')
     const vulntype = ref([])
-    const mountedFunctions = []//checkLogin,getVulnTypes,checkFrom]
+    const mountedFunctions = []//getVulnTypes,checkFrom]
     const xraypoc = `name: poc-yaml-test-php-rce
 manual: true
 transport: http

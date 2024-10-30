@@ -66,11 +66,7 @@
   const router = useRouter()
   const { t, locale } = useI18n();
   const username = sessionStorage.getItem('username')
-  const avatar = ref("/download/file?id=" + sessionStorage.getItem('avatar'))
-  
-  if (!sessionStorage.getItem('avatar')) {
-    avatar.value = "/avatar.svg"
-  }
+  const avatar = sessionStorage.getItem('avatar')
 
   const changelanguage = (language) => {
     locale.value = language;

@@ -7,9 +7,6 @@ import { jwtDecode } from 'jwt-decode'
 const routes: RouteRecordRaw[] = [
  { path: '/', name: 'Home', component: () => import('../views/Index.vue') },
  { path: '/login', name: 'Login', component: () => import('../pages/Login.vue') },
- { path: '/vulnlist', name: 'Vulnlist', component: () => import('../pages/Vulnlist.vue') },
- { path: '/profile', name: 'Profile', component: () => import('../pages/Profile.vue') },
- { path: '/editvuln', name: 'Editvuln', component: () => import('../pages/Editvuln.vue') },
 ]
 
 // RouterOptions是路由选项类型

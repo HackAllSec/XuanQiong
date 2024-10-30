@@ -91,6 +91,9 @@ export default {
             score: '分数',
             coefficient: '系数',
             weeklyadditions: '本周新增漏洞',
+            weeklyadditionspoc: '本周新增 Poc',
+            weeklyadditionsexp: '本周新增 Exp',
+            weeklyadditionsproduct: '本周新增受影响产品',
             pocmanager: 'Poc 管理',
             expmanager: 'Exp 管理',
             statistics: '统计',
@@ -127,6 +130,8 @@ export default {
             clickupload: '点击上传',
             uploadnotice1: '仅允许上传zip、doc、docx、pdf和txt，最大不超过 10 MB',
             uploadsucc: '上传成功',
+            addsuccess: '添加成功',
+            addfail: '添加失败',
             modifysucc: '修改成功',
             modifyfail: '修改失败',
             other: '其他',
@@ -144,7 +149,12 @@ export default {
             jwtkey: 'JWT 密钥',
             jwtvalidity: 'JWT 有效期',
             noticeconfig: '通知配置',
-            noticetype: '通知类型'
+            noticetype: '通知类型',
+            roleisnull: '角色不能为空',
+            invalidinput: '输入无效',
+            nopermation: '您没有权限访问',
+            modify: '修改',
+            userdisplay: '已删除用户显示名称'
         }
     }
 };

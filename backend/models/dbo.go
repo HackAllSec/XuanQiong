@@ -69,12 +69,12 @@ func init() {
     res := db.Raw("SELECT * FROM xq_users WHERE username = ?", "admin").Scan(&user)
     if res.Error != nil {
         log.Println("Initializing Database...")
-        db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNotice{}, &types.XqUser{},
+        db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
             &types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
             &types.XqRankingDetail{}, &types.XqScoreRule{})
         res = db.First(&types.XqSystemConfig{})
         if res.RowsAffected == 0 {
-            db.Create(&types.XqSystemConfig{UserRegister: false, MaxAttempts: 5, LockoutDuration: 3600, CreateTime: time.Now()})
+            db.Create(&types.XqSystemConfig{UserRegister: false, UserDisplay: "佚名", MaxAttempts: 5, LockoutDuration: 3600, CreateTime: time.Now()})
         }
         res = db.First(&types.XqJwtConfig{})
         if res.RowsAffected == 0 {
@@ -118,7 +118,7 @@ func init() {
         if err != nil {
             log.Fatalf("Error generating password: %v", err)
         }
-        err = CreateUser("admin", password, 1)
+        err = CreateUser("admin", password, "", "", 1)
         if err == nil {
             log.Println("Database initialized successfully!")
             log.Println("Successfully created administrator account:")
@@ -131,7 +131,7 @@ func init() {
             if err != nil {
                 log.Fatalf("Error generating password: %v", err)
             }
-            err = CreateUser("admin", password, 1)
+            err = CreateUser("admin", password, "", "", 1)
             if err == nil {
                 log.Println("Successfully created administrator account:")
                 log.Println("Username: admin")

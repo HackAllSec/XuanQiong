@@ -79,41 +79,10 @@ import api from '../api'
 import { DocumentCopy } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
-const data = ref({
-    "data":[{
-            "id": "1",
-            "name": "信息泄露",
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": "2",
-            "name": "远程代码执行",
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": "3",
-            "name": "反序列化",
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": "4",
-            "name": "SQL注入",
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": "5",
-            "name": "XSS",
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-    ]})
-const vulndetail = ref({})
+const data = ref({})
 const search = ref('')
-const mountedFunctions = []//fetchVulnList]
+const token = ref(sessionStorage.getItem('token'))
+const mountedFunctions = [fetchVulnType]
 const currentPage = ref(1);
 const pageSize = ref(15);
 const totalItems = ref(0)
@@ -173,13 +142,13 @@ const currentData = computed(() => {
 function handleSizeChange(size: number) {
   pageSize.value = size;
   currentPage.value = 1; // 每次改变条目数时重置到第一页
-  fetchVulnList();
+  fetchVulnType();
 }
 
 // 处理当前页变化
 async function handleCurrentChange(page: number) {
     currentPage.value = page;
-    await fetchVulnList();
+    await fetchVulnType();
 }
 
 onMounted(() => {
@@ -188,17 +157,13 @@ onMounted(() => {
   });
 });
 
-async function fetchVulnList() {
+async function fetchVulnType() {
+    console.log(data.value)
     try {
-        const response = await api.get(`/api/v1/getvulnlist?page=${currentPage.value}&limit=${pageSize.value}`)
+        const response = await api.get(`/api/v1/getvulntype?page=${currentPage.value}&limit=${pageSize.value}`)
         data.value = response.data
         totalItems.value = response.data.total
-        typefilter.value = response.data.data.reduce((acc, item) => {
-            if (!acc.some(i => i.value === item.vuln_type)) {
-                acc.push({ text: item.vuln_type, value: item.vuln_type });
-            }
-            return acc;
-        }, []);
+        console.log(data.value)
     } catch (error) {
         // 处理请求错误
         //ElMessage.error(t('app.webui.loginerr2'));
@@ -247,13 +212,81 @@ const handleDelete = (index, row) => {
       
     })
 }
-const addVulnType = () => {
+async function addVulnType() {
     console.log(vulntypeForm.value)
-    dialogVisibleAdd.value = false
+    try {
+        const config = {
+            headers: {
+                Authorization: 'Bearer ' + token.value
+            }
+        }
+        const response = await api.post("/api/v1/addvulntype", vulntypeForm.value, config)
+        console.log(response)
+        if (response.data.code == 1) {
+            ElMessage({
+                type: 'success',
+                message: t('app.webui.addsuccess'),
+            })
+            fetchVulnType()
+            dialogVisibleAdd.value = false
+            return
+        } else if (response.data.code == 2) {
+            ElMessage({
+                type: 'error',
+                message: t('app.webui.invalidinput'),
+            })
+            return
+        }  else if (response.data.code == 3) {
+            ElMessage({
+                type: 'error',
+                message: t('app.webui.addfail'),
+            })
+            return
+        } else {
+            // 返回登录界面
+        }     
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
 }
 const editVulnType = () => {
     console.log(vulntypeForm.value)
-    dialogVisibleEdit.value = false
+    try {
+        const config = {
+            headers: {
+                Authorization: 'Bearer ' + token.value
+            }
+        }
+        const response = api.post("/api/v1/updatevulntype", vulntypeForm.value, config)
+        console.log(response)
+        if (response.data.code == 1) {
+            ElMessage({
+                type: 'success',
+                message: t('app.webui.modifysucc'),
+            })
+            fetchVulnType()
+            dialogVisibleEdit.value = false
+            return
+        } else if (response.data.code == 2) {
+            ElMessage({
+                type: 'error',
+                message: t('app.webui.invalidinput'),
+            })
+            return
+        }  else if (response.data.code == 3) {
+            ElMessage({
+                type: 'error',
+                message: t('app.webui.modifyfail'),
+            })
+            return
+        } else {
+            // 返回登录界面
+        }
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
 }
 </script>
 <style scoped>

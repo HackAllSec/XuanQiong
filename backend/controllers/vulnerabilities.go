@@ -12,23 +12,21 @@ func GetVulnTypeList(c *gin.Context) {
     c.JSON(200, gin.H{"data": res})
 }
 
+// 分页获取漏洞类型列表
+func GetVulnType(c *gin.Context) {
+    page := c.Query("page")
+    limit := c.Query("limit")
+    total, data := models.GetVulnType(page, limit)
+    c.JSON(200, gin.H{"total": total, "data": data})
+}
+
 // 获取漏洞摘要，无需登录
 func GetVulnAbstract(c *gin.Context) {
-    token := c.Request.Header.Get("Authorization")
-    currentUser := models.GetUserByToken(token)
-    if currentUser != nil{
-        total, hasPoc, hasExp, affectedProduct, weeklyAdditionsVuln, weeklyAdditionsPoc, weeklyAdditionsExp, weeklyAdditionsProduct, res := models.GetVulnAbstract(true)
-        c.JSON(200, gin.H{"total": total, "hasPoc": hasPoc, "hasExp": hasExp,
+    total, hasPoc, hasExp, affectedProduct, weeklyAdditionsVuln, weeklyAdditionsPoc, weeklyAdditionsExp, weeklyAdditionsProduct, res := models.GetVulnAbstract()
+    c.JSON(200, gin.H{"total": total, "hasPoc": hasPoc, "hasExp": hasExp,
         "affectedProduct": affectedProduct, "weeklyAdditionsVuln": weeklyAdditionsVuln,
         "weeklyAdditionsPoc": weeklyAdditionsPoc, "weeklyAdditionsExp": weeklyAdditionsExp,
         "weeklyAdditionsProduct": weeklyAdditionsProduct, "data": res})
-    } else {
-        total, hasPoc, hasExp, affectedProduct, weeklyAdditionsVuln, weeklyAdditionsPoc, weeklyAdditionsExp, weeklyAdditionsProduct, res := models.GetVulnAbstract(false)
-        c.JSON(200, gin.H{"total": total, "hasPoc": hasPoc, "hasExp": hasExp,
-        "affectedProduct": affectedProduct, "weeklyAdditionsVuln": weeklyAdditionsVuln,
-        "weeklyAdditionsPoc": weeklyAdditionsPoc, "weeklyAdditionsExp": weeklyAdditionsExp,
-        "weeklyAdditionsProduct": weeklyAdditionsProduct, "data": res})
-    }
 }
 
 // 分页获取漏洞列表，无需登录
@@ -39,13 +37,41 @@ func GetVulnList(c *gin.Context) {
     c.JSON(200, gin.H{"total": total, "data": data})
 }
 
+// 分页获取待审核漏洞列表
+func GetUnauditList(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil && currentUser.Role == 1 {
+        page := c.Query("page")
+        limit := c.Query("limit")
+        total, data := models.GetUnauditList(page, limit)
+        c.JSON(200, gin.H{"code": 1, "total": total, "data": data})
+    } else {
+        c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+    }
+}
+
+// 分页获取已审核漏洞列表
+func GetAuditedList(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil && currentUser.Role == 1 {
+        page := c.Query("page")
+        limit := c.Query("limit")
+        total, data := models.GetAuditedList(page, limit)
+        c.JSON(200, gin.H{"code": 1, "total": total, "data": data})
+    } else {
+        c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+    }
+}
+
 // 获取漏洞详细信息，登录和未登录情况
 func GetVulnDetail(c *gin.Context) {
     id := c.Query("id")
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
     if currentUser != nil{
-        res := models.GetVulnDetailAuthed(id, currentUser.ID)
+        res := models.GetVulnDetailAuthed(id, currentUser.ID, currentUser.Role)
         c.JSON(200, gin.H{"code": 1, "data": res})
         return
     }
@@ -64,7 +90,6 @@ func AddVuln(c *gin.Context) {
             return
         }
         vulnerabilities.UserID = currentUser.ID
-        vulnerabilities.Submitter = currentUser.Username
         err := models.InsertVuln(vulnerabilities)
         if err != nil {
             c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
@@ -86,7 +111,7 @@ func EditVuln(c *gin.Context) {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input:" + err.Error()})
             return
         }
-        err := models.EditVuln(vulnerabilities, currentUser.ID)
+        err := models.EditVuln(vulnerabilities, currentUser.ID, currentUser.Role)
         if err != nil {
             c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
             return
@@ -161,6 +186,49 @@ func DeleteFile(c *gin.Context) {
             return
         }
         c.JSON(200, gin.H{"code": 1, "msg": "File deleted successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 添加漏洞类型
+func AddVulnType(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil && currentUser.Role == 1 {
+        var data map[string]interface{}
+        if err := c.ShouldBindJSON(&data); err != nil {
+            c.JSON(200, gin.H{"code": 2, "msg": "Invalid input"})
+            return
+        }
+        name, _ := data["name"].(string)
+        err := models.AddVulnType(name)
+        if err != nil {
+            c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "Add type successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 更新漏洞类型
+func UpdateVulnType(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil && currentUser.Role == 1 {
+        var vulntype types.XqVulnType
+        if err := c.ShouldBindJSON(&vulntype); err != nil {
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
+            return
+        }
+        err := models.UpdateVlunType(vulntype.ID, vulntype.Name)
+        if err != nil {
+            c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "Update type successfully"})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})

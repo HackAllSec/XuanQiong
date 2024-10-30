@@ -47,7 +47,7 @@
           <el-col>
             <el-statistic :value="vulndata.hasPoc"></el-statistic>
             <div style="display: flex; font-size: 13px; margin-top: 6%; gap: 10px;">
-              <span>{{ t('app.webui.weeklyadditions') }}</span>
+              <span>{{ t('app.webui.weeklyadditionspoc') }}</span>
               <span>{{ vulndata.weeklyAdditionsPoc }}</span>
             </div>
           </el-col>
@@ -64,7 +64,7 @@
           <el-col>
             <el-statistic :value="vulndata.hasExp"></el-statistic>
             <div style="display: flex; font-size: 13px; margin-top: 6%; gap: 10px;">
-              <span>{{ t('app.webui.weeklyadditions') }}</span>
+              <span>{{ t('app.webui.weeklyadditionsexp') }}</span>
               <span>{{ vulndata.weeklyAdditionsExp }}</span>
             </div>
           </el-col>
@@ -81,7 +81,7 @@
           <el-col>
             <el-statistic :value="vulndata.affectedProduct"></el-statistic>
             <div style="display: flex; font-size: 13px; margin-top: 6%; gap: 10px;">
-              <span>{{ t('app.webui.weeklyadditions') }}</span>
+              <span>{{ t('app.webui.weeklyadditionsproduct') }}</span>
               <span>{{ vulndata.weeklyAdditionsProduct }}</span>
             </div>
           </el-col>
@@ -128,9 +128,11 @@
 <script lang="ts" setup>
   import { useI18n } from 'vue-i18n';
   import { ref, onMounted } from 'vue';
+  import { useRouter } from 'vue-router'
   import api from '../api'
 
   const { t } = useI18n();
+  const router = useRouter();
   const sysdata = ref({})
   const vulndata = ref({})
   const colors = [
@@ -138,9 +140,9 @@
     { color: 'orange', percentage: 60 },
     { color: 'red', percentage: 100 }
   ]
-  const mountedFunctions = [getVuln]
+  const mountedFunctions = [getVuln, getSystem]
 
-  setInterval(getSystem, 3000);
+  let intervalId = setInterval(getSystem, 3000);
 
   onMounted(() => {
     mountedFunctions.forEach(fn => {
@@ -158,7 +160,12 @@
       };
       const response = await api.get('/api/v1/getsystemstatus', config)
       if (response.data.code != 1) {
+        clearInterval(intervalId);
         // 返回登录页
+        sessionStorage.removeItem('token')
+        sessionStorage.removeItem('username')
+        sessionStorage.removeItem('avatar')
+        router.push('/login')
       }
       sysdata.value = response.data.data
     } catch (error) {

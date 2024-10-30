@@ -66,6 +66,7 @@ func StartServer() {
     route.POST("/api/v1/login", controllers.Login)
     route.GET("/api/v1/getvulnabs", controllers.GetVulnAbstract)
     route.GET("/api/v1/getvulntypes", controllers.GetVulnTypeList)
+    route.GET("/api/v1/getvulntype", controllers.GetVulnType)
     route.GET("/api/v1/getvulnlist", controllers.GetVulnList)
     route.GET("/api/v1/getvulndtl", controllers.GetVulnDetail)
     route.GET("/api/v1/search", controllers.SearchVuln)
@@ -87,11 +88,17 @@ func StartServer() {
     // 管理员权限
     route.POST("/api/v1/adduser", controllers.CreateUser)
     route.POST("/api/v1/deluser", controllers.DeleteUser)
-    route.POST("/api/v1/userstatus", controllers.SetUserStatus)
+    //route.POST("/api/v1/userstatus", controllers.SetUserStatus)
     route.GET("/api/v1/getusers", controllers.GetUsers)
     route.POST("/api/v1/updateuser", controllers.UpdateUser)
     route.POST("/api/v1/auditvuln", controllers.AuditVuln)
     route.GET("/api/v1/getsystemstatus", controllers.GetSystemStatus)
+    route.POST("/api/v1/addvulntype", controllers.AddVulnType)
+    route.POST("/api/v1/updatevulntype", controllers.UpdateVulnType)
+    route.GET("/api/v1/getunauditlist", controllers.GetUnauditList)
+    route.GET("/api/v1/getauditedlist", controllers.GetAuditedList)
+    route.GET("/api/v1/getsysconfig", controllers.GetSystemConfig)
+    route.POST("/api/v1/updatesysconfig", controllers.UpdateSystemConfig)
     
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {

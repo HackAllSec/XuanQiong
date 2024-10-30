@@ -12,24 +12,6 @@ import (
     "xuanqiong/utils"
 )
 
-// 获取系统配置
-func GetSystemConfig() types.XqSystemConfig {
-    var LoginPolicy types.XqSystemConfig
-    db.First(&LoginPolicy)
-    return LoginPolicy
-}
-
-// 检查IP是否被锁定
-func IsLocked(ip string) bool {
-    var lockip types.XqLockip
-    if res := db.Raw("SELECT * FROM xq_lockips WHERE client_ip = ? AND status = 1", ip).Scan(&lockip).RowsAffected; res == 1 {
-        if lockip.LockoutUntil != nil && time.Now().Before(*lockip.LockoutUntil) {
-            return true
-        }
-    }
-    return false
-}
-
 // 检查登录凭据
 func CheckLogin(username string, password string) *types.XqUser {
     var user types.XqUser
@@ -80,18 +62,6 @@ func GetUserByToken(token string) *types.XqUser {
     return nil
 }
 
-// 锁定IP地址
-func LockIP(ip string, duration int64) {
-    var lockip types.XqLockip
-    db.Raw("SELECT * FROM xq_lockips WHERE client_ip = ?", ip).Scan(&lockip)
-    lockoutUntil := time.Now().Add(time.Duration(duration) * time.Second)
-    lockip.CreateTime = time.Now()
-    lockip.ClientIP = ip
-    lockip.Status = 1
-    lockip.LockoutUntil = &lockoutUntil
-    db.Save(&lockip)
-}
-
 // 清除token
 func CleanToken(username string) error {
     var user types.XqUser
@@ -107,7 +77,7 @@ func CleanToken(username string) error {
 }
 
 // 创建用户
-func CreateUser(username string, password string, role int64) error {
+func CreateUser(username string, password string, email string, phone string, role int64) error {
     var user types.XqUser
     res := db.Raw("SELECT * FROM xq_users WHERE username = ?", username).Scan(&user).RowsAffected
     if res == 0 {
@@ -115,6 +85,8 @@ func CreateUser(username string, password string, role int64) error {
         userData := types.XqUser{
             Username:   username,
             Password:   passwdHash,
+            Email:      email,
+            Phone:      phone,
             Role:       role,
             CreateTime: time.Now(),
             Status:     1,
@@ -127,58 +99,60 @@ func CreateUser(username string, password string, role int64) error {
 }
 
 // 删除用户
-func DeleteUser(username string) error {
+func DeleteUser(userid uint64) error {
     var user types.XqUser
-    res := db.Raw("SELECT * FROM xq_users WHERE username = ?", username).Scan(&user).RowsAffected
+    res := db.Where("id = ?", userid).Find(&user).RowsAffected
     if res == 0 {
-        return fmt.Errorf("User %s not found.", username)
+        return fmt.Errorf("User not found.")
     }
-    db.Delete(&user)
-    return nil
+    return db.Delete(&user).Error
 }
 
 // 修改用户信息
-func UpdateUser(username string, password string, role int64, status int64) error {
+func UpdateUser(userid uint64, role int64, username string, password string, email string, phone string, status int64) error {
     var user types.XqUser
-    res := db.Raw("SELECT * FROM xq_users WHERE username = ?", username).Scan(&user).RowsAffected
-    if res == 0 {
-        return fmt.Errorf("User %s not found.", username)
+    res := db.Where("username = ?", username).Where("id <> ?", userid).Find(&user).RowsAffected
+    if res != 0 {
+        return fmt.Errorf("Username %s already exists.", username)
     }
     updates := make(map[string]interface{})
+    db.Where("id = ?", userid).First(&user)
+    if user.Role != role {
+        updates["role"] = role
+    }
+    if username != "" && user.Username != username {
+        updates["username"] = username
+    }
     if password != "" {
         password = utils.GenPasswordHash(password)
         updates["password"] = password
     }
-    if role != -1 {
-        updates["role"] = role
+    if email != "" && user.Email != email && IsEmailValid(email) {
+        updates["email"] = email
     }
-    if status != -1 {
+    if phone != "" && user.Phone != phone {
+        updates["phone"] = phone
+    }
+    if user.Status != status {
         updates["status"] = status
     }
-    db.Model(&user).Where("username = ?", username).Updates(updates)
+    updates["update_time"] = time.Now()
+    db.Model(&user).Where("id = ?", userid).Updates(updates)
     return nil
 }
 
-// 获取所有用户
-func GetUsers() ([]types.XqUser) {
+// 分页获取所有用户
+func GetUsers(page string, pageSize string) (int64, []types.XqUser) {
     var users []types.XqUser
-    db.Select("id, username, role, create_time, status").Find(&users)
-    return users
-}
-
-// 启用或禁用用户
-func SetUserStatus(username string) error {
-    var user types.XqUser
-    res := db.Raw("SELECT * FROM xq_users WHERE username = ?", username).Scan(&user).RowsAffected
-    if res == 0 {
-        return fmt.Errorf("User %s not found.", username)
-    }
-    if user.Status == 0 {
-        db.Model(&user).Update("status", 1)
-    } else {
-        db.Model(&user).Update("status", 0)
-    }
-    return nil
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&users).Count(&totalCount)
+    db.Select("id, username, role, email, phone, create_time, status").
+    Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).
+    Find(&users)
+    //db.Select("id, username, role, create_time, status").Find(&users)
+    return totalCount, users
 }
 
 // 修改头像
@@ -402,67 +376,4 @@ func getRankingTop(start time.Time, end time.Time) []map[string]interface{} {
         Scan(&users)
 
     return users
-}
-
-func getCurrentQuarter() (time.Time, time.Time) {
-    now := time.Now()
-    currentMonth := now.Month()
-    quarter := (currentMonth - 1) / 3 + 1
-
-    // 计算季度的开始月份
-    startMonth := time.Month((quarter - 1) * 3 + 1)
-    // 计算季度的结束月份
-    endMonth := startMonth + 2
-
-    var startTime time.Time
-    var endTime time.Time
-    if quarter == 1 {
-        // 如果是第一季度，结束月份是3月
-        endTime = time.Date(now.Year(), 3, 31, 23, 59, 59, 0, now.Location())
-    } else {
-        // 否则，结束月份是当前季度的最后一个月
-        endTime = time.Date(now.Year(), endMonth, 31, 23, 59, 59, 59, now.Location())
-        if endMonth == time.December {
-            // 如果是第四季度，年份要加1
-            endTime = time.Date(now.Year()+1, 1, 1, 0, 0, 0, 0, now.Location()).Add(-1 * time.Second)
-        } else {
-            // 否则，年份不变
-            endTime = time.Date(now.Year(), endMonth+1, 1, 0, 0, 0, 0, now.Location()).Add(-1 * time.Second)
-        }
-    }
-    startTime = time.Date(now.Year(), startMonth, 1, 0, 0, 0, 0, now.Location())
-
-    return startTime, endTime
-}
-
-func getCurrentMonth() (time.Time, time.Time) {
-    now := time.Now()
-    startOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-    endOfMonth := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location()).Add(-1 * time.Second)
-    return startOfMonth, endOfMonth
-}
-
-func GetSystemStatus() (map[string]interface{}) {
-    var userslist []types.XqUser
-    var users types.XqUser
-    var adminCount int64
-    var userCount int64
-    var onlineUsers int64
-    db.Model(&users).Where("role = 1").Count(&adminCount)
-    db.Model(&users).Where("role = 0").Count(&userCount)
-    db.Where("token <> '' AND role = 0").Find(&userslist)
-    for _, user := range userslist {
-        if res := GetUserByToken(user.Token); res != nil {
-            onlineUsers++
-        }
-    }
-    cpuUsage, memUsage, diskUsage := utils.GetSystemUsage()
-    return map[string]interface{}{
-        "cpu":    cpuUsage,
-        "mem":    memUsage,
-        "disk":   diskUsage,
-        "admintotal": adminCount,
-        "usertotal": userCount,
-        "onlineuser": onlineUsers,
-    }
 }

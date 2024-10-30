@@ -38,10 +38,11 @@ async function getRankingList() {
         // 遍历每个排名列表并处理空的 avatar
         Object.keys(rankings).forEach((period) => {
             rankings[period].forEach((user) => {
-                user.avatar = '/download/file?id=' + user.avatar || '/avatar.svg';
+                user.avatar = !user.avatar ? '/avatar.svg' : '/download/file?id=' + user.avatar;
             });
         });
     data.value = rankings
+    console.log(data.value)
 }
 console.log(data.value)
 </script>

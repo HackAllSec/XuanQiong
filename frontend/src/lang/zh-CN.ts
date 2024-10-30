@@ -37,6 +37,7 @@ export default {
             email: '邮箱',
             confirmpassword: '确认密码',
             submit: '提交',
+            back: '返回',
             submitter: '提交者',
             language: '语言',
             loginsucc: '登录成功',

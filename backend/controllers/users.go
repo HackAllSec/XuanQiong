@@ -11,7 +11,7 @@ var (
 
 // 登录
 func Login(c *gin.Context) {
-    LoginPolicy := models.GetSystemConfig()
+    LoginPolicy, _, _, _ := models.GetSystemConfig()
     if models.IsLocked(c.ClientIP()) {
         c.JSON(200, gin.H{"code": 0, "msg": "Too many login attempts. Please try again later."})
         return
@@ -70,7 +70,10 @@ func CreateUser(c *gin.Context) {
         }
         username, _ := data["username"].(string)
         password, _ := data["password"].(string)
-        err := models.CreateUser(username, password, 0)
+        email, _ := data["email"].(string)
+        phone, _ := data["phone"].(string)
+        role, _ := data["role"].(float64)
+        err := models.CreateUser(username, password, email, phone, int64(role))
         if err == nil {
             c.JSON(200, gin.H{"code": 1, "msg": "User created successfully."})
             return
@@ -86,33 +89,34 @@ func CreateUser(c *gin.Context) {
 func DeleteUser(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-            return
-        }
+    if currentUser != nil && currentUser.Role == 1 {
         var data map[string]interface{}
         if err := c.ShouldBindJSON(&data); err != nil {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
             return
         }
-        username, ok := data["username"].(string)
+        userid, ok := data["userid"].(float64)
         if !ok {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
             return
         }
-        err := models.DeleteUser(username)
+        if uint64(userid) == currentUser.ID {
+            c.JSON(200, gin.H{"code": 0, "msg": "You can't delete yourself"})
+            return
+        }
+        err := models.DeleteUser(uint64(userid))
         if err != nil {
             c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
             return
         }
-        c.JSON(200, gin.H{"code": 1, "msg": "Delete " + username + " successfully"})
+        c.JSON(200, gin.H{"code": 1, "msg": "Delete successfully"})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 }
 
 // 启用或禁用用户
+/*
 func SetUserStatus(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
@@ -142,8 +146,9 @@ func SetUserStatus(c *gin.Context) {
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 }
+    */
 
-// 获取所有用户信息
+// 分页获取所有用户信息
 func GetUsers(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
@@ -152,8 +157,10 @@ func GetUsers(c *gin.Context) {
             c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
             return
         }
-        users := models.GetUsers()
-        c.JSON(200, gin.H{"code": 1, "data": users})
+        page := c.Query("page")
+        limit := c.Query("limit")
+        total, users := models.GetUsers(page, limit)
+        c.JSON(200, gin.H{"code": 1, "total": total, "data": users})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
@@ -170,24 +177,21 @@ func UpdateUser(c *gin.Context) {
         }
         var data map[string]interface{}
         if err := c.ShouldBindJSON(&data); err != nil {
-            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input1"})
             return
         }
+        userid, _ := data["id"].(float64)
+        role, _ := data["role"].(float64)
         username, ok := data["username"].(string)
         if !ok {
-            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input3"})
             return
         }
         password, _ := data["password"].(string)
-        role, ok := data["role"].(int64)
-        if !ok {
-            role = -1
-        }
-        status, ok := data["status"].(int64)
-        if !ok {
-            status = -1
-        }
-        err := models.UpdateUser(username, password, role, status)
+        email, _ := data["email"].(string)
+        phone, _ := data["phone"].(string)
+        status, _ := data["status"].(float64)
+        err := models.UpdateUser(uint64(userid), int64(role), username, password, email, phone, int64(status))
         if err != nil {
             c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
             return
@@ -280,7 +284,7 @@ func UpdateUserPassword(c *gin.Context) {
 
 // 注册用户
 func Register(c *gin.Context) {
-    LoginPolicy := models.GetSystemConfig()
+    LoginPolicy, _, _, _ := models.GetSystemConfig()
     if LoginPolicy.UserRegister == false {
         c.JSON(200, gin.H{"code": 0, "msg": "Register function is disabled"})
         return
@@ -362,22 +366,6 @@ func AuditVuln(c *gin.Context) {
             return
         }
         c.JSON(200, gin.H{"code": 1, "msg": "Audit successfully"})
-        return
-    }
-    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-}
-
-// 获取系统状态-管理员
-func GetSystemStatus(c *gin.Context) {
-    token := c.Request.Header.Get("Authorization")
-    currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-            return
-        }
-        data := models.GetSystemStatus()
-        c.JSON(200, gin.H{"code": 1, "data": data})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})

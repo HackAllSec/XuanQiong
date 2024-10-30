@@ -123,38 +123,9 @@
                         </div>
                     </el-descriptions-item>
                     <el-descriptions-item span="5" :label="`${t('app.webui.reviewcomments')}:`">
-                        <div style="margin-top: 10px; padding-inline: 25px;">{{vulndetail.data.review_comments}}</div>
+                        <div style="margin-top: 10px; padding-inline: 25px; color: red;">{{vulndetail.data.review_comments}}</div>
                     </el-descriptions-item>
                 </el-descriptions>
-            </div>
-        </el-card>
-        <el-card style="font-size: 20px; font-weight: bold; margin-top: 20px;" shadow="always" :header="t('app.webui.searchquery')">
-            <div style="font-weight: lighter; font-size: 17px;">
-                <el-descriptions :column="5">
-                    <el-descriptions-item span="2" :label="`Fofa ${t('app.webui.searchquery')}:`">{{vulndetail.data.fofa_query}}</el-descriptions-item>
-                    <el-descriptions-item span="2" :label="`ZoomEye ${t('app.webui.searchquery')}:`">{{vulndetail.data.zoom_eye_query}}</el-descriptions-item>
-                    <el-descriptions-item :label="`Quake ${t('app.webui.searchquery')}:`">{{vulndetail.data.quake_query}}</el-descriptions-item>
-                    <el-descriptions-item span="2" :label="`Hunter ${t('app.webui.searchquery')}:`">{{vulndetail.data.hunter_query}}</el-descriptions-item>
-                    <el-descriptions-item span="2" :label="`Google ${t('app.webui.searchquery')}:`">{{vulndetail.data.google_query}}</el-descriptions-item>
-                    <el-descriptions-item :label="`Shodan ${t('app.webui.searchquery')}:`">{{vulndetail.data.shodan_query}}</el-descriptions-item>
-                    <el-descriptions-item span="2" :label="`Censys ${t('app.webui.searchquery')}:`">{{vulndetail.data.censys_query}}</el-descriptions-item>
-                    <el-descriptions-item :label="`Greynoise ${t('app.webui.searchquery')}:`">{{vulndetail.data.greynoise_query}}</el-descriptions-item>
-                    
-                </el-descriptions>
-            </div>
-        </el-card>
-        <el-card style="font-size: 20px; font-weight: bold; margin-top: 20px;" shadow="always" header="Poc">
-            <div style="font-weight: lighter; font-size: 14px; position: relative;">
-                <el-button type="primary" :icon="DocumentCopy" circle style="position: absolute; right: 10px; top: 10px; z-index: 1000;" @click="copyToClipboard(vulndetail.data.poc)" />
-                <el-input v-if="vulndetail.data.poc != ''" v-model="vulndetail.data.poc" type="textarea" autosize readonly input-style="background-color: #515151; color: #fff;" />
-                <el-empty v-else :description="t('app.webui.empty')" />
-            </div>
-        </el-card>
-        <el-card style="font-size: 20px; font-weight: bold; margin-top: 20px;" shadow="always" header="Exp">
-            <div style="font-weight: lighter; font-size: 14px; position: relative;">
-                <el-button type="primary" :icon="DocumentCopy" circle style="position: absolute; right: 10px; top: 10px; z-index: 1000;" @click="copyToClipboard(vulndetail.data.exp)" />
-                <el-input v-if="vulndetail.data.exp != ''" v-model="vulndetail.data.exp" type="textarea" autosize readonly input-style="background-color: #515151; color: #fff;" />
-                <el-empty v-else :description="t('app.webui.empty')" />
             </div>
         </el-card>
     </div>

@@ -70,16 +70,19 @@
     </div>
     <el-dialog :title="t('app.webui.adduser')" v-model="dialogVisibleAdd" width="30%" @close="resetForm">
         <el-form :model="userForm" label-width="100px">
-            <el-form-item :label="t('app.webui.role')">
+            <el-form-item required :label="t('app.webui.role')">
                 <el-select v-model="userForm.role" :placeholder="t('el.select.placeholder')">
                     <el-option v-for="item in rolelist" :key="item.id" :label="item.label" :value="item.id" />
                 </el-select>
             </el-form-item>
-            <el-form-item :label="t('app.webui.username')">
+            <el-form-item required :label="t('app.webui.username')">
                 <el-input v-model="userForm.username" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item :label="t('app.webui.password')">
-                <el-input type="password" v-model="userForm.password" autocomplete="new-password"></el-input>
+            <el-form-item required :label="t('app.webui.password')">
+                <el-input type="password" show-password v-model="userForm.password"></el-input>
+            </el-form-item>
+            <el-form-item required :label="t('app.webui.confirmpassword')">
+                <el-input type="password" show-password v-model="confirmpassword"></el-input>
             </el-form-item>
             <el-form-item :label="t('app.webui.email')">
                 <el-input v-model="userForm.email"></el-input>
@@ -104,13 +107,20 @@
                 <el-input v-model="userForm.username" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item :label="t('app.webui.password')">
-                <el-input type="password" show-password v-model="userForm.password" autocomplete="new-password"></el-input>
+                <el-input type="password" show-password v-model="userForm.password"></el-input>
+            </el-form-item>
+            <el-form-item :label="t('app.webui.confirmpassword')">
+                <el-input type="password" show-password v-model="confirmpassword"></el-input>
             </el-form-item>
             <el-form-item :label="t('app.webui.email')">
                 <el-input v-model="userForm.email"></el-input>
             </el-form-item>
             <el-form-item :label="t('app.webui.phone')">
                 <el-input v-model="userForm.phone"></el-input>
+            </el-form-item>
+            <el-form-item :label="t('app.webui.status')">
+                <el-switch v-model="userForm.status"
+                    style="--el-switch-on-color: #13ce66;"/>
             </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -124,44 +134,15 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
-import { DocumentCopy } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
-const data = ref({
-    "data":[{
-        "id": 1,
-        "username": "admin",
-        "password": "",
-        "avatar": "",
-        "email": "99999999999@qq.com",
-        "phone": "99999999999",
-        "ranking": 0,
-        "role": 1,
-        "status": 1,
-        "token": "",
-        "create_time": "2024-10-16T17:31:17.3780967+08:00",
-        "update_time": "0001-01-01T00:00:00Z"
-    },
-    {
-            "id": 2,
-            "username": "test",
-            "password": "",
-            "avatar": "",
-            "email": "",
-            "phone": "",
-            "ranking": 0,
-            "role": 0,
-            "status": 1,
-            "token": "",
-            "create_time": "2024-10-16T22:40:30.1913285+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        }
-    ]})
+const data = ref({})
 const rolelist = ref([
     { id: 1, label: t('app.webui.admin') },
     { id: 0, label: t('app.webui.user') }
 ])
 const search = ref('')
+const token = sessionStorage.getItem('token')
 const dialogVisibleAdd = ref(false)
 const dialogVisibleEdit = ref(false)
 const userForm = ref({})
@@ -171,9 +152,10 @@ const pageSize = ref(15);
 const totalItems = ref(0)
 const multipleSelection = ref([])
 const multideleteVisible = ref(true)
+const confirmpassword = ref('')
 
 const handleSelectionChange = (val) => {
-    multideleteVisible.value = val.id
+    multipleSelection.value = val
     if (val.length > 0) {
         multideleteVisible.value = false
     } else {
@@ -223,38 +205,58 @@ onMounted(() => {
 });
 
 async function getUsers() {
-    /*
     try {
-        const response = await api.get(`/api/v1/getvulnlist?page=${currentPage.value}&limit=${pageSize.value}`)
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`  // 使用Bearer schema
+            }
+        };
+        const response = await api.get(`/api/v1/getusers?page=${currentPage.value}&limit=${pageSize.value}`, config)
+        if (response.data.code != 1) {
+            // 清空token，返回登录页
+            sessionStorage.removeItem("token")
+            sessionStorage.removeItem("username")
+
+        }
         data.value = response.data
         totalItems.value = response.data.total
-        typefilter.value = response.data.data.reduce((acc, item) => {
-            if (!acc.some(i => i.value === item.vuln_type)) {
-                acc.push({ text: item.vuln_type, value: item.vuln_type });
-            }
-            return acc;
-        }, []);
     } catch (error) {
         // 处理请求错误
         //ElMessage.error(t('app.webui.loginerr2'));
     }
-        */
 }
 function multiDeleteUser() {
     ElMessageBox.confirm(
-    t('app.webui.deletenotice'),
-    t('app.webui.confirmdelete'),
-    {
-      confirmButtonText: t('app.webui.confirm'),
-      cancelButtonText: t('app.webui.cancel'),
-      type: 'warning',
-    }
-  )
-    .then(() => {
-      ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
+        t('app.webui.deletenotice'),
+        t('app.webui.confirmdelete'),
+        {
+            confirmButtonText: t('app.webui.confirm'),
+            cancelButtonText: t('app.webui.cancel'),
+            type: 'warning',
+        }
+    )
+    .then(async () => {
+        const data = {
+            "ids": multipleSelection.value.map(item => item.id)
+        }
+        try {
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            const response = await api.post('/api/v1/multideleteusers', data, config)
+            if (response.data.code == 1) {
+                getUsers()
+                ElMessage.success(t('app.webui.deletecomplete'));
+            } else if (response.data.code == 0) {
+                ElMessage.error(t('app.webui.needlogin'));
+            } else {
+                ElMessage.error(t('app.webui.deletefail'));
+            }
+        } catch (error) {
+            
+        }
     })
     .catch(() => {
       
@@ -266,8 +268,10 @@ const handleEdit = (index, row) => {
     userForm.value.id = row.id
     userForm.value.role = row.role
     userForm.value.username = row.username
+    userForm.value.password = row.password
     userForm.value.email = row.email
     userForm.value.phone = row.phone
+    userForm.value.status = row.status == 1
     dialogVisibleEdit.value = true
 }
 const rolefilterHandler = (value, row) => {
@@ -278,20 +282,34 @@ const statusfilterHandler = (value, row) => {
 }
 const handleDelete = (index, row) => {
     ElMessageBox.confirm(
-    t('app.webui.deletenotice'),
-    t('app.webui.confirmdelete'),
-    {
-      confirmButtonText: t('app.webui.confirm'),
-      cancelButtonText: t('app.webui.cancel'),
-      type: 'warning',
-    }
-  )
-    .then(() => {
-        ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
-      console.log(index,row)
+        t('app.webui.deletenotice'),
+        t('app.webui.confirmdelete'),
+        {
+            confirmButtonText: t('app.webui.confirm'),
+            cancelButtonText: t('app.webui.cancel'),
+            type: 'warning',
+        }
+    )
+    .then(async () => {
+        console.log(JSON.stringify({id: row.id}))
+        try {
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            const response = await api.post('/api/v1/deluser', {userid: row.id}, config)
+            if (response.data.code == 1) {
+                getUsers()
+                ElMessage.success(t('app.webui.deletecomplete'));
+            } else if (response.data.code == 0) {
+                ElMessage.error(t('app.webui.needlogin'));
+            } else {
+                ElMessage.error(t('app.webui.deletefail'));
+            }
+        } catch (error) {
+            
+        }
     })
     .catch(() => {
       
@@ -304,13 +322,76 @@ const resetForm = () => {
     userForm.value.password = ''
     userForm.value.email = ''
     userForm.value.phone = ''
+    userForm.value.status = null
+    confirmpassword.value = ''
 }
-const addUser = () => {
-    console.log(userForm.value)
-    dialogVisibleAdd.value = false
+async function addUser () {
+    //console.log(userForm.value)
+    if (userForm.value.role == null) {
+        ElMessage.error(t('app.webui.roleisnull'));
+        return
+    }
+    if (userForm.value.username == '') {
+        ElMessage.error(t('app.webui.usernameempty'));
+        return
+    }
+    if (userForm.value.password == '') {
+        ElMessage.error(t('app.webui.passwordempty'));
+        return
+    }
+    if (userForm.value.password != confirmpassword.value) {
+        ElMessage.error(t('app.webui.passwordnotmatch'));
+        return
+    }
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const response = await api.post('/api/v1/adduser', userForm.value, config)
+        if (response.data.code == 1) {
+            getUsers()
+            ElMessage.success(t('app.webui.addsuccess'));
+            dialogVisibleAdd.value = false
+            console.log(userForm.value)
+        } else if (response.data.code == 0) {
+            ElMessage.error(t('app.webui.needlogin'));
+        } else {
+            ElMessage.error(t('app.webui.usernamealreadyexist'));
+        }
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
 }
-function editUser() {
-    console.log(userForm.value)
+async function editUser() {
+    //console.log(userForm.value)
+    if (userForm.value.password == '') {
+        if (userForm.value.password != confirmpassword.value) {
+            ElMessage.error(t('app.webui.passwordnotmatch'));
+            return
+        }
+    }
+    userForm.value.status = userForm.value.status == true ? 1 : 0
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const response = await api.post('/api/v1/updateuser', userForm.value, config)
+        if (response.data.code == 1) {
+            getUsers()
+            ElMessage.success(t('app.webui.modifysucc'));
+        } else if (response.data.code == 0) {
+            ElMessage.error(t('app.webui.needlogin'));
+        } else {
+            ElMessage.error(t('app.webui.modifyfail'));
+        }
+    } catch (error) {
+        
+    }
     dialogVisibleEdit.value = false
 }
 </script>

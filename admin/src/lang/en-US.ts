@@ -91,6 +91,9 @@ export default {
             score: 'Score',
             coefficient: 'Coefficient',
             weeklyadditions: 'New additions this week',
+            weeklyadditionspoc: 'New Pocs this week',
+            weeklyadditionsexp: 'New Exps this week',
+            weeklyadditionsproduct: 'New Affected Products this week',
             pocmanager: 'Poc Manager',
             expmanager: 'Exp Manager',
             statistics: 'Statistics',
@@ -127,6 +130,8 @@ export default {
             clickupload: 'Click to upload',
             uploadnotice1: 'Only zip, doc, docx, pdf and txt files are allowed, and the maximum size is 10MB',
             uploadsucc: 'Upload Successful',
+            addsuccess: 'Add Successful',
+            addfail: 'Add Failed',
             modifysucc: 'Modify Successful',
             modifyfail: 'Modify Failed',
             other: 'Other',
@@ -144,7 +149,12 @@ export default {
             jwtkey: 'JWT Secret',
             jwtvalidity: 'JWT Validity Period',
             noticeconfig: 'Notice Config',
-            noticetype: 'Notice Type'
+            noticetype: 'Notice Type',
+            roleisnull: 'Role cannot be empty',
+            invalidinput: 'Invalid input',
+            nopermation: 'You do not have permission to access',
+            modify: 'Modify',
+            userdisplay: 'Deleted user name display'
         }
     }
 };

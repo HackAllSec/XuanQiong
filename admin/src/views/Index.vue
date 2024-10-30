@@ -81,12 +81,11 @@
         <el-header style="background-color: #393939; display: flex; justify-content: flex-end; align-items: center; padding: 10px;">
           <div style="cursor: pointer; margin-left: auto;">
             <el-dropdown style="color: #fff;" trigger="click" @command="handleCommand">
-              <span><el-avatar style="margin-right: 10px;"> A </el-avatar>Admin</span>
+              <span style="display: flex; align-items: center;"><el-avatar style="margin-right: 10px;" :src="avatar" /> {{ username }}</span>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command=1>{{ t('app.webui.myprofile') }}</el-dropdown-item>
-                  <el-dropdown-item command=2>消息</el-dropdown-item>
-                  <el-dropdown-item command=3>{{ t('app.webui.logout') }}</el-dropdown-item>
+                  <el-dropdown-item command=2>{{ t('app.webui.logout') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -117,6 +116,9 @@
           <div v-else-if="enumid === '5'">
             <ScoreRule />
           </div>
+          <div v-else-if="showprofile">
+            <Profile />
+          </div>
         </el-main>
       </div>
     </el-container>
@@ -126,7 +128,6 @@
 <script lang="ts" setup>
 import { User, Compass, TrophyBase, Histogram, Menu as IconMenu, Place, Setting, Fold, Expand } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n';
-import internal from 'stream';
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router'
 import { ref } from 'vue'
@@ -138,14 +139,17 @@ import Audited from '../pages/Audited.vue';
 import System from '../pages/System.vue';
 import ScoreRule from '../pages/ScoreRule.vue';
 import VulnType from '../pages/VulnType.vue';
+import Profile from '../pages/Profile.vue';
 
 const { t, locale } = useI18n();
+const showprofile = ref(false)
 const changelanguage = (language) => {
     locale.value = language;
     localStorage.setItem('selectedLanguage', language);
     enumid.value = '1'
 };
 const username = sessionStorage.getItem('username');
+const avatar = sessionStorage.getItem('avatar');
 const enumid = ref('1')
 const isCollapse = ref(false)
 
@@ -156,30 +160,24 @@ function handleMenuClick(index: string) {
       enumid.value = index
 }
 
-/*
 const router = useRoute()
 onMounted(performAction);
 function performAction() {
   const token = sessionStorage.getItem('token')
   if (!token) {
-    ElMessage.error('请登录后访问!');
     router.push('/login')
   }
-  if (router.redirectedFrom.path === '/login') {
-    location.reload();
-  }
-}*/
+}
+
 function handleCommand(command: number) {
-  console.log(command)
     if (command == 1) {
-      router.push('/profile');
+      enumid.value = ''
+      showprofile.value = true
     }
     if (command == 2) {
-      router.push('/');
-    }
-    if (command == 3) {
       sessionStorage.removeItem('username');
       sessionStorage.removeItem('token');
+      sessionStorage.removeItem('avatar');
       location.reload();
     }
   }

@@ -81,7 +81,9 @@
                 sessionStorage.setItem('token', response.data.token);
                 sessionStorage.setItem('username', response.data.username);
                 if (response.data.avatar != '') {
-                    sessionStorage.setItem('avatar', response.data.avatar);
+                    sessionStorage.setItem('avatar', '/download/file?id=' + response.data.avatar);
+                } else {
+                    sessionStorage.setItem('avatar', '/avatar.svg');
                 }
                 router.push('/')
             }

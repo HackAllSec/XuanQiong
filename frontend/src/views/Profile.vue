@@ -49,7 +49,7 @@
     const userinfo = ref({})
     const buttonstatus = ref(true)
     const mountedFunctions = [checkLogin, getUserinfo]
-    const avatar = ref("/download/file?id=" + sessionStorage.getItem('avatar'))
+    const avatar = ref(sessionStorage.getItem('avatar'))
     onMounted(() => {
         mountedFunctions.forEach(fn => {
             fn();
@@ -70,9 +70,6 @@
                 sessionStorage.removeItem('avatar')
                 location.reload()
             }
-            if (!sessionStorage.getItem('avatar')) {
-                avatar.value = "/avatar.svg"
-            }
         } catch (error) {
             // 处理请求错误
             //ElMessage.error(t('app.webui.loginerr2'));
@@ -83,7 +80,7 @@
     }
     const handleSuccess = (response) => {
         ElMessage.success(t('app.webui.uploadsucc'))
-        sessionStorage.setItem('avatar', response.data)
+        sessionStorage.setItem('avatar', '/download/file?id=' + response.data)
         location.reload()
     }
     const checkEmail = () => {

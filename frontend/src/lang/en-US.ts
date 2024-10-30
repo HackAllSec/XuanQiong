@@ -37,6 +37,7 @@ export default {
             email: 'Email',
             confirmpassword: 'Confirmpassword',
             submit: 'Submit',
+            back: 'Back',
             submitter: 'Submitter',
             language: 'Language',
             loginsucc: 'Login Successful',

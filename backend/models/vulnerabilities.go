@@ -12,7 +12,7 @@ import (
 )
 
 // 获取漏洞摘要
-func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, int64, int64, []types.XqVulnerability) {
+func GetVulnAbstract() (int64, int64, int64, int64, int64, int64, int64, int64, []types.XqVulnerability) {
     var vulnDatas []types.XqVulnerability
     var totalCount int64
     var pocCount int64
@@ -25,53 +25,152 @@ func GetVulnAbstract(islogin bool) (int64, int64, int64, int64, int64, int64, in
     db.Model(&vulnDatas).Where("status = 1").Count(&totalCount)
     db.Raw("SELECT COUNT(*) FROM xq_vulnerabilities WHERE poc <> '' AND status = 1").Scan(&pocCount)
     db.Raw("SELECT COUNT(*) FROM xq_vulnerabilities WHERE exp <> '' AND status = 1").Scan(&expCount)
-    db.Model(&vulnDatas).Where("affected_product <> '' AND status = 1").Count(&affectedProductCount)
+    db.Model(&vulnDatas).Where("affected_product <> '' AND status = 1").Group("affected_product").Count(&affectedProductCount)
     thisWeek := time.Now().UTC().Truncate(24 * 7 * time.Hour)
     db.Model(&vulnDatas).Where("create_time >= ? AND status = 1", thisWeek).Count(&weeklyCount)
-    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM xq_vulnerabilities WHERE poc <> '' AND status = 1").Scan(&weeklyPocCount)
-    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM xq_vulnerabilities WHERE exp <> '' AND status = 1").Scan(&weeklyExpCount)
-    db.Where("create_time >= ?", thisWeek).Raw("SELECT COUNT(*) FROM xq_vulnerabilities WHERE affected_product <> '' AND status = 1").Scan(&weeklyAffectedProductCount)
-    if islogin {
-        db.Select("id, vuln_name, vuln_type, cvss, vuln_level, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
-        Where("status = 1").
-        Order("create_time DESC").Find(&vulnDatas)
-    } else {
-        db.Select("id, vuln_name, vuln_type, cvss, vuln_level, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+    db.Model(&vulnDatas).Where("create_time >= ? AND poc <> '' AND status = 1", thisWeek).Count(&weeklyPocCount)
+    db.Model(&vulnDatas).Where("create_time >= ? AND exp <> '' AND status = 1", thisWeek).Count(&weeklyExpCount)
+    subQuery := db.Model(&vulnDatas).Where("create_time < ? AND affected_product = v.affected_product AND status = 1", thisWeek)
+    db.Table("xq_vulnerabilities as v").
+        Select("COUNT(DISTINCT v.affected_product)").
+        Where("v.create_time >= ? AND v.affected_product <> '' AND v.status = 1", thisWeek).
+        Where("NOT EXISTS (?)", subQuery).
+        Count(&weeklyAffectedProductCount)
+        /*
+    db.Select("id, vuln_name, vuln_type, cvss, vuln_level, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
         Where("status = 1").
         Order("create_time DESC").
-        Limit(10).Find(&vulnDatas)
+        Limit(10).
+        Find(&vulnDatas)
+    for i := range vulnDatas {
+        var vulntype types.XqVulnType
+        db.Where("id = ?", vulnDatas[i].VulnTypeID).First(&vulntype)
+        vulnDatas[i].VulnType = vulntype.Name
     }
+        */
+    //db.Preload("VulnType").Where("status = 1").Order("create_time DESC").Limit(10).Find(&vulnDatas)
+    db.Table("xq_vulnerabilities").
+    Select("xq_vulnerabilities.*, xq_vuln_types.name as vuln_type").
+    Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+    Order("create_time DESC").
+    Limit(10).
+    Find(&vulnDatas)
     return totalCount, pocCount, expCount, affectedProductCount, weeklyCount, weeklyPocCount, weeklyExpCount,weeklyAffectedProductCount, vulnDatas
 }
 
-// 分页获取漏洞列表
+// 分页获取审核通过的漏洞列表
 func GetVulnList(page string, pageSize string) (int64, []types.XqVulnerability) {
     var vulnDatas []types.XqVulnerability
     var totalCount int64
     pageNum, _ := strconv.Atoi(page)
     pageSizeNum, _ := strconv.Atoi(pageSize)
     db.Model(&vulnDatas).Where("status = 1").Count(&totalCount)
+    /*
     db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
     Where("status = 1").Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Order("create_time DESC").
     Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
+    */
+    db.Table("xq_vulnerabilities").
+    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time").
+    Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+    Where("xq_vulnerabilities.status = 1").
+    Limit(pageSizeNum).
+    Offset((pageNum - 1) * pageSizeNum).
+    Order("xq_vulnerabilities.create_time DESC").
+    Omit("xq_vulnerabilities.user_id, xq_vulnerabilities.attachment_id, xq_vulnerabilities.attachment_name, xq_vulnerabilities.update_time").
+    Find(&vulnDatas)
+    return totalCount, vulnDatas
+}
+
+// 分页获取待审核漏洞列表
+func GetUnauditList(page string, pageSize string) (int64, []types.XqVulnerability) {
+    var vulnDatas []types.XqVulnerability
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&vulnDatas).Where("status = 0").Count(&totalCount)
+    /*
+    db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+    Where("status = 0").Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Order("create_time DESC").
+    Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
+    */
+    db.Table("xq_vulnerabilities").
+    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time").
+    Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+    Where("xq_vulnerabilities.status = 0").
+    Limit(pageSizeNum).
+    Offset((pageNum - 1) * pageSizeNum).
+    Order("xq_vulnerabilities.create_time DESC").
+    Omit("xq_vulnerabilities.user_id, xq_vulnerabilities.attachment_id, xq_vulnerabilities.attachment_name, xq_vulnerabilities.update_time").
+    Find(&vulnDatas)
+    return totalCount, vulnDatas
+}
+
+// 分页获取已审核漏洞列表
+func GetAuditedList(page string, pageSize string) (int64, []types.XqVulnerability) {
+    var vulnDatas []types.XqVulnerability
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&vulnDatas).Where("status <> 0").Count(&totalCount)
+    /*
+    db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
+    Where("status <> 0").Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Order("create_time DESC").
+    Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
+    */
+    db.Table("xq_vulnerabilities").
+    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time").
+    Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+    Where("xq_vulnerabilities.status <> 0").
+    Limit(pageSizeNum).
+    Offset((pageNum - 1) * pageSizeNum).
+    Order("xq_vulnerabilities.create_time DESC").
+    Omit("xq_vulnerabilities.user_id, xq_vulnerabilities.attachment_id, xq_vulnerabilities.attachment_name, xq_vulnerabilities.update_time").
+    Find(&vulnDatas)
     return totalCount, vulnDatas
 }
 
 // 获取漏洞详情，未登录时，返回不包含poc、exp和附件信息
 func GetVulnDetail(id string) (types.XqVulnerability) {
     var vulnerabilities types.XqVulnerability
-    res := db.Where("id = ? AND is_public = true AND status = 1", id).Omit("user_id, exp, attachment_id, attachment_name").First(&vulnerabilities)
-    if res.RowsAffected != 0 {
-        return vulnerabilities
+    //var user types.XqUser
+    //var vulntype types.XqVulnType
+    //db.Where("id = ? AND is_public = true AND status = 1", id).Omit("exp, attachment_id, attachment_name").First(&vulnerabilities)
+    //db.Where("id = ?", vulnerabilities.UserID).First(&user)
+    //db.Where("id = ?", vulnerabilities.VulnTypeID).First(&vulntype)
+    //vulnerabilities.Submitter = user.Username
+    //vulnerabilities.VulnType = vulntype.Name
+    db.Table("xq_vulnerabilities as v").
+        Select("v.*, '' as poc, '' as exp, '' as attachment_id, '' as attachment_name, u.id as user_id, u.username as submitter,vt.id as vuln_type_id, vt.name as vuln_type").
+        Joins("left join xq_users as u on v.user_id = u.id").
+        Joins("left join xq_vuln_types as vt on v.vuln_type_id = vt.id").
+        Where("v.id = ? AND v.is_public = true AND v.status = 1", id).
+        First(&vulnerabilities)
+    if vulnerabilities.Submitter == "" {
+        var sysconfig types.XqSystemConfig
+        db.First(&sysconfig)
+        vulnerabilities.Submitter = sysconfig.UserDisplay
     }
     return vulnerabilities
 }
 
 // 获取漏洞详情，已登录时，返回漏洞全部信息
-func GetVulnDetailAuthed(id string, userid uint64) (types.XqVulnerability) {
+func GetVulnDetailAuthed(id string, userid uint64, roleid int64) (types.XqVulnerability) {
     var vulnerabilities types.XqVulnerability
-    db.Where("id = ?", id).First(&vulnerabilities)
-    if vulnerabilities.UserID == userid {
+    //var user types.XqUser
+    //var vulntype types.XqVulnType
+    //db.Where("id = ?", id).First(&vulnerabilities)
+    //db.Where("id = ?", vulnerabilities.UserID).First(&user)
+    //db.Where("id = ?", vulnerabilities.VulnTypeID).First(&vulntype)
+    //vulnerabilities.Submitter = user.Username
+    //vulnerabilities.VulnType = vulntype.Name
+    db.Table("xq_vulnerabilities as v").
+        Select("v.*,u.id as user_id, u.username as submitter,vt.id as vuln_type_id, vt.name as vuln_type").
+        Joins("left join xq_users as u on v.user_id = u.id").
+        Joins("left join xq_vuln_types as vt on v.vuln_type_id = vt.id").
+        Where("v.id = ?", id).
+        First(&vulnerabilities)
+    if vulnerabilities.UserID == userid || roleid == 1 {
         return vulnerabilities
     }
     if vulnerabilities.IsPublic && vulnerabilities.Status == 1 {
@@ -198,14 +297,13 @@ func getVdbid() string {
 // 插入漏洞信息
 func InsertVuln(vuln types.XqVulnerability) error {
     var attachment types.XqAttachment
-    var vulntype types.XqVulnType
     err := checkVulnData(vuln)
     if vuln.AttachmentID != "" {
         db.Where("id = ?", vuln.AttachmentID).First(&attachment)
         vuln.AttachmentName = attachment.Name
     }
-    db.Where("id = ?", vuln.VulnTypeID).First(&vulntype)
-    vuln.VulnType = vulntype.Name
+    vuln.VulnType = ""
+    vuln.Submitter = ""
     hvdid := getVdbid()
     vuln.ID = hvdid
     vuln.Status = 0
@@ -219,31 +317,26 @@ func InsertVuln(vuln types.XqVulnerability) error {
 }
 
 // 编辑漏洞
-func EditVuln(vuln types.XqVulnerability, userid uint64) error {
+func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
     var vulnerability types.XqVulnerability
-    var attachment types.XqAttachment
-    var vulntype types.XqVulnType
     res := db.Where("id = ?", vuln.ID).First(&vulnerability)
     if res.RowsAffected == 0 {
         return fmt.Errorf("漏洞不存在")
     }
-    if vulnerability.Status == 1 {
-        return fmt.Errorf("漏洞已审核通过，无法编辑")
-    }
-    if vulnerability.UserID != userid {
-        return fmt.Errorf("你没有权限编辑该漏洞")
+    if roleid != 1 {
+        if vulnerability.UserID != userid {
+            return fmt.Errorf("你没有权限编辑该漏洞")
+        }
+        if vulnerability.Status == 1 {
+            return fmt.Errorf("漏洞已审核通过，无法编辑")
+        }
     }
     err := checkVulnData(vuln)
     if err != nil {
         return err
     }
-    if vuln.AttachmentID != "" {
-        db.Where("id = ?", vuln.AttachmentID).First(&attachment)
-        vuln.AttachmentName = attachment.Name
-    }
-    db.Where("id = ?", vuln.VulnTypeID).First(&vulntype)
-    vuln.VulnType = vulntype.Name
     vuln.ReviewComments = vulnerability.ReviewComments
+    vuln.UserID = vulnerability.UserID
     vuln.Status = 0
     vuln.UpdateTime = time.Now()
     err = db.Save(&vuln).Error
@@ -358,16 +451,43 @@ func DeleteFile(attachmentID string, userid uint64) error {
 }
 
 // 获取漏洞类型列表
-func GetVulnTypeList() []map[string]interface{} {
+func GetVulnTypeList() []types.XqVulnType {
     var vulnTypes []types.XqVulnType
-    var newVulnTypes []map[string]interface{}
     db.Find(&vulnTypes)
-    for _, vulnType := range vulnTypes {
-        newVulnType := map[string]interface{}{
-            "value": vulnType.ID,
-            "label": vulnType.Name,
-        }
-        newVulnTypes = append(newVulnTypes, newVulnType)
+    return vulnTypes
+}
+
+// 分页获取漏洞类型列表
+func GetVulnType(page string, pageSize string) (int64, []types.XqVulnType) {
+    var vulntype []types.XqVulnType
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&vulntype).Count(&totalCount)
+    db.Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Find(&vulntype)
+    return totalCount, vulntype
+}
+
+// 添加漏洞类型
+func AddVulnType(name string) error {
+    var vulnType types.XqVulnType
+    res := db.Where("name = ?", name).First(&vulnType).RowsAffected
+    if res != 0 {
+        return fmt.Errorf("漏洞类型已存在")
     }
-    return newVulnTypes
+    vulnType.Name = name
+    vulnType.CreateTime = time.Now()
+    return db.Create(&vulnType).Error
+}
+
+// 更新漏洞类型
+func UpdateVlunType(id uint64, name string) error {
+    var vulnType types.XqVulnType
+    res := db.Where("id = ?", id).First(&vulnType).RowsAffected
+    if res == 0 {
+        return fmt.Errorf("漏洞类型不存在")
+    }
+    vulnType.Name = name
+    vulnType.UpdateTime = time.Now()
+    return db.Save(&vulnType).Error
 }

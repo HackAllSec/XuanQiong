@@ -161,6 +161,39 @@
             </div>
             <el-empty v-else style="height: 30vh;" :description="t('app.webui.empty')" />
         </el-card>
+        <el-card style="margin-top: 20px;" shadow="always" :header="t('app.webui.audit')">
+            <div>
+                <el-input type="numper" v-model="audit.cvss" />
+            </div>
+            <div>
+                <el-select v-model="audit.audit" :placeholder="t('app.webui.observability')">
+                    <el-option v-for="item in priority" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+            </div>
+            <div>
+                <el-input type="textarea" v-model="audit.review" />
+            </div>
+            <div>
+                <el-select v-model="audit.prid" :placeholder="t('app.webui.priority')">
+                    <el-option v-for="item in priority" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+            </div>
+            <div>
+                <el-select v-model="audit.erid" :placeholder="t('app.webui.exploitability')">
+                    <el-option v-for="item in exploitability" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+            </div>
+            <div>
+                <el-select v-model="audit.irid" :placeholder="t('app.webui.impact')">
+                    <el-option v-for="item in impact" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+            </div>
+            <div>
+                <el-select v-model="audit.orid" :placeholder="t('app.webui.observability')">
+                    <el-option v-for="item in observability" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+            </div>
+        </el-card>
         <div style="margin-top: 1%;">
             <el-button @click="goBack">{{ t('app.webui.cancel') }}</el-button>
             <el-button type="primary" @click="submitAudit">{{ t('app.webui.confirm') }}</el-button>
@@ -176,90 +209,31 @@ import { DocumentCopy } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
 const showvulndetail = ref(false)
-const data = ref({
-    "data":[{
-            "id": "HVD-2024-0013",
-            "user_id": 0,
-            "cve": "",
-            "nvd": "",
-            "edb": "",
-            "cnnvd": "",
-            "cnvd": "",
-            "vuln_name": "灵当CRM wechatSession/index.php接口处存在文件上传漏洞",
-            "vuln_type_id": 0,
-            "vuln_type": "任意文件上传",
-            "vuln_level": "Critical",
-            "cvss": 10,
-            "description": "",
-            "affected_product": "",
-            "affected_product_version": "",
-            "fofa_query": "",
-            "zoomeye_query": "",
-            "quake_query": "",
-            "hunter_query": "",
-            "google_query": "",
-            "shodan_query": "",
-            "censys_query": "",
-            "greynoise_query": "",
-            "poc": "1",
-            "poc_type": "",
-            "exp": "1",
-            "exp_type": "",
-            "repair_suggestion": "",
-            "attachment_id": "",
-            "attachment_name": "",
-            "submitter": "",
-            "is_public": true,
-            "status": 1,
-            "review_comments": "",
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": "HVD-2024-0012",
-            "user_id": 0,
-            "cve": "",
-            "nvd": "",
-            "edb": "",
-            "cnnvd": "",
-            "cnvd": "",
-            "vuln_name": "VMware NSX Manager XStream 远程代码执行漏洞",
-            "vuln_type_id": 0,
-            "vuln_type": "远程代码执行",
-            "vuln_level": "High",
-            "cvss": 8.5,
-            "description": "",
-            "affected_product": "",
-            "affected_product_version": "",
-            "fofa_query": "",
-            "zoomeye_query": "",
-            "quake_query": "",
-            "hunter_query": "",
-            "google_query": "",
-            "shodan_query": "",
-            "censys_query": "",
-            "greynoise_query": "",
-            "poc": "1",
-            "poc_type": "",
-            "exp": "1",
-            "exp_type": "",
-            "repair_suggestion": "",
-            "attachment_id": "",
-            "attachment_name": "",
-            "submitter": "",
-            "is_public": false,
-            "status": 1,
-            "review_comments": "",
-            "create_time": "2024-10-21T10:05:12.324+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        }
-    ]})
+const token = sessionStorage.getItem('token')
+const typefilter = ref([])
+const data = ref({})
 const vulndetail = ref({})
+const audit = ref({
+    id: null,
+    audit: 1,
+    review: '',
+    cvss: null,
+    prid: 1,
+    erid: 1,
+    irid: 1,
+    orid: 1
+})
 const search = ref('')
-const mountedFunctions = []//fetchVulnList]
+const mountedFunctions = [getUnauthVulns]
 const currentPage = ref(1);
 const pageSize = ref(15);
 const totalItems = ref(0)
+const priority = [
+    { id: 1, name: '优秀' },
+    { id: 2, name: '良好' },
+    { id: 3, name: '一般' },
+    { id: 4, name: '差' }
+]
 
 function sortIsPublic(a, b) {
     if (a.is_public && !b.is_public) return -1;
@@ -300,13 +274,13 @@ const currentData = computed(() => {
 function handleSizeChange(size: number) {
   pageSize.value = size;
   currentPage.value = 1; // 每次改变条目数时重置到第一页
-  fetchVulnList();
+  getUnauthVulns();
 }
 
 // 处理当前页变化
 async function handleCurrentChange(page: number) {
     currentPage.value = page;
-    await fetchVulnList();
+    await getUnauthVulns();
 }
 
 onMounted(() => {
@@ -319,59 +293,44 @@ const goBack = () => {
     showvulndetail.value = false
     vulndetail.value = {}
 }
-const handleAudit = (index, row) => {
+const handleAudit = async (index, row) => {
     console.log(index, row);
-    vulndetail.value = {
-    "code": 1,
-    "data": {
-        "id": "HVD-2024-0005",
-        "user_id": 2,
-        "cve": "",
-        "nvd": "",
-        "edb": "",
-        "cnnvd": "",
-        "cnvd": "",
-        "vuln_name": "test3",
-        "vuln_type_id": 5,
-        "vuln_type": "跨站脚本攻击",
-        "vuln_level": "Low",
-        "cvss": 0.3,
-        "description": "1234",
-        "affected_product": "2134",
-        "affected_product_version": "2134",
-        "fofa_query": "",
-        "zoomeye_query": "",
-        "quake_query": "",
-        "hunter_query": "",
-        "google_query": "",
-        "shodan_query": "",
-        "censys_query": "",
-        "greynoise_query": "",
-        "poc": "",
-        "poc_type": "xray",
-        "exp": "",
-        "exp_type": "xray",
-        "repair_suggestion": "1234",
-        "attachment_id": "",
-        "attachment_name": "",
-        "submitter": "test",
-        "is_public": true,
-        "status": 0,
-        "review_comments": "",
-        "create_time": "2024-10-16T23:57:52.3650024+08:00",
-        "update_time": "2024-10-17T11:10:47.6528251+08:00"
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`  // 使用Bearer schema
+            }
+        };
+        const response = await api.get('/api/v1/getvulndtl?id=' + row.id, config)
+        if (token && response.data.code == 0) {
+            sessionStorage.removeItem('token')
+            sessionStorage.removeItem('username')
+            sessionStorage.removeItem('avatar')
+            location.reload()
+        }
+        vulndetail.value = response.data
+        audit.value.id = row.id
+        audit.value.cvss = response.data.data.cvss
+        showvulndetail.value = true
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
     }
-}
-    showvulndetail.value = true
 }
 
 const submitAudit = () => {
     console.log('审核')
+    console.log(audit.value)
 }
 
-async function fetchVulnList() {
+async function getUnauthVulns() {
     try {
-        const response = await api.get(`/api/v1/getvulnlist?page=${currentPage.value}&limit=${pageSize.value}`)
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`  // 使用Bearer schema
+            }
+        };
+        const response = await api.get(`/api/v1/getunauditlist?page=${currentPage.value}&limit=${pageSize.value}`, config)
         data.value = response.data
         totalItems.value = response.data.total
         typefilter.value = response.data.data.reduce((acc, item) => {

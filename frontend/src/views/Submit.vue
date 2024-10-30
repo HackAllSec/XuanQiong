@@ -7,7 +7,7 @@
             </el-form-item>
             <el-form-item :label="t('app.webui.vulntype')" style="width: 45%" required>
                 <el-select v-model="form.vuln_type_id" :placeholder="t('el.select.placeholder')">
-                    <el-option v-for="item in vulntype" :key="item.value" :label="item.label" :value="item.value" />
+                    <el-option v-for="item in vulntype" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
             </el-form-item>
             <el-form-item :label="t('app.webui.affectedproduct')" prop="affected_product" style="width: 45%" :rules="[{ required: true, message: t('app.webui.required') },]">
@@ -104,7 +104,8 @@
                 </el-upload>
             </el-form-item>
             <el-form-item style="width: 100%;  margin-left: 35%;">
-              <el-button type="primary" size="large" @click="onSubmit" style="width: 30%; font-size: 16px;" auto-insert-space>{{ t('app.webui.submitvuln') }}</el-button>
+                <el-button v-if="showback" size="large" @click="goBack" style="width: 30%; font-size: 16px;" auto-insert-space>{{ t('app.webui.back') }}</el-button>
+                <el-button type="primary" size="large" @click="onSubmit" style="width: 30%; font-size: 16px;" auto-insert-space>{{ t('app.webui.submitvuln') }}</el-button>
             </el-form-item>
             </el-form>
         </div>
@@ -113,16 +114,18 @@
 <script lang="ts" setup>
     import { ref } from 'vue'
     import { UploadFilled } from '@element-plus/icons-vue'
-    import { useRoute } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
     import { onMounted } from 'vue';
     import { useI18n } from 'vue-i18n';
     import api from '../api'
     import { checkLogin } from '../utils'
 
     const { t } = useI18n()
-    const router = useRoute();
+    const route = useRoute();
+    const router = useRouter()
     const token = sessionStorage.getItem('token')
     const url = ref('/api/v1/addvuln')
+    const showback = ref(false)
     const poc = ref('xray')
     const exp = ref('xray')
     const vulntype = ref([])
@@ -271,16 +274,23 @@ Connection: close
         });
     });
     function checkFrom () {
-        const id = router.query.id
-        if (router.redirectedFrom.path === '/myvulns') {
+        const id = route.query.id
+        if (route.redirectedFrom.path === '/myvulns') {
             const data = JSON.parse(localStorage.getItem('form'))
             if (data.id === id) {
                 form.value = data
                 url.value = '/api/v1/editvuln'
             }
+            showback.value = true
         } else {
             localStorage.removeItem('form')
         }
+    }
+    
+    function goBack() {
+        localStorage.removeItem('form')
+        router.back()
+        //router.push('/myvulns')
     }
     async function getVulnTypes() {
         try {

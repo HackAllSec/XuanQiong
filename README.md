@@ -1,6 +1,6 @@
 # 简介
 
-**XuanQiong（玄穹）**——开源漏洞库平台，中小型团队自建漏洞库的合适之选，为了提高性能，采用Go + Vue + Typescript实现，React比较难
+**XuanQiong（玄穹）**——一款高性能的开源漏洞库平台，中小型团队自建漏洞库的合适之选。支持漏洞提交、漏洞审核、漏洞搜索、漏洞排行榜、消息推送等功能。
 
 ## 功能
 
@@ -51,11 +51,11 @@ XuanQiong/
 │   ├── go.sum
 │   └── main.go            # 后端主入口
 │
-├── frontend/              # 用户前端目录
+├── frontend/              # 用户界面目录，Vue3+Vite+Element Plus+Typescript
 |   ├── dist               # build生成的目录
 │   │   └── assets/        # 静态资源，如图片、样式等
 │   │   └── index.html     # 用户端入口文件
-├── admin/                 # 管理员前端目录
+├── admin/                 # 后台管理界面目录，Vue3+Vite+Element Plus+Typescript
 │   ├── dist               # build生成的目录
 │   │   └── assets/        # 静态资源，如图片、样式等
 │   │   └── index.html     # 后台入口文件
@@ -67,6 +67,7 @@ XuanQiong/
 ### 前端
 
 - Vite
+- Vue3
 - Element Plus
 - Typescript
 

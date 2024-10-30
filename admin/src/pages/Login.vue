@@ -50,17 +50,25 @@
         let token = sessionStorage.getItem('token');
         if (token) {
             try {
-            const decodedToken = jwtDecode(token)
-            let currentTime = Math.floor(Date.now() / 1000)
-            if (currentTime > decodedToken.exp) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                location.reload();
-                return;
-            }
+                const decodedToken = jwtDecode(token)
+                if (decodedToken.role != 1) {
+                    //ElMessage.error('您没有权限访问该页面');
+                    sessionStorage.removeItem('token')
+                    sessionStorage.removeItem('username')
+                    sessionStorage.removeItem('avatar')
+                    return;
+                }
+                let currentTime = Math.floor(Date.now() / 1000)
+                if (currentTime > decodedToken.exp) {
+                    sessionStorage.removeItem('token')
+                    sessionStorage.removeItem('username')
+                    sessionStorage.removeItem('avatar')
+                    return;
+                }
             } catch (error) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')
+                sessionStorage.removeItem('avatar')
                 location.reload();
                 return;
             }
@@ -86,20 +94,28 @@
             console.log(response.data);
             // 检查登录是否成功
             if (response.data.token) {
+                const decodedToken = jwtDecode(response.data.token)
+                if (decodedToken.role != 1) {
+                    ElMessage.error(t('app.webui.nopermation'));
+                    return;
+                }
                 ElNotification({
-                    title: '登录成功',
-                    message: response.data.username + ', 欢迎您' ,
+                    title: t('app.webui.loginsucc'),
+                    message: response.data.username + ', ' + t('app.webui.welcome'),
                     type: 'success',
                 });
                 await new Promise((resolve) => setTimeout(resolve, 1000))
                 sessionStorage.setItem('token', response.data.token);
                 sessionStorage.setItem('username', response.data.username);
+                if (response.data.avatar == '') {
+                    sessionStorage.setItem('avatar', '/avatar.svg');
+                } else {
+                    sessionStorage.setItem('avatar', '/download/file?id=' + response.data.avatar);
+                }
                 router.push('/')
             } else {
                 ElMessage.error(response.data.msg);
             }
-            console.log(response.data.username);
-            console.log(response.data.token);
         } catch (error) {
             // 处理请求错误
             console.error(error);
