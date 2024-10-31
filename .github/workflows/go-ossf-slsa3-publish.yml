@@ -38,7 +38,11 @@ jobs:
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
               GOOS=$GOOS GOARCH=$GOARCH go build -o xuanqiong-$GOOS-$GOARCH main.go
-              zip -r xuanqiong-$GOOS-$GOARCH.zip backend/xuanqiong-$GOOS-$GOARCH config.yaml
+              if [ "$GOOS" = "windows" ]; then
+                zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH.exe config.yaml
+              else
+                zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH config.yaml
+              fi
             done
           done
 
@@ -47,6 +51,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: backend/xuanqiong-*.zip
-          tag: ${{ github.ref }}
+          tag: ${{ github.event.release.tag_name }}
           overwrite: true
           file_glob: true
