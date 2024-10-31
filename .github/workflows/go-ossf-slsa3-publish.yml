@@ -44,7 +44,6 @@ jobs:
         else
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
         fi
-        ls
 
     - name: Calculate Hash
       id: hash
