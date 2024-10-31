@@ -1,0 +1,100 @@
+name: SLSA Go Releaser
+
+on:
+  workflow_dispatch:
+  release:
+    types: [created]
+
+permissions:
+  id-token: write
+  contents: write
+  actions: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        goos: [windows, linux, darwin]
+        goarch: [amd64, 386, arm64, arm]
+        exclude:
+          - goos: darwin
+            goarch: 386
+          - goos: darwin
+            goarch: arm
+          - goos: windows
+            goarch: arm
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Go 1.20
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.20'
+        check-latest: true
+
+    - name: Build
+      run: |
+        echo "Building for ${{ matrix.goos }}-${{ matrix.goarch }}"
+        cd backend
+        if [ "${{ matrix.goos }}" = "windows" ]; then
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe
+        else
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
+        fi
+        ls
+
+    - name: Calculate Hash
+      id: hash
+      run: |
+        echo "Calculating hash for ${{ matrix.goos }}-${{ matrix.goarch }}"
+        if [ "${{ matrix.goos }}" = "windows" ]; then
+          HASH=$(sha256sum ./xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe | awk '{ print $1 }')
+        else
+          HASH=$(sha256sum ./xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }} | awk '{ print $1 }')
+        fi
+        echo "hash_${{ matrix.goos }}_${{ matrix.goarch }}=${HASH}" >> ${GITHUB_OUTPUT}
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
+        path: ./backend/xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}(.exe)
+
+  generate_provenance:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Generate SLSA Provenance
+      uses: slsa-framework/slsa-github-generator@latest
+      with:
+        go-version: '1.20'
+        base64-subjects: ${{ fromJSON(needs.build.outputs.hash) }}
+        upload-assets: true
+
+  release:
+    needs: [build, generate_provenance]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Download Artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: ./bin/
+
+    - name: Upload Release Assets
+      uses: shogo82148/actions-upload-release-artifact@v1
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_dir: ./bin/
