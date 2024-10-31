@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         goos: [windows, linux, darwin]
-        goarch: [amd64, 386, arm64]
+        goarch: [amd64, 386, arm64, arm]
         exclude:
           - goos: darwin
             goarch: 386
@@ -34,8 +34,7 @@ jobs:
       run: |
         echo "Building for ${{ matrix.goos }}-${{ matrix.goarch }}"
         cd backend
-        pwd
-        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=1 go build -v -o ./backend/${{ matrix.goos }}-${{ matrix.goarch }}
+        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o ./backend/${{ matrix.goos }}-${{ matrix.goarch }}
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
