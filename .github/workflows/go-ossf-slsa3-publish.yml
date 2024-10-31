@@ -31,14 +31,11 @@ jobs:
         with:
           go-version: 1.20
 
-      - name: Initialize Go Modules
-        run: |
-          go mod init xuanqiong
-          go mod tidy
-        
       - name: Build
         run: |
           cd backend
+          go mod init xuanqiong
+          go mod tidy
           for GOOS in ${{ matrix.goos }}; do
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
