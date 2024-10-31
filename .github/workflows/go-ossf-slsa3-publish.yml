@@ -36,7 +36,7 @@ jobs:
       run: |
         echo "Building for ${{ matrix.goos }}-${{ matrix.goarch }}"
         cd backend
-        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o ./backend/${{ matrix.goos }}-${{ matrix.goarch }}
+        GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o ${{ matrix.goos }}-${{ matrix.goarch }}
         ls
 
     - name: Upload Artifacts
