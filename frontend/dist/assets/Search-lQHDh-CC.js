@@ -1,0 +1,1 @@
+import{d as n,u as o,i as p,h as s,T as a,g as c}from"./index-CD0ViaIB.js";/* empty css                 */const l=n({__name:"Search",setup(r){const{t:e}=o();return(_,i)=>{const t=a;return c(),p(t,{description:s(e)("app.webui.empty")},null,8,["description"])}}});export{l as default};
