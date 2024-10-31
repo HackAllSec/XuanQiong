@@ -20,6 +20,8 @@ jobs:
         exclude:
           - goarch: 386
             goos: darwin
+          - goarch: arm
+            goos: darwin
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
