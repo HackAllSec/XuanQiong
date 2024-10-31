@@ -26,6 +26,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Parse CHANGELOG
+        id: parse_changelog
+        run: |
+          version_line=$(grep -E "^## \[" CHANGELOG.md | head -n 1)
+          version=$(echo $version_line | sed -E 's/## \[([^\]]+)\]/\1/')
+          description=$(echo $version_line | sed -E 's/## \[.*\] - .*/\1/' | sed 's/- /\n/g' | sed '1d;s/^/  /')
+          echo "Latest Version: $version"
+          echo "Release Notes: $description"
+          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
+          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
+
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
@@ -46,11 +57,22 @@ jobs:
             done
           done
 
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
+          release_name: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
+          body: ${{ steps.parse_changelog.outputs.RELEASE_NOTES }}
+          draft: false
+          prerelease: false
+
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: backend/xuanqiong-*.zip
-          tag: ${{ github.event.release.tag_name }}
+          tag: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
           overwrite: true
           file_glob: true
