@@ -30,8 +30,8 @@ jobs:
         id: parse_changelog
         run: |
           version_line=$(grep -E "^## \[" CHANGELOG.md | head -n 1)
-          version=$(echo $version_line | sed -E 's/## \[([^\]]+)\]/\1/')
-          description=$(echo $version_line | sed -E 's/## \[.*\] - (.*)/\1/' | sed 's/- /\n/g' | sed '1d;s/^/  /')
+          version=$(echo $version_line | sed -E 's/## \[([^\]]+)\] - .*/\1/')
+          description=$(echo $version_line | sed -E 's/## \[.*\] - (.*)/\1/')
           echo "Latest Version: $version"
           echo "Release Notes: $description"
           echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
