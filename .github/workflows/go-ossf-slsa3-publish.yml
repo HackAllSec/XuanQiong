@@ -50,11 +50,10 @@ jobs:
       id: hash
       run: |
         echo "Calculating hash for ${{ matrix.goos }}-${{ matrix.goarch }}"
-        pwd
         if [ "${{ matrix.goos }}" = "windows" ]; then
-          HASH=$(sha256sum ./xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe | awk '{ print $1 }')
+          HASH=$(sha256sum ./backend/xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe | awk '{ print $1 }')
         else
-          HASH=$(sha256sum ./xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }} | awk '{ print $1 }')
+          HASH=$(sha256sum ./backend/xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }} | awk '{ print $1 }')
         fi
         echo "hash_${{ matrix.goos }}_${{ matrix.goarch }}=${HASH}" >> ${GITHUB_OUTPUT}
 
@@ -92,10 +91,10 @@ jobs:
     - name: Download Artifacts
       uses: actions/download-artifact@v3
       with:
-        path: ./bin/
+        path: ./
 
     - name: Upload Release Assets
       uses: shogo82148/actions-upload-release-artifact@v1
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_dir: ./bin/
+        asset_dir: ./
