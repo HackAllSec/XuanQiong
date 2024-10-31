@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: ./xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}(.exe)
+        path: ./backend/xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}(.exe)
 
   generate_provenance:
     needs: [build]
