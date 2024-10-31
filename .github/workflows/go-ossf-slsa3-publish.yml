@@ -48,6 +48,7 @@ jobs:
       id: hash
       run: |
         echo "Calculating hash for ${{ matrix.goos }}-${{ matrix.goarch }}"
+        cd backend
         if [ "${{ matrix.goos }}" = "windows" ]; then
           HASH=$(sha256sum ./backend/xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe | awk '{ print $1 }')
         else
