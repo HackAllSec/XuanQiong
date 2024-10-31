@@ -43,15 +43,16 @@ jobs:
         path: ./bin/${{ matrix.goos }}-${{ matrix.goarch }}
 
   generate_provenance:
-    needs: build
+    needs: [build]
     runs-on: ubuntu-latest
-    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.4.0
-    with:
-      go-version: '1.20'
-      # 注意：这里需要确保前一个作业输出了正确的哈希值，并传递给这个作业
-      # 由于这个示例中没有显示如何生成和传递哈希值，你需要根据你的具体实现来调整
-      base64-subjects: ${{ needs.build.outputs.digests }}
-      upload-assets: true
+    steps:
+    - name: Generate SLSA Provenance
+      uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.4.0
+      with:
+        go-version: '1.20'
+        # 确保这一步与你生成和传递哈希值的步骤一致
+        base64-subjects: ${{ fromJSON(needs.build.outputs.digests) }}
+        upload-assets: true
 
   release:
     needs: [build, generate_provenance]
