@@ -30,7 +30,6 @@ jobs:
       with:
         go-version: '1.20'
         check-latest: true
-        private-repository: true
 
     - name: Build
       run: |
@@ -43,15 +42,19 @@ jobs:
         name: binaries-${{ matrix.goos }}-${{ matrix.goarch }}
         path: ./bin/${{ matrix.goos }}-${{ matrix.goarch }}
 
-    - name: Generate SLSA Provenance
-      uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.4.0
-      with:
-        go-version: '1.20'
-        base64-subjects: ${{ steps.hash.outputs.digests }}
-        upload-assets: true
+  generate_provenance:
+    needs: build
+    runs-on: ubuntu-latest
+    uses: slsa-framework/slsa-github-generator/.github/workflows/builder_go_slsa3.yml@v1.4.0
+    with:
+      go-version: '1.20'
+      # 注意：这里需要确保前一个作业输出了正确的哈希值，并传递给这个作业
+      # 由于这个示例中没有显示如何生成和传递哈希值，你需要根据你的具体实现来调整
+      base64-subjects: ${{ needs.build.outputs.digests }}
+      upload-assets: true
 
   release:
-    needs: build
+    needs: [build, generate_provenance]
     runs-on: ubuntu-latest
     steps:
     - name: Create Release
