@@ -37,9 +37,9 @@ jobs:
         echo "Building for ${{ matrix.goos }}-${{ matrix.goarch }}"
         cd backend
         if [ "${{ matrix.goos }}" = "windows" ]; then
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe .
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}.exe
         else
-          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }} .
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
         fi
         ls
 
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: ./backend/${{ matrix.goos }}-${{ matrix.goarch }}
+        path: ./xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}(.exe)
 
   generate_provenance:
     needs: [build]
