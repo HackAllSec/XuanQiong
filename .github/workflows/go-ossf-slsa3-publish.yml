@@ -32,6 +32,7 @@ jobs:
       with:
         go-version: '1.20'
         check-latest: true
+
     - name: Build
       run: |
         echo "Building for ${{ matrix.goos }}-${{ matrix.goarch }}"
@@ -42,6 +43,7 @@ jobs:
           GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} CGO_ENABLED=0 go build -v -o xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }}
         fi
         ls
+
     - name: Calculate Hash
       id: hash
       run: |
@@ -51,7 +53,8 @@ jobs:
         else
           HASH=$(sha256sum ./backend/xuanqiong-${{ matrix.goos }}-${{ matrix.goarch }} | awk '{ print $1 }')
         fi
-        echo "hash=${HASH}" >> $GITHUB_OUTPUT
+        echo "hash_${{ matrix.goos }}_${{ matrix.goarch }}=${HASH}" >> ${GITHUB_OUTPUT}
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -66,7 +69,7 @@ jobs:
       uses: slsa-framework/slsa-github-generator
       with:
         go-version: '1.20'
-        base64-subjects: ${{ needs.build.outputs.digests }}
+        base64-subjects: ${{ fromJSON(needs.build.outputs.hash) }}
         upload-assets: true
 
   release:
