@@ -64,8 +64,8 @@ jobs:
           description=$(awk '/## \[/ {if (found) {found=0; exit} else {found=1; next}} found' CHANGELOG.md)
           echo "Latest Version: $version"
           echo "Release Notes: $description"
-          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
-          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
+          echo "::set-output name=RELEASE_TAG::$version"
+          echo "::set-output name=RELEASE_NOTES::$description"
 
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
