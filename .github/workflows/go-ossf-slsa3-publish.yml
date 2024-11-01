@@ -1,9 +1,8 @@
 name: SLSA Go releaser
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+  release:
+    types: [created]
 
 permissions: read-all
 
@@ -40,22 +39,15 @@ jobs:
           description=$(awk '/## \[/ {if (found) {found=0; print buffer "\n"; buffer=""; next} else {found=1}} {if (found) buffer=buffer"\n"$0} END {if (found) print buffer}' CHANGELOG.md)
           echo "Latest Version: $version"
           echo "Release Notes: $description"
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          if [[ "${latest_tag#v}" == "version" ]]; then
+              echo "Not a release event, ending workflow."
+              exit 0
+          fi
           echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
-          echo "RELEASE_NOTES=${description//$'\n'/\\n}" >> $GITHUB_OUTPUT
-
-      - name: Get latest tag
-        id: get_latest_tag
-        run: |
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null)
-          if [[ -z "$latest_tag" ]]; then
-            echo "No tags found, exiting."
-            exit 0
-          fi
-          echo "Latest Tag: $latest_tag"
-          if [[ "$latest_tag" == "${{ steps.parse_changelog.outputs.RELEASE_TAG }}" ]]; then
-            echo "Not a release event, ending workflow."
-            exit 0
-          fi
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "$description" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Set up Go
         uses: actions/setup-go@v3
