@@ -66,8 +66,6 @@ jobs:
           echo "Release Notes: $description"
           echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
           echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_OUTPUT: ${{ runner.temp }}/outputs
 
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
