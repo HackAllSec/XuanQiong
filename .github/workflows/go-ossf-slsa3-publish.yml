@@ -64,8 +64,8 @@ jobs:
           description=$(awk '/## \[/ {if (found) {found=0; print buffer "\n"; buffer=""; next} else {found=1}} {if (found) buffer=buffer"\n"$0} END {if (found) print buffer}' CHANGELOG.md)
           echo "Latest Version: $version"
           echo "Release Notes: $description"
-          echo "::set-output name=RELEASE_TAG::$version"
-          echo "::set-output name=RELEASE_NOTES::$description"
+          export RELEASE_TAG=$version
+          export RELEASE_NOTES=$description
 
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
