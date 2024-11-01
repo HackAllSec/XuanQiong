@@ -147,14 +147,14 @@
                 </el-descriptions>
             </div>
         </el-card>
-        <el-card style="margin-top: 20px;" shadow="always" header="Poc">
+        <el-card v-if="vulndetail.data.poc != ''" style="margin-top: 20px;" shadow="always" header="Poc">
             <div v-if="vulndetail.data.poc != ''" style="position: relative;">
                 <el-button type="primary" :icon="DocumentCopy" circle style="position: absolute; right: 10px; top: 10px; z-index: 1000;" @click="copyToClipboard(vulndetail.data.poc)" />
                 <el-input v-model="vulndetail.data.poc" type="textarea" autosize readonly input-style="background-color: #515151; color: #fff;" />
             </div>
             <el-empty v-else style="height: 30vh;" :description="t('app.webui.empty')" />
         </el-card>
-        <el-card style="margin-top: 20px;" shadow="always" header="Exp">
+        <el-card v-if="vulndetail.data.exp != ''" style="margin-top: 20px;" shadow="always" header="Exp">
             <div v-if="vulndetail.data.exp != ''" style="position: relative;">
                 <el-button type="primary" :icon="DocumentCopy" circle style="position: absolute; right: 10px; top: 10px; z-index: 1000;" @click="copyToClipboard(vulndetail.data.exp)" />
                 <el-input v-model="vulndetail.data.exp" type="textarea" autosize readonly input-style="background-color: #515151; color: #fff;" />
@@ -162,37 +162,39 @@
             <el-empty v-else style="height: 30vh;" :description="t('app.webui.empty')" />
         </el-card>
         <el-card style="margin-top: 20px;" shadow="always" :header="t('app.webui.audit')">
-            <div>
-                <el-input type="numper" v-model="audit.cvss" />
-            </div>
-            <div>
-                <el-select v-model="audit.audit" :placeholder="t('app.webui.observability')">
-                    <el-option v-for="item in priority" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </div>
-            <div>
-                <el-input type="textarea" v-model="audit.review" />
-            </div>
-            <div>
-                <el-select v-model="audit.prid" :placeholder="t('app.webui.priority')">
-                    <el-option v-for="item in priority" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </div>
-            <div>
-                <el-select v-model="audit.erid" :placeholder="t('app.webui.exploitability')">
-                    <el-option v-for="item in exploitability" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </div>
-            <div>
-                <el-select v-model="audit.irid" :placeholder="t('app.webui.impact')">
-                    <el-option v-for="item in impact" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </div>
-            <div>
-                <el-select v-model="audit.orid" :placeholder="t('app.webui.observability')">
-                    <el-option v-for="item in observability" :key="item.id" :label="item.name" :value="item.id" />
-                </el-select>
-            </div>
+            <el-form :model="audit">
+                <el-form-item label="CVSS:">
+                    <el-input type="numper" v-model="audit.cvss" />
+                </el-form-item>
+                <el-form-item :label="`${t('app.webui.audit')}:`">
+                    <el-select v-model="audit.audit" :placeholder="t('app.webui.observability')">
+                        <el-option v-for="item in priority" :key="item.id" :label="item.name" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="audit.audit == 2" :label="t('app.webui.reviewcomments')">
+                    <el-input type="textarea" v-model="audit.review" />
+                </el-form-item>
+                <el-form-item v-if="audit.audit == 1" :label="`${t('app.webui.pocscorerule')}:`">
+                    <el-select v-model="audit.prid" :placeholder="t('app.webui.priority')">
+                        <el-option v-for="item in pocrules" :key="item.id" :label="item.rule" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="audit.audit == 1" :label="`${t('app.webui.exprule')}:`">
+                    <el-select v-model="audit.erid" :placeholder="t('app.webui.priority')">
+                        <el-option v-for="item in exprules" :key="item.id" :label="item.rule" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="audit.audit == 1" :label="`${t('app.webui.incidencerule')}:`">
+                    <el-select v-model="audit.irid" :placeholder="t('app.webui.priority')">
+                        <el-option v-for="item in incidencerules" :key="item.id" :label="item.rule" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item v-if="audit.audit == 1" :label="`${t('app.webui.otherrule')}:`">
+                    <el-select v-model="audit.orid" :placeholder="t('app.webui.priority')">
+                        <el-option v-for="item in otherrules" :key="item.id" :label="item.rule" :value="item.id" />
+                    </el-select>
+                </el-form-item>
+            </el-form>
         </el-card>
         <div style="margin-top: 1%;">
             <el-button @click="goBack">{{ t('app.webui.cancel') }}</el-button>
@@ -218,22 +220,25 @@ const audit = ref({
     audit: 1,
     review: '',
     cvss: null,
-    prid: 1,
-    erid: 1,
-    irid: 1,
-    orid: 1
+    prid: 0,
+    erid: 0,
+    irid: 0,
+    orid: 0
 })
 const search = ref('')
-const mountedFunctions = [getUnauthVulns]
+const mountedFunctions = [getUnauthVulns, getRules]
 const currentPage = ref(1);
 const pageSize = ref(15);
 const totalItems = ref(0)
+const pocrules = ref([])
+const exprules = ref([])
+const incidencerules = ref([])
+const otherrules = ref([])
 const priority = [
-    { id: 1, name: '优秀' },
-    { id: 2, name: '良好' },
-    { id: 3, name: '一般' },
-    { id: 4, name: '差' }
+    { id: 1, name: t('app.webui.pass') },
+    { id: 2, name: t('app.webui.unpassed') },
 ]
+const noscore = {"id": 0, "rule": "没有分数"}
 
 function sortIsPublic(a, b) {
     if (a.is_public && !b.is_public) return -1;
@@ -318,9 +323,29 @@ const handleAudit = async (index, row) => {
     }
 }
 
-const submitAudit = () => {
-    console.log('审核')
-    console.log(audit.value)
+async function submitAudit() {
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`  // 使用Bearer schema
+            }
+        };
+        const response = await api.post("/api/v1/auditvuln", audit.value, config)
+        if (response.data.code == 0) {
+            sessionStorage.removeItem('token')
+            sessionStorage.removeItem('username')
+            sessionStorage.removeItem('avatar')
+            location.reload()
+        } else {
+            ElMessage.success(t('app.webui.audited'))
+            vulndetail.value = {}
+            showvulndetail.value = false
+            getUnauthVulns()
+        }
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
 }
 
 async function getUnauthVulns() {
@@ -339,6 +364,34 @@ async function getUnauthVulns() {
             }
             return acc;
         }, []);
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
+}
+
+async function getRules() {
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`  // 使用Bearer schema
+            }
+        };
+        const response = await api.get("/api/v1/getscorerules", config)
+        if (response.data.code == 0) {
+            sessionStorage.removeItem('token')
+            sessionStorage.removeItem('username')
+            sessionStorage.removeItem('avatar')
+            location.reload()
+        }
+        pocrules.value = response.data.data.pocrules
+        exprules.value = response.data.data.exprules
+        incidencerules.value = response.data.data.incidencerules
+        otherrules.value = response.data.data.otherrules
+        pocrules.value.push(noscore)
+        exprules.value.push(noscore)
+        incidencerules.value.push(noscore)
+        otherrules.value.push(noscore)
     } catch (error) {
         // 处理请求错误
         //ElMessage.error(t('app.webui.loginerr2'));

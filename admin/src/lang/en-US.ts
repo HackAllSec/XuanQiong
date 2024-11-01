@@ -119,6 +119,7 @@ export default {
             wxwork: 'Wechat Work',
             yes: 'Yes',
             no: 'No',
+            pass: 'Pass',
             passed: 'Passed',
             unpassed: 'Unpassed',
             reviewcomments: 'Review Comments',

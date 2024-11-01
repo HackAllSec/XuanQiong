@@ -99,6 +99,7 @@ func StartServer() {
     route.GET("/api/v1/getauditedlist", controllers.GetAuditedList)
     route.GET("/api/v1/getsysconfig", controllers.GetSystemConfig)
     route.POST("/api/v1/updatesysconfig", controllers.UpdateSystemConfig)
+    route.GET("/api/v1/getscorerules", controllers.GetScoreRules)
     
     // 通配符路由
     route.NoRoute(func(c *gin.Context) {

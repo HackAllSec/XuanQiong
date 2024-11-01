@@ -119,6 +119,7 @@ export default {
             wxwork: '企业微信',
             yes: '是',
             no: '否',
+            pass: '通过',
             passed: '已通过',
             unpassed: '未通过',
             reviewcomments: '审核意见',

@@ -119,7 +119,7 @@ func GetAuditedList(page string, pageSize string) (int64, []types.XqVulnerabilit
     Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
     */
     db.Table("xq_vulnerabilities").
-    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time").
+    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, xq_vulnerabilities.review_comments, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time").
     Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
     Where("xq_vulnerabilities.status <> 0").
     Limit(pageSizeNum).

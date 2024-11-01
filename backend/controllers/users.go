@@ -58,11 +58,7 @@ func Logout(c *gin.Context) {
 func CreateUser(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-            return
-        }
+    if currentUser != nil && currentUser.Role == 1 {
         var data map[string]interface{}
         if err := c.ShouldBindJSON(&data); err != nil {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -152,11 +148,7 @@ func SetUserStatus(c *gin.Context) {
 func GetUsers(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-            return
-        }
+    if currentUser != nil && currentUser.Role == 1 {
         page := c.Query("page")
         limit := c.Query("limit")
         total, users := models.GetUsers(page, limit)
@@ -170,11 +162,7 @@ func GetUsers(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-            return
-        }
+    if currentUser != nil && currentUser.Role == 1 {
         var data map[string]interface{}
         if err := c.ShouldBindJSON(&data); err != nil {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input1"})
@@ -342,11 +330,7 @@ func GetUserTop10(c *gin.Context) {
 func AuditVuln(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
-    if currentUser != nil {
-        if currentUser.Role != 1 {
-            c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
-            return
-        }
+    if currentUser != nil && currentUser.Role == 1 {
         var data map[string]interface{}
         if err := c.ShouldBindJSON(&data); err != nil {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -366,6 +350,18 @@ func AuditVuln(c *gin.Context) {
             return
         }
         c.JSON(200, gin.H{"code": 1, "msg": "Audit successfully"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 获取评分规则
+func GetScoreRules(c *gin.Context) {
+    token := c.Request.Header.Get("Authorization")
+    currentUser := models.GetUserByToken(token)
+    if currentUser != nil && currentUser.Role == 1 {
+        rules := models.GetScoreRules()
+        c.JSON(200, gin.H{"code": 1, "data": rules})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
