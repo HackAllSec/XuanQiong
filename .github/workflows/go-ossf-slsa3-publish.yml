@@ -65,7 +65,9 @@ jobs:
           echo "Latest Version: $version"
           echo "Release Notes: $description"
           echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
-          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          echo "$description" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
