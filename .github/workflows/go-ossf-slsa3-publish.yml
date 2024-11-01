@@ -46,9 +46,6 @@ jobs:
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH.exe config.yaml
               else
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH config.yaml
-                ls
-                unzip xuanqiong-$GOOS-$GOARCH.zip
-                ls xuanqiong-$GOOS-$GOARCH
               fi
             done
           done
