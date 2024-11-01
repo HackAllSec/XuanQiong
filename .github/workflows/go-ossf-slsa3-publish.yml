@@ -29,9 +29,8 @@ jobs:
       - name: Parse CHANGELOG
         id: parse_changelog
         run: |
-          version_line=$(grep -E "^## \[" CHANGELOG.md | head -n 1)
-          version=$(echo $version_line | sed -E 's/## \[([^\]]+)\] - .*/\1/')
-          description=$(echo $version_line | sed -E 's/## \[.*\] - (.*)/\1/')
+          version=$(grep -E '## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}.*' CHANGELOG.md | head -n 1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}(.*)/\1 \2/')
+          description=$(awk '/## \[/ {if (found) {found=0; exit} else {found=1; next}} found' CHANGELOG.md)
           echo "Latest Version: $version"
           echo "Release Notes: $description"
           echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
