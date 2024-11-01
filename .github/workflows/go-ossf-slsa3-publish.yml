@@ -43,7 +43,6 @@ jobs:
       - name: Build
         run: |
           cd backend
-          go mod tidy
           for GOOS in ${{ matrix.goos }}; do
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
