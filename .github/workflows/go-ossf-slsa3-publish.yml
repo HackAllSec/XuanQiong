@@ -40,7 +40,7 @@ jobs:
           echo "Latest Version: $version"
           echo "Release Notes: $description"
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-          if [[ "${latest_tag#v}" == "version" ]]; then
+          if [[ "${latest_tag#v}" == "$version" ]]; then
               echo "Not a release event, ending workflow."
               exit 0
           fi
