@@ -41,7 +41,7 @@ jobs:
           for GOOS in ${{ matrix.goos }}; do
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
-              GOOS=$GOOS GOARCH=$GOARCH go build -o xuanqiong-$GOOS-$GOARCH main.go
+              GOOS=$GOOS GOARCH=$GOARCH go build -ldflags="-s -w" -o xuanqiong-$GOOS-$GOARCH main.go
               if [ "$GOOS" = "windows" ]; then
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH.exe config.yaml
               else
