@@ -11,7 +11,7 @@ import (
 var (
     configFile = "config.yaml"
     Config types.Config
-    Version = "v1.0.0"
+    Version = "v1.0.2"
 )
 
 func init() {
