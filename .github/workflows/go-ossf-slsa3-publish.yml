@@ -28,6 +28,9 @@ jobs:
           - goos: windows
             goarch: arm
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Parse CHANGELOG
         id: parse_changelog
         run: |
@@ -46,9 +49,6 @@ jobs:
               echo "Not a release event, ending workflow."
               exit 0
           fi
-      
-      - name: Checkout code
-        uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v3
