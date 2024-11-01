@@ -35,6 +35,11 @@ jobs:
         with:
           go-version: '1.20'
 
+      - name: Install UPX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y upx
+          
       - name: Build
         run: |
           cd backend
@@ -42,6 +47,7 @@ jobs:
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
               GOOS=$GOOS GOARCH=$GOARCH go build -ldflags="-s -w" -o xuanqiong-$GOOS-$GOARCH main.go
+              upx --lzma --best xuanqiong-$GOOS-$GOARCH
               if [ "$GOOS" = "windows" ]; then
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH.exe config.yaml
               else
