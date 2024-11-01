@@ -47,11 +47,11 @@ jobs:
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
               if [ "$GOOS" = "windows" ]; then
-                GOOS=$GOOS GOARCH=$GOARCH go build -ldflags="-s -w" -o xuanqiong-$GOOS-$GOARCH.exe main.go
+                GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=1 go build -ldflags="-s -w" -o xuanqiong-$GOOS-$GOARCH.exe main.go
                 upx --lzma --best xuanqiong-$GOOS-$GOARCH.exe
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH.exe config.yaml ../frontend/dist/ ../admin/dist/
               else
-                GOOS=$GOOS GOARCH=$GOARCH go build -ldflags="-s -w" -o xuanqiong-$GOOS-$GOARCH main.go
+                GOOS=$GOOS GOARCH=$GOARCH CGO_ENABLED=1 go build -ldflags="-s -w" -o xuanqiong-$GOOS-$GOARCH main.go
                 upx --lzma --best xuanqiong-$GOOS-$GOARCH
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH config.yaml ../frontend/dist/ ../admin/dist/
               fi
