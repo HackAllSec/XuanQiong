@@ -3,8 +3,8 @@ package models
 import (
     "time"
 
-    "xuanqiong/types"
-    "xuanqiong/utils"
+    "xuanqiong/backend/types"
+    "xuanqiong/backend/utils"
 )
 
 // 获取系统配置

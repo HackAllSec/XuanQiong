@@ -5,7 +5,7 @@ import (
     "log"
 
     "gopkg.in/yaml.v2"
-    "xuanqiong/types"
+    "xuanqiong/backend/types"
 )
 
 var (

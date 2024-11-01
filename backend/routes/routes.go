@@ -6,8 +6,8 @@ import (
     "strconv"
 
     "github.com/gin-gonic/gin"
-    "xuanqiong/controllers"
-    "xuanqiong/config"
+    "xuanqiong/backend/controllers"
+    "xuanqiong/backend/config"
 )
 
 var (

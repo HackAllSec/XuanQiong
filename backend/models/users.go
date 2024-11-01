@@ -8,8 +8,8 @@ import (
     "time"
     "mime/multipart"
 
-    "xuanqiong/types"
-    "xuanqiong/utils"
+    "xuanqiong/backend/types"
+    "xuanqiong/backend/utils"
 )
 
 // 检查登录凭据

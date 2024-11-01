@@ -7,8 +7,8 @@ import (
     "strings"
     "strconv"
     "time"
-    "xuanqiong/types"
-    "xuanqiong/utils"
+    "xuanqiong/backend/types"
+    "xuanqiong/backend/utils"
 )
 
 // 获取漏洞摘要

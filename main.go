@@ -1,7 +1,7 @@
 package main
 
 import (
-    "xuanqiong/routes"
+    "xuanqiong/backend/routes"
 )
 
 func main() {

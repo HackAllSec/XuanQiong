@@ -1,7 +1,7 @@
 package controllers
 
 import (
-    "xuanqiong/models"
+    "xuanqiong/backend/models"
     "github.com/gin-gonic/gin"
 )
 
