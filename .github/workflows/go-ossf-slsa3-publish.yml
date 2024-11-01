@@ -26,21 +26,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Parse CHANGELOG
+        id: parse_changelog
+        run: |
+          version_line=$(grep -E "^## \[" CHANGELOG.md | head -n 1)
+          version=$(echo $version_line | sed -E 's/^## \[([^\]]+)\] - .*/\1/')
+          description=$(echo $version_line | sed -E 's/^## \[.*\] - (.*)/\1/')
+          echo "Latest Version: $version"
+          echo "Release Notes: $description"
+          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
+          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
+
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: '1.20'
 
-      - name: Parse CHANGELOG
-        id: parse_changelog
-        run: |
-          version=$(grep -E '## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}.*' CHANGELOG.md | head -n 1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}(.*)/\1 \2/')
-          description=$(awk '/## \[/ {if (found) {found=0; exit} else {found=1; next}} found' CHANGELOG.md)
-          echo "Latest Version: $version"
-          echo "Release Notes: $description"
-          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
-          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
-          
       - name: Build and Zip
         run: |
           cd backend
@@ -64,9 +65,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          release_name: Release ${{ env.RELEASE_TAG }}
-          body: ${{ env.RELEASE_NOTES }}
+          tag_name: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
+          release_name: Release ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
+          body: ${{ steps.parse_changelog.outputs.RELEASE_NOTES }}
           draft: false
           prerelease: false
 
@@ -74,7 +75,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ env.ZIP_FILES }}
-          tag: ${{ env.RELEASE_TAG }}
+          file: ${{ steps.parse_changelog.outputs.ZIP_FILES }}
+          tag: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
           overwrite: true
           file_glob: false
