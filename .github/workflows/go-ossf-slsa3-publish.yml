@@ -1,8 +1,9 @@
 name: SLSA Go releaser
 on:
   workflow_dispatch:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 permissions: read-all
 
@@ -27,6 +28,25 @@ jobs:
           - goos: windows
             goarch: arm
     steps:
+      - name: Parse CHANGELOG
+        id: parse_changelog
+        run: |
+          version=$(grep -E '## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}.*' CHANGELOG.md | head -n 1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}(.*)/\1 \2/')
+          description=$(awk '/## \[/ {if (found) {found=0; print buffer "\n"; buffer=""; next} else {found=1}} {if (found) buffer=buffer"\n"$0} END {if (found) print buffer}' CHANGELOG.md)
+          echo "Latest Version: $version"
+          echo "Release Notes: $description"
+          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
+          echo "RELEASE_NOTES=${description//$'\n'/\\n}" >> $GITHUB_OUTPUT
+
+      - name: Get latest tag
+        id: get_latest_tag
+        run: |
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          if [[ "$latest_tag" == "${{ steps.parse_changelog.outputs.RELEASE_TAG }}" ]]; then
+              echo "Not a release event, ending workflow."
+              exit 0
+          fi
+      
       - name: Checkout code
         uses: actions/checkout@v3
 
@@ -56,18 +76,6 @@ jobs:
               fi
             done
           done
-
-      - name: Parse CHANGELOG
-        id: parse_changelog
-        run: |
-          version=$(grep -E '## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}.*' CHANGELOG.md | head -n 1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}(.*)/\1 \2/')
-          description=$(awk '/## \[/ {if (found) {found=0; print buffer "\n"; buffer=""; next} else {found=1}} {if (found) buffer=buffer"\n"$0} END {if (found) print buffer}' CHANGELOG.md)
-          echo "Latest Version: $version"
-          echo "Release Notes: $description"
-          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-          echo "$description" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload release assets
         uses: svenstaro/upload-release-action@v2
