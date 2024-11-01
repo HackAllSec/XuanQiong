@@ -26,26 +26,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Parse CHANGELOG
-        id: parse_changelog
-        run: |
-          version=$(grep -E '## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}.*' CHANGELOG.md | head -n 1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}(.*)/\1 \2/')
-          description=$(awk '/## \[/ {if (found) {found=0; exit} else {found=1; next}} found' CHANGELOG.md)
-          description=$(echo $version_line | sed -E 's/^## \[.*\] - (.*)/\1/')
-          echo "Latest Version: $version"
-          echo "Release Notes: $description"
-          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
-          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
-
       - name: Set up Go
         uses: actions/setup-go@v3
         with:
           go-version: '1.20'
 
-      - name: Build and Zip
+      - name: Build
         run: |
           cd backend
-          zip_files=""
           for GOOS in ${{ matrix.goos }}; do
             for GOARCH in ${{ matrix.goarch }}; do
               echo "Building for $GOOS/$GOARCH"
@@ -55,10 +43,27 @@ jobs:
               else
                 zip -r xuanqiong-$GOOS-$GOARCH.zip xuanqiong-$GOOS-$GOARCH config.yaml
               fi
-              zip_files="$zip_files backend/xuanqiong-$GOOS-$GOARCH.zip "
             done
           done
-          echo "ZIP_FILES=$zip_files" >> $GITHUB_OUTPUT
+
+      - name: Parse CHANGELOG
+        id: parse_changelog
+        run: |
+          version=$(grep -E '## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}.*' CHANGELOG.md | head -n 1 | sed -E 's/## \[([0-9]+\.[0-9]+\.[0-9]+)\] - [0-9]{4}-[0-9]{2}-[0-9]{2}(.*)/\1 \2/')
+          description=$(awk '/## \[/ {if (found) {found=0; exit} else {found=1; next}} found' CHANGELOG.md)
+          echo "Latest Version: $version"
+          echo "Release Notes: $description"
+          echo "RELEASE_TAG=$version" >> $GITHUB_OUTPUT
+          echo "RELEASE_NOTES=$description" >> $GITHUB_OUTPUT
+
+      - name: Upload release assets
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: backend/xuanqiong-*.zip
+          tag: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
+          overwrite: true
+          file_glob: true
 
       - name: Create Release
         uses: actions/create-release@v1
@@ -66,16 +71,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
-          release_name: Release ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
+          release_name: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
           body: ${{ steps.parse_changelog.outputs.RELEASE_NOTES }}
           draft: false
           prerelease: false
-
-      - name: Upload release assets
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ steps.parse_changelog.outputs.ZIP_FILES }}
-          tag: ${{ steps.parse_changelog.outputs.RELEASE_TAG }}
-          overwrite: true
-          file_glob: false
