@@ -44,11 +44,15 @@ jobs:
       - name: Get latest tag
         id: get_latest_tag
         run: |
-          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1` 2>/dev/null)
+          if [[ -z "$latest_tag" ]]; then
+            echo "No tags found, exiting."
+            exit 0
+          fi
           echo "Latest Tag: $latest_tag"
           if [[ "$latest_tag" == "${{ steps.parse_changelog.outputs.RELEASE_TAG }}" ]]; then
-              echo "Not a release event, ending workflow."
-              exit 0
+            echo "Not a release event, ending workflow."
+            exit 0
           fi
 
       - name: Set up Go
