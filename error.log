@@ -1,0 +1,15 @@
+
+2024/11/02 00:17:02 D:/CodeProjects/XuanQiong/backend/models/dbo.go:54
+[error] failed to initialize database, got error dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it.
+
+2024/11/02 00:17:22 D:/CodeProjects/XuanQiong/backend/models/dbo.go:58
+[error] failed to initialize database, got error Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+
+2024/11/02 00:17:29 D:/CodeProjects/XuanQiong/backend/models/dbo.go:58
+[error] failed to initialize database, got error Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+
+2024/11/02 00:18:00 D:/CodeProjects/XuanQiong/backend/models/dbo.go:58
+[error] failed to initialize database, got error Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+
+2024/11/02 00:18:12 D:/CodeProjects/XuanQiong/backend/models/dbo.go:69 no such table: xq_users
+[0.000ms] [rows:-] SELECT * FROM xq_users WHERE username = "admin"

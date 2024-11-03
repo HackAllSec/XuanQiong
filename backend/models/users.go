@@ -362,6 +362,15 @@ func GetUserTop10() ([]map[string]interface{}, []map[string]interface{}, []map[s
     qres := getRankingTop(qstart, qend)
     mstart, mend := getCurrentMonth()
     mres := getRankingTop(mstart, mend)
+    if yres == nil {
+        yres = []map[string]interface{}{}
+    }
+    if qres == nil {
+        qres = []map[string]interface{}{}
+    }
+    if mres == nil {
+        mres = []map[string]interface{}{}
+    }
     return yres, qres, mres
 }
 

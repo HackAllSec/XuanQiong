@@ -1,0 +1,6 @@
+
+2024/11/01 20:24:01 D:/CodeProjects/XuanQiong/backend/models/dbo.go:58
+[error] failed to initialize database, got error Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
+
+2024/11/01 20:24:16 D:/CodeProjects/XuanQiong/backend/models/dbo.go:58
+[error] failed to initialize database, got error Binary was compiled with 'CGO_ENABLED=0', go-sqlite3 requires cgo to work. This is a stub
