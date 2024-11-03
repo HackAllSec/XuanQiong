@@ -1,6 +1,6 @@
 # 数据库配置
 database:
-  type: sqlite             # 设置数据库类型，可选值: mysql, postgres, sqlite, sqlserver, 暂不支持oracle
+  type: mysql             # 设置数据库类型，可选值: mysql, postgres, sqlite, sqlserver, 暂不支持oracle
 
   # 数据库连接配置
   connection:
