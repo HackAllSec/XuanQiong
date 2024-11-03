@@ -52,19 +52,19 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Set up Go
-        if: env.RELEASE_TAG != ''
+        if: steps.parse_changelog.outputs.RELEASE_TAG != ''
         uses: actions/setup-go@v3
         with:
           go-version: '1.20'
 
       - name: Install UPX
-        if: env.RELEASE_TAG != ''
+        if: steps.parse_changelog.outputs.RELEASE_TAG != ''
         run: |
           sudo apt-get update
           sudo apt-get install -y upx
           
       - name: Build
-        if: env.RELEASE_TAG != ''
+        if: steps.parse_changelog.outputs.RELEASE_TAG != ''
         run: |
           for GOOS in ${{ matrix.goos }}; do
             for GOARCH in ${{ matrix.goarch }}; do
@@ -82,7 +82,7 @@ jobs:
           done
 
       - name: Upload release assets
-        if: env.RELEASE_TAG != ''
+        if: steps.parse_changelog.outputs.RELEASE_TAG != ''
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
