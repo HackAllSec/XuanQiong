@@ -1,5 +1,7 @@
 # 简介
 
+## 简体中文 | [English](README_EN.md)
+
 **XuanQiong（玄穹）**——一款高性能的开源漏洞库平台，中小型团队自建漏洞库的合适之选。支持漏洞提交、漏洞审核、漏洞搜索、漏洞排行榜、消息推送等功能。
 
 ## 技术栈和功能
@@ -20,7 +22,7 @@
 支持漏洞提交、漏洞审核、漏洞搜索、漏洞排行榜、消息推送等功能。
 支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。
 支持JWT、Webhook、邮件通知等。
-内置漏洞类型，漏洞评分规则，积分计算规则查看[规则](ScoreRules.md)。
+内置漏洞类型，漏洞评分规则，积分计算规则查看[积分规则](ScoreRules.md)。
 
 ### 用户界面功能
 
@@ -66,24 +68,27 @@
 XuanQiong/
 │
 ├── backend/               # 后端目录
-│   ├── cmd/               # 可执行文件（如果使用 Go Modules）
-│   │   └── main.go
+│   ├── config/            # 配置解析和验证
 │   ├── controllers/       # 控制器，处理路由和逻辑
 │   ├── models/            # 数据模型
 │   ├── routes/            # 路由定义
+│   ├── types/             # 类型定义
 │   ├── utils/             # 工具和辅助函数
-│   ├── go.mod             # Go Modules 依赖文件
-│   ├── go.sum
-│   └── main.go            # 后端主入口
 │
 ├── frontend/              # 用户界面目录，Vue3+Vite+Element Plus+Typescript
 |   ├── dist               # build生成的目录
 │   │   └── assets/        # 静态资源，如图片、样式等
 │   │   └── index.html     # 用户端入口文件
+|
 ├── admin/                 # 后台管理界面目录，Vue3+Vite+Element Plus+Typescript
 │   ├── dist               # build生成的目录
 │   │   └── assets/        # 静态资源，如图片、样式等
 │   │   └── index.html     # 后台入口文件
+|
+├── config.yaml            # 配置文件
+├── go.mod                 # Go Modules 依赖文件
+├── go.sum
+├── main.go                # 主入口
 └── README.md              # 项目说明文件
 ```
 
