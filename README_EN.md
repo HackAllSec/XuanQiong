@@ -22,7 +22,7 @@
 Support functions such as vulnerability submission, vulnerability review, vulnerability search, vulnerability ranking list, and message push.
 Supports databases such as MySQL, PostgreSQL, SQLite3, SQL Server, etc. Please refer to the databases supported by GORM for details.
 Support JWT, Webhook, email notifications, etc.
-View the built-in vulnerability types, vulnerability rating rules, and point calculation rules [Score Rules] (ScoreRules.md).
+View the built-in vulnerability types, vulnerability rating rules, and point calculation rules [Score Rules](ScoreRules.md).
 
 ### User UI functions
 
@@ -64,27 +64,6 @@ View the built-in vulnerability types, vulnerability rating rules, and point cal
 
 ## Directory structure
 
-```
-XuanQiong/
-│
-├── backend/               # backend source code
-│   ├── controllers/       # Controller, responsible for handling routes and logic
-│   ├── models/            # Models, responsible for database operations
-│   ├── routes/            # Routes, responsible for routing
-│   ├── utils/             # Utils, responsible for common functions
-│   ├── go.mod
-│   ├── go.sum
-│   └── main.go            # Main entry point
-│
-├── frontend/              # User Frontend, Vue3+Vite+Element Plus+Typescript
-|   ├── dist               # build
-│   │   └── assets/
-│   │   └── index.html
-├── admin/                 # Admin Frontend, Vue3+Vite+Element Plus+Typescript
-│   ├── dist               # build
-│   │   └── assets/
-│   │   └── index.html
-└── README.md
 ```
 XuanQiong/
 │
