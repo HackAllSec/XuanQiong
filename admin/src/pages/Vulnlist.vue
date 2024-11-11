@@ -259,8 +259,8 @@
                 </el-table-column>
                 <el-table-column :label="t('app.webui.operate')" width="140">
                     <template #default="scope">
-                        <el-button size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">{{ t('app.webui.edit') }}</el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">{{ t('app.webui.delete') }}</el-button>
+                        <el-button :disabled="scope.row.status === 0" size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">{{ t('app.webui.edit') }}</el-button>
+                        <el-button :disabled="scope.row.status === 0" size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">{{ t('app.webui.delete') }}</el-button>
                     </template>
                 </el-table-column>
             </el-table>

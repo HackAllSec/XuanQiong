@@ -52,6 +52,7 @@ func GetVulnAbstract() (int64, int64, int64, int64, int64, int64, int64, int64, 
     db.Table("xq_vulnerabilities").
     Select("xq_vulnerabilities.*, xq_vuln_types.name as vuln_type").
     Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+    Where("status = 1").
     Order("create_time DESC").
     Limit(10).
     Find(&vulnDatas)
@@ -64,20 +65,21 @@ func GetVulnList(page string, pageSize string) (int64, []types.XqVulnerability) 
     var totalCount int64
     pageNum, _ := strconv.Atoi(page)
     pageSizeNum, _ := strconv.Atoi(pageSize)
-    db.Model(&vulnDatas).Where("status = 1").Count(&totalCount)
+    //db.Model(&vulnDatas).Where("status = 1").Count(&totalCount)
+    db.Model(&vulnDatas).Count(&totalCount)
     /*
     db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
     Where("status = 1").Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Order("create_time DESC").
     Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
     */
     db.Table("xq_vulnerabilities").
-    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time").
+    Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time, xq_vulnerabilities.update_time").
     Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
-    Where("xq_vulnerabilities.status = 1").
+    //Where("xq_vulnerabilities.status = 1").
     Limit(pageSizeNum).
     Offset((pageNum - 1) * pageSizeNum).
     Order("xq_vulnerabilities.create_time DESC").
-    Omit("xq_vulnerabilities.user_id, xq_vulnerabilities.attachment_id, xq_vulnerabilities.attachment_name, xq_vulnerabilities.update_time").
+    //Omit("xq_vulnerabilities.user_id, xq_vulnerabilities.attachment_id, xq_vulnerabilities.attachment_name, xq_vulnerabilities.update_time").
     Find(&vulnDatas)
     return totalCount, vulnDatas
 }
