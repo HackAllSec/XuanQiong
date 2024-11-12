@@ -330,6 +330,7 @@ async function submitAudit() {
                 'Authorization': `Bearer ${token}`  // 使用Bearer schema
             }
         };
+        audit.value.cvss = Number(audit.value.cvss)
         const response = await api.post("/api/v1/auditvuln", audit.value, config)
         if (response.data.code == 0) {
             sessionStorage.removeItem('token')

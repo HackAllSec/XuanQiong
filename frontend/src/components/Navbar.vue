@@ -1,11 +1,7 @@
 <template>
     <el-menu class="el-menu" mode="horizontal" :ellipsis="false">
       <el-menu-item index="0">
-        <img
-          style="width: 50px"
-          src="/avatar.svg"
-          alt="Element logo"
-        />
+        <img style="width: 50px" src="/avatar.svg" alt="Element logo" />
       </el-menu-item>
       <el-menu-item index="1" @click="GotoIndex">{{ t('app.webui.home') }}</el-menu-item>
       <el-menu-item index="2" @click="SubmitVuln">{{ t('app.webui.submitvuln') }}</el-menu-item>
@@ -25,15 +21,7 @@
         <el-menu-item index="5-1" @click="changelanguage('zh-CN')">简体中文</el-menu-item>
         <el-menu-item index="5-2" @click="changelanguage('en-US')">English</el-menu-item>
       </el-sub-menu>
-      <el-input
-      v-model="keyword"
-      style="width: 240px"
-      :placeholder="t('app.webui.search')"
-      :prefix-icon="Search"
-      @change="Searchvuln"
-      @keyup.enter.native="Searchvuln"
-      clearable
-      />
+      <el-menu-item index="6" @click="Searchvuln">{{ t('app.webui.search') }}</el-menu-item>
       <div style="margin-left: auto; cursor: pointer; color: var(--el-menu-text-color); ">
         <div v-if="!username" @click="Login" style="display: flex; align-items: center;">
           <el-icon style="margin-right: 10px;"><UserFilled /></el-icon>
@@ -58,11 +46,11 @@
   
   <script lang="ts" setup>
   import { ref, onMounted  } from 'vue'
-  import { UserFilled, Search } from '@element-plus/icons-vue'
+  import { UserFilled } from '@element-plus/icons-vue'
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n';
+  import api from '../api'
 
-  const keyword = ref('')
   const router = useRouter()
   const { t, locale } = useI18n();
   const username = sessionStorage.getItem('username')
@@ -83,10 +71,7 @@
       router.push('/modifypwd');
     }
     if (command == 4) {
-      sessionStorage.removeItem('username');
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('avatar')
-      location.reload();
+      logout();
     }
   }
 
@@ -106,14 +91,29 @@
     window.open('https://github.com/HackAllSec/XuanQiong/issues');
   }
   function Searchvuln() {
-    if (keyword.value != '') {
-      router.push('/search');
-    }
+    router.push('/search');
   }
   function Login() {
     router.push('/login');
   }
- 
+  async function logout() {
+    try {
+      const token = sessionStorage.getItem('token')
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const response = await api.get('/api/v1/logout', config)
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('avatar');
+        location.reload();
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
+  }
   </script>
   
   <style>
@@ -122,7 +122,7 @@
     width: 100%;
     --el-menu-bg-color: #383737;
     --el-menu-text-color: #fff;
-    padding-inline: 5%;
+    padding-inline: 1%;
 }
   .el-menu--horizontal > .el-menu-item:nth-child(1) {
     margin-right: auto;

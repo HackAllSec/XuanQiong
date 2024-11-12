@@ -1,15 +1,30 @@
 <template>
   <div>
-    <el-container>
-      <el-menu
+    <el-container style="width: 100%;">
+      <el-header style="background-color: #393939; display: flex; justify-content: flex-end; align-items: center; padding: 10px;">
+          <div style="display: flex; justify-content: center; align-items: center; color: #fff;">
+            <img src="../assets/vue.svg" fit="contain" style="margin-left: 1vw; height: 50px; width: 50px;">
+            <span style="margin-left: 1vw;">玄穹后台管理系统</span>
+          </div>
+          <div style="cursor: pointer; margin-left: auto;">
+            <el-dropdown style="color: #fff;" trigger="click" @command="handleCommand">
+              <span style="display: flex; align-items: center;"><el-avatar style="margin-right: 10px;" :src="avatar" /> {{ username }}</span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command=1>{{ t('app.webui.myprofile') }}</el-dropdown-item>
+                  <el-dropdown-item command=2>{{ t('app.webui.alterpwd') }}</el-dropdown-item>
+                  <el-dropdown-item command=3>{{ t('app.webui.logout') }}</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+      </el-header>
+      <el-container style="width: 100%;">
+        <el-menu
         :collapse="isCollapse"
         class="el-menu-vertical-demo"
         @select="handleMenuClick">
-        <div style="display: flex; margin: auto; height: 50px; width: 50px;">
-          <img src="../assets/vue.svg" fit="contain">
-        </div>
-        <div style="margin-top: 50%;">
-          <el-menu-item index="1">
+        <el-menu-item index="1" style="margin-top: 2vh;">
           <el-icon><Compass /></el-icon>
           <span>{{ t('app.webui.dashboard') }}</span>
         </el-menu-item>
@@ -75,22 +90,7 @@
           <el-icon v-if="!isCollapse" @click="handleCollapse" style="margin-left: auto;" size="25" color="#008B8B"><Fold /></el-icon>
           <el-icon v-else @click="handleCollapse" style="margin-left: auto;" size="25" color="#008B8B"><Expand /></el-icon>
         </div>
-        </div>
-      </el-menu>
-      <div style="width: 100%;">
-        <el-header style="background-color: #393939; display: flex; justify-content: flex-end; align-items: center; padding: 10px;">
-          <div style="cursor: pointer; margin-left: auto;">
-            <el-dropdown style="color: #fff;" trigger="click" @command="handleCommand">
-              <span style="display: flex; align-items: center;"><el-avatar style="margin-right: 10px;" :src="avatar" /> {{ username }}</span>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command=1>{{ t('app.webui.myprofile') }}</el-dropdown-item>
-                  <el-dropdown-item command=2>{{ t('app.webui.logout') }}</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </el-header>
+        </el-menu>
         <el-main>
           <div v-if="enumid === '1'">
             <Dashboard />
@@ -119,8 +119,11 @@
           <div v-else-if="showprofile">
             <Profile />
           </div>
+          <div v-else-if="changepwd">
+            <Modifypasswd />
+          </div>
         </el-main>
-      </div>
+      </el-container>
     </el-container>
   </div>
 </template>
@@ -140,9 +143,12 @@ import System from '../pages/System.vue';
 import ScoreRule from '../pages/ScoreRule.vue';
 import VulnType from '../pages/VulnType.vue';
 import Profile from '../pages/Profile.vue';
+import Modifypasswd from '../pages/Modifypasswd.vue';
+import api from '../api'
 
 const { t, locale } = useI18n();
 const showprofile = ref(false)
+const changepwd = ref(false)
 const changelanguage = (language) => {
     locale.value = language;
     localStorage.setItem('selectedLanguage', language);
@@ -152,6 +158,7 @@ const username = sessionStorage.getItem('username');
 const avatar = sessionStorage.getItem('avatar');
 const enumid = ref('1')
 const isCollapse = ref(false)
+const token = sessionStorage.getItem('token')
 
 function handleCollapse() {
   isCollapse.value = !isCollapse.value
@@ -163,7 +170,6 @@ function handleMenuClick(index: string) {
 const router = useRoute()
 onMounted(performAction);
 function performAction() {
-  const token = sessionStorage.getItem('token')
   if (!token) {
     router.push('/login')
   }
@@ -172,13 +178,33 @@ function performAction() {
 function handleCommand(command: number) {
     if (command == 1) {
       enumid.value = ''
+      changepwd.value = false
       showprofile.value = true
     }
     if (command == 2) {
-      sessionStorage.removeItem('username');
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('avatar');
-      location.reload();
+      enumid.value = ''
+      showprofile.value = false
+      changepwd.value = true
+    }
+    if (command == 3) {
+      logout();
+    }
+  }
+  async function logout() {
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const response = await api.get('/api/v1/logout', config)
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('avatar');
+        location.reload();
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
     }
   }
 </script>

@@ -125,8 +125,10 @@ func EditVuln(c *gin.Context) {
 // 搜索漏洞
 func SearchVuln(c *gin.Context) {
     keyword := c.Query("keyword")
-    res := models.SearchVuln(keyword)
-    c.JSON(200, gin.H{"msg": res})
+    page := c.Query("page")
+    limit := c.Query("limit")
+    total, data := models.SearchVuln(keyword, page, limit)
+    c.JSON(200, gin.H{"total": total, "data": data})
 }
 
 // 高级搜索
@@ -136,8 +138,8 @@ func SearchVulnAdv(c *gin.Context) {
         c.JSON(200, gin.H{"code": 2, "msg": "Invalid input"})
         return
     }
-    res := models.SearchVulnAdv(data)
-    c.JSON(200, gin.H{"code": 1, "msg": res})
+    total, res := models.SearchVulnAdv(data)
+    c.JSON(200, gin.H{"total": total, "data": res})
 }
 
 // 上传文件

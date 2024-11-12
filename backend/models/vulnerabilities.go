@@ -346,16 +346,29 @@ func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
 }
 
 // 搜索漏洞信息
-func SearchVuln(keyword string) []types.XqVulnerability {
+func SearchVuln(keyword string, page string, pageSize string) (int64, []types.XqVulnerability) {
     var vulnDatas []types.XqVulnerability
-    db.Where("status = 1").Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
-        "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").Find(&vulnDatas)
-    return vulnDatas
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&vulnDatas).
+        Where("status = 1").
+        Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
+        "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").
+        Count(&totalCount)
+    db.Where("status = 1").
+        Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
+        "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").
+        Limit(pageSizeNum).
+        Offset((pageNum - 1) * pageSizeNum).
+        Find(&vulnDatas)
+    return totalCount, vulnDatas
 }
 
 // 高级搜索
-func SearchVulnAdv(data map[string]interface{}) []types.XqVulnerability {
+func SearchVulnAdv(data map[string]interface{}) (int64, []types.XqVulnerability) {
     var vulnDatas []types.XqVulnerability
+    var totalCount int64
     var conditions []string
     var values []interface{}
     conditions = append(conditions, "status = 1")
@@ -384,22 +397,20 @@ func SearchVulnAdv(data map[string]interface{}) []types.XqVulnerability {
         conditions = append(conditions, "affected_product LIKE ?")
         values = append(values, "%"+affected_product+"%")
     }
-    poc, _ := data["poc"].(string)
-    if poc != "" {
+    poc, _ := data["poc"].(bool)
+    if poc {
         conditions = append(conditions, "poc IS NOT NULL AND poc <> ''")
     }
-    exp, _ := data["exp"].(string)
-    if exp != "" {
-        conditions = append(conditions, "poc IS NOT NULL AND poc <> ''")
+    exp, _ := data["exp"].(bool)
+    if exp {
+        conditions = append(conditions, "poc IS NOT NULL AND exp <> ''")
     }
-    submitter, _ := data["submitter"].(string)
-    if submitter != "" {
-        conditions = append(conditions, "submitter LIKE ?")
-        values = append(values, "%"+submitter+"%")
-    }
+    page, _ := data["page"].(float64)
+    limit, _ := data["limit"].(float64)
     query := strings.Join(conditions, " AND ")
-    db.Where(query, values...).Find(&vulnDatas)
-    return vulnDatas
+    db.Model(&vulnDatas).Where(query, values...).Count(&totalCount)
+    db.Where(query, values...).Limit(int(limit)).Offset((int(page) - 1) * int(limit)).Find(&vulnDatas)
+    return totalCount, vulnDatas
 }
 
 // 存储文件到数据库

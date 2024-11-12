@@ -295,11 +295,10 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
         var scoreRule types.XqScoreRule
         var vulnScore int64
         updates["status"] = 1
-        if cvss != 0 {
+        if cvss != vuln.CVSS {
             updates["cvss"] = cvss
-        } else {
-            cvss = vuln.CVSS
         }
+        fmt.Println(cvss)
         if cvss >0 && cvss <= 3.9 {
             updates["vuln_level"] = "Low"
         } else if cvss >= 4 && cvss <= 6.9 {
