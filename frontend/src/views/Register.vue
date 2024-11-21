@@ -2,6 +2,7 @@
     <div class="register-container">
         <el-card class="register-card" :header="t('app.webui.register')" shadow="always">
             <el-input
+                style="width: 75%; margin-left: 10%; padding: 15px;"
                 v-model="uname"
                 maxlength="50"
                 :placeholder="t('app.webui.username')"
@@ -11,6 +12,17 @@
                 @blur="checkuname"
             />
             <el-input
+                style="width: 75%; margin-left: 10%; padding: 15px;"
+                v-model="phone"
+                maxlength="50"
+                :placeholder="t('app.webui.phone')"
+                size="large"
+                :prefix-icon="Phone"
+                clearable
+            />
+            <div style="display: flex; align-items: center;">
+                <el-input
+                style="width: 75%; margin-left: 10%; padding: 15px;"
                 v-model="email"
                 maxlength="50"
                 :placeholder="t('app.webui.email')"
@@ -18,8 +30,21 @@
                 :prefix-icon="Message"
                 clearable
                 @blur="checkemail"
+                />
+                <el-button v-if="showcaptcha" style="width: 15%;" type="primary" size="small" @click="getCaptcha">{{ t('app.webui.getcaptcha') }}</el-button>
+                <el-countdown v-else format="ss" :value="remaintime" @finish="showcaptcha=true" value-style="font-size: 14px;" />
+            </div>
+            <el-input
+                style="width: 75%; margin-left: 10%; padding: 15px;"
+                v-model="captcha"
+                maxlength="50"
+                :placeholder="t('app.webui.captcha')"
+                size="large"
+                :prefix-icon="Camera"
+                clearable
             />
             <el-input
+                style="width: 75%; margin-left: 10%; padding: 15px;"
                 v-model="passwd"
                 maxlength="50"
                 type="password"
@@ -31,6 +56,7 @@
                 @blur="checkpasswd"
             />
             <el-input
+                style="width: 75%; margin-left: 10%; padding: 15px;"
                 v-model="cfmpasswd"
                 maxlength="50"
                 type="password"
@@ -58,15 +84,19 @@
 
 <script lang="ts" setup>
     import { ref } from 'vue'
-    import { User, Lock, Unlock, Message } from '@element-plus/icons-vue'
+    import { User, Lock, Unlock, Message, Camera, Phone } from '@element-plus/icons-vue'
     import { useI18n } from 'vue-i18n';
     import api from '../api'
 
     const { t } = useI18n()
     const uname = ref('');
+    const phone = ref('');
     const passwd = ref('');
     const cfmpasswd = ref('');
     const email = ref('');
+    const captcha = ref('');
+    const showcaptcha = ref(true);
+    const remaintime = ref(0);
     function checkuname() {
         if (uname.value == '') {
             ElMessage.error(t('app.webui.loginerr1'));
@@ -103,6 +133,24 @@
             return;
         }
     }
+    async function getCaptcha() {
+        if (email.value == '') {
+            ElMessage.error(t('app.webui.emailempty'))
+            return;
+        }
+        try {
+            const response = await api.get('/api/v1/getcaptcha?email=' + email.value)
+            if (response.data.code == 1) {
+                ElMessage.success(t('app.webui.captchasucc'))
+                remaintime.value = Date.now() + 1000 * 120
+                showcaptcha.value = false
+            } else {
+                ElMessage.error(t('app.webui.captchafail'))
+            }
+        } catch (error){
+            //错误处理
+        }
+    }
     async function Register() {
         if (uname.value == '' || passwd.value == '' || cfmpasswd.value == '' || email.value == '') {
             ElMessage.error(t('app.webui.missingnotice'));
@@ -118,8 +166,10 @@
         try {
             const data = {
                 "username": uname.value,
+                "phone": phone.value,
                 "password": cfmpasswd.value,
                 "email": email.value,
+                "captcha": captcha.value,
             }
             const response = await api.post('/api/v1/register', data)
             if (response.data.code == 0) {
@@ -132,6 +182,8 @@
                 ElMessage.error(t('app.webui.emailformat'))
             } else if (response.data.code == 5) {
                 ElMessage.error(t('app.webui.emailalreadyexist'))
+            } else if (response.data.code == 6) {
+                ElMessage.error(t('app.webui.captchaerr'))
             } else {
                 ElMessage.error(t('app.webui.registerfail'))
             }
@@ -157,11 +209,6 @@
     /*background: #303030;*/
   }
   
-  .el-input {
-    width: 80%;
-    margin: 0 10%;
-    padding: 15px;
-  }
   .register-option {
     display: flex;
     justify-content: right;

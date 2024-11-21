@@ -43,6 +43,7 @@ export default {
             user: '普通用户',
             confirmpassword: '确认密码',
             submit: '提交',
+            submitsuccess: '提交成功',
             language: '语言',
             loginsucc: '登录成功',
             welcome: '欢迎',
@@ -149,6 +150,7 @@ export default {
             emailserver: '发件箱服务器',
             emailport: '端口',
             emailuser: '发件人邮箱地址',
+            emailsender: '发件人名称',
             emailpasswd: '发件人邮箱密码',
             jwtconfig: 'JWT 配置',
             jwtkey: 'JWT 密钥',
@@ -159,7 +161,15 @@ export default {
             invalidinput: '输入无效',
             nopermation: '您没有权限访问',
             modify: '修改',
-            userdisplay: '已删除用户显示名称'
+            userdisplay: '已删除用户显示名称',
+            needemail: '注册和密码找回需要发送验证码，请正确配置邮箱',
+            savesuccess: '保存成功',
+            savefail: '保存失败',
+            captcha: '验证码',
+            getcaptcha: '获取验证码',
+            captchasucc: '验证码获取成功',
+            captchafail: '验证码获取失败',
+            restfail: '重置密码失败，请检查后重试'
         }
     }
 };

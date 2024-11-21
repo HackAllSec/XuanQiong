@@ -184,6 +184,16 @@ type XqScoreRule struct {
     UpdateTime      time.Time
 }
 
+// 验证码表
+type XqVerifyCode struct {
+    ID             uint64    `gorm:"primaryKey"`
+    Email          string
+    Code           string
+    CreateTime     time.Time
+    UpdateTime     time.Time
+    ExpiredTime     time.Time
+}
+
 type SystemConfigData struct {
     EmailConfig    XqEmailConfig    `json:"emailconf"`
     JwtConfig      XqJwtConfig      `json:"jwtconf"`

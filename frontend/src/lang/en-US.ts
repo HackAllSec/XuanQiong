@@ -122,7 +122,13 @@ export default {
             auditing: 'Auditing',
             reviewcomments: 'Review Comments',
             cvsserror: 'CVSS Value Error',
-            edit: 'Edit'
+            edit: 'Edit',
+            captcha: 'Captcha',
+            getcaptcha: 'Get Captcha',
+            captchasucc: 'Captcha Successful',
+            captchafail: 'Captcha Failed',
+            captchaerr: 'Captcha Error',
+            restfail: 'Reset Password Failed, please check and try again'
         }
     }
 };

@@ -21,7 +21,7 @@
                 @keyup.enter.native="Login"
             />
             <div class="login-option">
-                <el-link href="#/register" style="margin-right: 10px;">{{ t('app.webui.forgot') }}</el-link>
+                <el-link href="#/forgotpwd" style="margin-right: 10px;">{{ t('app.webui.forgot') }}</el-link>
             </div>
             <el-button
                 type="success"

@@ -31,7 +31,7 @@ View the built-in vulnerability types, vulnerability rating rules, and point cal
 |View Vulnerabilities|View vulnerability summary and details, paginated view|✅|✅|
 |Register|User Register|✅|✅|
 |Login/Logout|USer Login/Logout|✅|✅|
-|Forgot Password|Forgot Password|❌|❌|
+|Forgot Password|Forgot Password and Reset Password|✅|✅|
 |My Profile|Avatar, username, email, and phone number modification, points, vulnerability submission status display|✅|✅|
 |Modify personal information|Change username, email, phone number, password|✅|✅|
 |Message|View vulnerability review messages, points change messages, etc|❌|❌|
@@ -40,8 +40,8 @@ View the built-in vulnerability types, vulnerability rating rules, and point cal
 |Submit vulnerabilities|Submit vulnerabilities details|✅|✅|
 |Edit vulnerabilities|Unauthorized vulnerability information modification|✅|✅|
 |Attachment upload|Upload vulnerability information attachment|✅|✅|
-|Simple Search|fuzzy search|❌Front end page to be completed|✅|
-|Advanced search|Accurate search|❌Front end page to be completed|✅|
+|Simple Search|fuzzy search|✅|✅|
+|Advanced search|Accurate search|✅|✅|
 |Ranking list|Monthly, quarterly, and annual rankings|✅|✅|
 |Language switching|Supports both Chinese and English|✅|✅|
 
@@ -50,7 +50,7 @@ View the built-in vulnerability types, vulnerability rating rules, and point cal
 |Function|Description|Is the front-end implemented|Is the back-end implemented|
 |-|-|-|-|
 |Login/Logout|Admin Login/Logout|✅|✅|
-|Forgot Password|Forgot Password|❌|❌|
+|Forgot Password|Forgot Password|✅|✅|
 |Modify personal information|Change username, email, phone number, password|✅|✅|
 |Create Users|Create administrator and normal users|✅|✅|
 |View Users|Page view user list|✅|✅|
@@ -61,6 +61,7 @@ View the built-in vulnerability types, vulnerability rating rules, and point cal
 |Vulnerability management|Add, modify, and delete vulnerability types, view, update, and review vulnerabilities, import and export vulnerabilities|✅|❌Import and export to be completed, Multiple delete to be completed|
 |Scoring rule management|Add, modify, and delete rating rules|✅|❌Multiple delete to be completed|
 |Language switching|Supports both Chinese and English|✅|✅|
+|Push messages|Support DingTalk and WxWork webhook notifications|❌|❌|
 
 ## Directory structure
 
@@ -112,5 +113,12 @@ User front-end files and administrator front-end files are independent and can b
 
 [CHANGELOG](CHANGELOG.md)
 
-## API Docs
+## API
 
+- [HTML](API/XuanQiong.html)
+- [Apifox](API/XuanQiong.apifox.json)
+- [Openapi](API/XuanQiong.openapi.json)
+
+## Star History
+
+![](https://api.star-history.com/svg?repos=HackAllSec/XuanQiong&type=Date)

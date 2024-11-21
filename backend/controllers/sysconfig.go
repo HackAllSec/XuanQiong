@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"xuanqiong/backend/types"
+    "xuanqiong/backend/types"
     "xuanqiong/backend/models"
     "github.com/gin-gonic/gin"
 )
@@ -40,13 +40,24 @@ func UpdateSystemConfig(c *gin.Context) {
             c.JSON(400, gin.H{"code": 2, "msg": "Invalid input", "err": err})
             return
         }
-		err := models.UpdateSystemConfig(configData)
-		if err != nil {
-			c.JSON(200, gin.H{"code": 3, "msg": "Update failed", "err": err})
-			return
-		}
-		c.JSON(200, gin.H{"code": 1, "msg": "Update success"})
-		return
+        err := models.UpdateSystemConfig(configData)
+        if err != nil {
+            c.JSON(200, gin.H{"code": 3, "msg": "Update failed", "err": err})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "Update success"})
+        return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+// 获取验证码
+func GetCaptcha(c *gin.Context) {
+    email := c.Query("email")
+    err := models.SendCaptcha(email)
+    if err != nil {
+        c.JSON(200, gin.H{"code": 0, "msg": "Send email failed"})
+        return
+    }
+    c.JSON(200, gin.H{"code": 1, "msg": "Send email success"})
 }

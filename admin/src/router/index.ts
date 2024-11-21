@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode'
 const routes: RouteRecordRaw[] = [
  { path: '/', name: 'Home', component: () => import('../views/Index.vue') },
  { path: '/login', name: 'Login', component: () => import('../pages/Login.vue') },
+ { path: '/forgotpwd', name: 'Forgotpwd', component: () => import('../pages/Forgotpwd.vue') },
 ]
 
 // RouterOptions是路由选项类型

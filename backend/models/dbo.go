@@ -71,7 +71,7 @@ func init() {
         log.Println("Initializing Database...")
         db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
             &types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
-            &types.XqRankingDetail{}, &types.XqScoreRule{})
+            &types.XqRankingDetail{}, &types.XqScoreRule{}, &types.XqVerifyCode{})
         res = db.First(&types.XqSystemConfig{})
         if res.RowsAffected == 0 {
             db.Create(&types.XqSystemConfig{UserRegister: false, UserDisplay: "佚名", MaxAttempts: 5, LockoutDuration: 3600, CreateTime: time.Now()})
@@ -121,7 +121,7 @@ func init() {
             db.Create(&types.XqScoreRule{Type: 3, Rule: "互联网资产数介于 1000 到 5000", Score: 20, Coefficient: 1.0, CreateTime: time.Now()})
             db.Create(&types.XqScoreRule{Type: 3, Rule: "互联网资产数小于 1000", Score: 10, Coefficient: 1.0, CreateTime: time.Now()})
         }
-        password, err := utils.GenerateRandomPassword(12)
+        password, err := utils.GenerateRandomChars(12, 5)
         if err != nil {
             log.Fatalf("Error generating password: %v", err)
         }
@@ -134,7 +134,7 @@ func init() {
         }
     } else {
         if res.RowsAffected == 0 {
-            password, err := utils.GenerateRandomPassword(12)
+            password, err := utils.GenerateRandomChars(12, 5)
             if err != nil {
                 log.Fatalf("Error generating password: %v", err)
             }

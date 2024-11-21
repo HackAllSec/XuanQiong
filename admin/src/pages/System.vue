@@ -13,6 +13,9 @@
             <el-form-item :label="t('app.webui.lockoutduration')" required>
                 <el-input type="number" v-model="data.sysconf.lockout_duration" />
             </el-form-item>
+            <el-form-item>
+                <span style="color: red;">{{ t('app.webui.needemail') }}</span>
+            </el-form-item>
             <el-form-item :label="t('app.webui.emailserver')">
                 <el-input v-model="data.emailconf.email_host" />
             </el-form-item>
@@ -33,7 +36,7 @@
     <el-card :header="t('app.webui.jwtconfig')" style="margin-top: 2%;">
         <el-form :disabled="editable" :model="data.jwtconf" label-width="auto" style="margin-left: 2%; max-width: 900px">
             <el-form-item :label="t('app.webui.jwtkey')" required>
-                <el-input v-model="data.jwtconf.jwt_secret" />
+                <el-input type="password" show-password v-model="data.jwtconf.jwt_secret" />
             </el-form-item>
             <el-form-item :label="t('app.webui.jwtvalidity')" required>
                 <el-input type="number" v-model="data.jwtconf.jwt_expires" />
@@ -55,9 +58,12 @@
             </el-form-item>
         </el-form>
     </el-card>
-    <div style="margin-top: 1%;">
-        <el-button v-if="editable" type="primary" @click="editable=false">{{ t('app.webui.edit') }}</el-button>
-        <el-button v-else type="primary" @click="Save">{{ t('app.webui.save') }}</el-button>
+    <div v-if="editable" style="margin-top: 1%;">
+        <el-button type="primary" @click="editable=false">{{ t('app.webui.edit') }}</el-button>
+    </div>
+    <div v-else style="margin-top: 1%;">
+        <el-button type="primary" @click="Save">{{ t('app.webui.save') }}</el-button>
+        <el-button @click="editable=true">{{ t('app.webui.cancel') }}</el-button>
     </div>
 </template>
 <script lang="ts" setup>

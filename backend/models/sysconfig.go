@@ -1,10 +1,12 @@
 package models
 
 import (
+    "mime"
     "time"
 
     "xuanqiong/backend/types"
     "xuanqiong/backend/utils"
+    "github.com/go-gomail/gomail"
 )
 
 // 获取系统配置
@@ -35,28 +37,44 @@ func UpdateSystemConfig(configData types.SystemConfigData) error {
     
     db.First(&sysConf)
     err = db.Model(&sysConf).Updates(configData.SysConfig).Error
-    
-    err = db.First(&emailConfig).Error
-    if err == nil {
+    if err != nil {
+        return err
+    }
+    res := db.First(&emailConfig).RowsAffected
+    if res != 0 {
         configData.EmailConfig.UpdateTime = time.Now()
         err = db.Model(&emailConfig).Updates(configData.EmailConfig).Error
+        if err != nil {
+            return err
+        }
     } else {
         configData.EmailConfig.CreateTime = time.Now()
-        db.Create(&configData.EmailConfig)
+        err = db.Create(&configData.EmailConfig).Error
+        if err != nil {
+            return err
+        }
     }
     
     db.First(&jwtConfig)
     err = db.Model(&jwtConfig).Updates(configData.JwtConfig).Error
-    
-    err = db.First(&noticeConfig).Error
-    if err == nil {
+    if err != nil {
+        return err
+    }
+    res = db.First(&noticeConfig).RowsAffected
+    if res != 0 {
         configData.NoticeConfig.UpdateTime = time.Now()
         err = db.Model(&noticeConfig).Updates(configData.NoticeConfig).Error
+        if err != nil {
+            return err
+        }
     } else {
         configData.NoticeConfig.CreateTime = time.Now()
-        db.Create(&configData.NoticeConfig)
+        err = db.Create(&configData.NoticeConfig).Error
+        if err != nil {
+            return err
+        }
     }
-    return err
+    return nil
 }
 
 // 检查IP是否被锁定
@@ -143,4 +161,48 @@ func GetSystemStatus() (map[string]interface{}) {
         "usertotal": userCount,
         "onlineuser": onlineUsers,
     }
+}
+
+// 发送验证码
+func SendCaptcha(email string) error {
+    var verifycode types.XqVerifyCode
+    
+    captcha, err := utils.GenerateRandomChars(6, 1)
+    if err != nil {
+        return err
+    }
+    
+    res := db.Where("email = ?", email).First(&verifycode).RowsAffected
+    if res != 0 {
+        timeDiff := time.Now().Sub(verifycode.UpdateTime)
+        if timeDiff < 2*time.Minute {
+            return nil
+        }
+        verifycode.Code = captcha
+        verifycode.UpdateTime = time.Now()
+        verifycode.ExpiredTime = time.Now().Add(time.Minute * 5)
+        db.Save(&verifycode)
+        return sendEmail(email, captcha)
+    }
+    verifycode.Email = email
+    verifycode.Code = captcha
+    verifycode.CreateTime = time.Now()
+    verifycode.UpdateTime = time.Now()
+    verifycode.ExpiredTime = time.Now().Add(time.Minute * 5)
+    db.Create(&verifycode)
+    return sendEmail(email, captcha)
+}
+
+func sendEmail(email, captcha string) error {
+    var emailConfig types.XqEmailConfig
+    db.First(&emailConfig)
+    m := gomail.NewMessage()
+    from := mime.QEncoding.Encode("UTF-8", emailConfig.EmailSender) + " <" + emailConfig.EmailUser + ">"
+    m.SetHeader("From", from)
+    m.SetHeader("To", email)
+    m.SetHeader("Subject", "欢迎使用玄穹漏洞平台")
+    m.SetBody("text/plain", "尊敬的用户，\r\n您好！欢迎使用玄穹漏洞平台，您的验证码是：" + captcha +
+        "\r\n请注意为了您的账户安全，请勿将验证码透露给任何人，验证码有效期为5分钟。")
+    d := gomail.NewDialer(emailConfig.EmailHost, int(emailConfig.EmailPort), emailConfig.EmailUser, emailConfig.EmailPassword)
+    return d.DialAndSend(m)
 }

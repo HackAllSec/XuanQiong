@@ -1,0 +1,3983 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "XuanQiong",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "管理员接口"
+    },
+    {
+      "name": "无需登录"
+    },
+    {
+      "name": "需要登录"
+    }
+  ],
+  "paths": {
+    "/api/v1/login": {
+      "post": {
+        "summary": "登录",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "x-apifox-orders": [
+                  "username",
+                  "password"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "username": "admin",
+                "password": "Qwer1234"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213668580-run",
+        "security": []
+      }
+    },
+    "/api/v1/adduser": {
+      "post": {
+        "summary": "创建账户",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjk2ODQ4ODMsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.NZ_2ZGY4ZGw8KRXFTAHVngEGNNcF_RPpBLcveRfM_7c",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "username": "test2",
+                "password": "Qwer!234",
+                "email": "aab@qq.ca",
+                "phone": "13888888889",
+                "role": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Successful": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "Successful"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "Successful"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213668879-run",
+        "security": []
+      }
+    },
+    "/api/v1/deluser": {
+      "post": {
+        "summary": "删除账户",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxOTgxNzksInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.Q1BZUBcdGYPd8xP2vosa30TrGf6a3yY9-Hthtgx25mY",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "userid": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213691378-run",
+        "security": []
+      }
+    },
+    "/api/v1/logout": {
+      "get": {
+        "summary": "退出",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjU5NDcwMTEsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.djQh-SSQMn5yiWV6wbHmuubcDsR9773jqzfAcRwfV58",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "已退出": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "已退出"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "已退出"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213723295-run",
+        "security": []
+      }
+    },
+    "/api/v1/getusers": {
+      "get": {
+        "summary": "分页查看所有账户",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxNzY2ODUsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.PAno5SIDbUyrjy-KaVVUOuEMkaeDxUgbj3qOA5uKlxE",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ID": {
+                            "type": "integer"
+                          },
+                          "Username": {
+                            "type": "string"
+                          },
+                          "Password": {
+                            "type": "string"
+                          },
+                          "Role": {
+                            "type": "integer"
+                          },
+                          "CreateTime": {
+                            "type": "string"
+                          },
+                          "Status": {
+                            "type": "integer"
+                          },
+                          "Token": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "ID",
+                          "Username",
+                          "Password",
+                          "Role",
+                          "CreateTime",
+                          "Status",
+                          "Token"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "ID",
+                          "Username",
+                          "Password",
+                          "Role",
+                          "CreateTime",
+                          "Status",
+                          "Token"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213739459-run",
+        "security": []
+      }
+    },
+    "/api/v1/updateuser": {
+      "post": {
+        "summary": "修改用户信息",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjkxNzM2OTQsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.iM_rhj1rTvjyaG7M3jtbi6cCu_J2BXBjPBhx9tTTx1I",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "username": "admin",
+                "password": "Admin@123",
+                "role": -1,
+                "status": -1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213816452-run",
+        "security": []
+      }
+    },
+    "/api/v1/getvulnabs": {
+      "get": {
+        "summary": "获取漏洞摘要",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ID": {
+                            "type": "string"
+                          },
+                          "CVE": {
+                            "type": "string"
+                          },
+                          "CNNVD": {
+                            "type": "string"
+                          },
+                          "CNVD": {
+                            "type": "string"
+                          },
+                          "VulnName": {
+                            "type": "string"
+                          },
+                          "VulnType": {
+                            "type": "string"
+                          },
+                          "VulnLevel": {
+                            "type": "string"
+                          },
+                          "Description": {
+                            "type": "string"
+                          },
+                          "AffectedProduct": {
+                            "type": "string"
+                          },
+                          "Poc": {
+                            "type": "string"
+                          },
+                          "Exp": {
+                            "type": "string"
+                          },
+                          "RepairSuggestion": {
+                            "type": "string"
+                          },
+                          "Submit": {
+                            "type": "string"
+                          },
+                          "CreateTime": {
+                            "type": "string"
+                          },
+                          "UpdateTime": {
+                            "type": "string"
+                          }
+                        },
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "ID",
+                          "CVE",
+                          "CNNVD",
+                          "CNVD",
+                          "VulnName",
+                          "VulnType",
+                          "VulnLevel",
+                          "Description",
+                          "AffectedProduct",
+                          "Poc",
+                          "Exp",
+                          "RepairSuggestion",
+                          "Submit",
+                          "CreateTime",
+                          "UpdateTime"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-213966000-run",
+        "security": []
+      }
+    },
+    "/api/v1/getvulndtl": {
+      "get": {
+        "summary": "获取漏洞信息",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "Authorization有效时返回全部信息",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "HVD-2024-0001",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "cve": {
+                          "type": "string"
+                        },
+                        "cnnvd": {
+                          "type": "string"
+                        },
+                        "cnvd": {
+                          "type": "string"
+                        },
+                        "vuln_name": {
+                          "type": "string"
+                        },
+                        "vuln_type": {
+                          "type": "string"
+                        },
+                        "vuln_level": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "affected_product": {
+                          "type": "string"
+                        },
+                        "poc": {
+                          "type": "string"
+                        },
+                        "exp": {
+                          "type": "string"
+                        },
+                        "repair_suggestion": {
+                          "type": "string"
+                        },
+                        "submit": {
+                          "type": "string"
+                        },
+                        "create_time": {
+                          "type": "string"
+                        },
+                        "update_time": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "cve",
+                        "cnnvd",
+                        "cnvd",
+                        "vuln_name",
+                        "vuln_type",
+                        "vuln_level",
+                        "description",
+                        "affected_product",
+                        "poc",
+                        "exp",
+                        "repair_suggestion",
+                        "submit",
+                        "create_time",
+                        "update_time"
+                      ],
+                      "x-apifox-ignore-properties": [],
+                      "x-apifox-orders": [
+                        "id",
+                        "cve",
+                        "cnnvd",
+                        "cnvd",
+                        "vuln_name",
+                        "vuln_type",
+                        "vuln_level",
+                        "description",
+                        "affected_product",
+                        "poc",
+                        "exp",
+                        "repair_suggestion",
+                        "submit",
+                        "create_time",
+                        "update_time"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-214308216-run",
+        "security": []
+      }
+    },
+    "/api/v1/addvuln": {
+      "post": {
+        "summary": "添加漏洞信息",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxMDEzMjcsInJvbGUiOjAsInVzZXJuYW1lIjoidGVzdCJ9.26FLPzQRQjrdYYFxmTWuXWIdLlu6VMr49xEbMppNsNc",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vuln_name": {
+                    "type": "string"
+                  },
+                  "vuln_type_id": {
+                    "type": "integer"
+                  },
+                  "cvss": {
+                    "type": "integer"
+                  },
+                  "vuln_level": {
+                    "type": "string"
+                  },
+                  "cve": {
+                    "type": "string"
+                  },
+                  "nvd": {
+                    "type": "string"
+                  },
+                  "edb": {
+                    "type": "string"
+                  },
+                  "cnnvd": {
+                    "type": "string"
+                  },
+                  "cnvd": {
+                    "type": "string"
+                  },
+                  "affected_product": {
+                    "type": "string"
+                  },
+                  "repair_suggestion": {
+                    "type": "string"
+                  },
+                  "poc": {
+                    "type": "string"
+                  },
+                  "exp": {
+                    "type": "string"
+                  },
+                  "poc_type": {
+                    "type": "string"
+                  },
+                  "exp_type": {
+                    "type": "string"
+                  },
+                  "is_public": {
+                    "type": "boolean"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "fofa_query": {
+                    "type": "string"
+                  },
+                  "zoom_eye_query": {
+                    "type": "string"
+                  },
+                  "quake_query": {
+                    "type": "string"
+                  },
+                  "hunter_query": {
+                    "type": "string"
+                  },
+                  "google_query": {
+                    "type": "string"
+                  },
+                  "shodan_query": {
+                    "type": "string"
+                  },
+                  "censys_query": {
+                    "type": "string"
+                  },
+                  "greynoise_query": {
+                    "type": "string"
+                  },
+                  "attachment_id": {
+                    "type": "string"
+                  },
+                  "affected_product_version": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "vuln_name",
+                  "vuln_type_id",
+                  "cvss",
+                  "vuln_level",
+                  "affected_product",
+                  "repair_suggestion",
+                  "description",
+                  "affected_product_version"
+                ],
+                "x-apifox-orders": [
+                  "vuln_name",
+                  "vuln_type_id",
+                  "cvss",
+                  "vuln_level",
+                  "cve",
+                  "nvd",
+                  "edb",
+                  "cnnvd",
+                  "cnvd",
+                  "affected_product",
+                  "repair_suggestion",
+                  "poc",
+                  "exp",
+                  "poc_type",
+                  "exp_type",
+                  "is_public",
+                  "description",
+                  "fofa_query",
+                  "zoom_eye_query",
+                  "quake_query",
+                  "hunter_query",
+                  "google_query",
+                  "shodan_query",
+                  "censys_query",
+                  "greynoise_query",
+                  "attachment_id",
+                  "affected_product_version"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "vuln_name": "test",
+                "vuln_type_id": 1,
+                "cvss": 1,
+                "vuln_level": "Low",
+                "cve": "",
+                "nvd": "",
+                "edb": "",
+                "cnnvd": "",
+                "cnvd": "",
+                "affected_product": "1",
+                "repair_suggestion": "1",
+                "poc": "",
+                "exp": "",
+                "poc_type": "xray",
+                "exp_type": "xray",
+                "is_public": true,
+                "description": "1",
+                "fofa_query": "",
+                "zoom_eye_query": "",
+                "quake_query": "",
+                "hunter_query": "",
+                "google_query": "",
+                "shodan_query": "",
+                "censys_query": "",
+                "greynoise_query": "",
+                "attachment_id": "",
+                "affected_product_version": "1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "null"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-214308529-run",
+        "security": []
+      }
+    },
+    "/api/v1/search": {
+      "get": {
+        "summary": "简单搜索",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "分页获取搜索结果",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "123",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjYwNTA5NTcsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.DMdov8swMuATrphl-xVQQV_3M8jSSOMfSsVLasGZMDY",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "cve": {
+                            "type": "string"
+                          },
+                          "cnnvd": {
+                            "type": "string"
+                          },
+                          "cnvd": {
+                            "type": "string"
+                          },
+                          "vuln_name": {
+                            "type": "string"
+                          },
+                          "vuln_type": {
+                            "type": "string"
+                          },
+                          "vuln_level": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "affected_product": {
+                            "type": "string"
+                          },
+                          "poc": {
+                            "type": "string"
+                          },
+                          "exp": {
+                            "type": "string"
+                          },
+                          "repair_suggestion": {
+                            "type": "string"
+                          },
+                          "submit": {
+                            "type": "string"
+                          },
+                          "create_time": {
+                            "type": "string"
+                          },
+                          "update_time": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "cve",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type",
+                          "vuln_level",
+                          "description",
+                          "affected_product",
+                          "poc",
+                          "exp",
+                          "repair_suggestion",
+                          "submit",
+                          "create_time",
+                          "update_time"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "id",
+                          "cve",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type",
+                          "vuln_level",
+                          "description",
+                          "affected_product",
+                          "poc",
+                          "exp",
+                          "repair_suggestion",
+                          "submit",
+                          "create_time",
+                          "update_time"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-214386138-run",
+        "security": []
+      }
+    },
+    "/api/v1/advsearch": {
+      "post": {
+        "summary": "高级搜索",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "分页获取高级搜索结果",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjYwNTA5NTcsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.DMdov8swMuATrphl-xVQQV_3M8jSSOMfSsVLasGZMDY",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "vuln_name": {
+                    "type": "string"
+                  },
+                  "vuln_type": {
+                    "type": "string"
+                  },
+                  "vuln_level": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "affected_product": {
+                    "type": "string"
+                  },
+                  "poc": {
+                    "type": "boolean"
+                  },
+                  "exp": {
+                    "type": "boolean"
+                  },
+                  "page": {
+                    "type": "integer"
+                  },
+                  "limit": {
+                    "type": "integer"
+                  }
+                },
+                "x-apifox-orders": [
+                  "vuln_name",
+                  "vuln_type",
+                  "vuln_level",
+                  "description",
+                  "affected_product",
+                  "poc",
+                  "exp",
+                  "page",
+                  "limit"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "vuln_name": "",
+                "vuln_type": "",
+                "vuln_level": "",
+                "description": "",
+                "affected_product": "",
+                "poc": true,
+                "exp": true,
+                "page": 1,
+                "limit": 15
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "cve": {
+                            "type": "string"
+                          },
+                          "cnnvd": {
+                            "type": "string"
+                          },
+                          "cnvd": {
+                            "type": "string"
+                          },
+                          "vuln_name": {
+                            "type": "string"
+                          },
+                          "vuln_type": {
+                            "type": "string"
+                          },
+                          "vuln_level": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "affected_product": {
+                            "type": "string"
+                          },
+                          "poc": {
+                            "type": "string"
+                          },
+                          "exp": {
+                            "type": "string"
+                          },
+                          "repair_suggestion": {
+                            "type": "string"
+                          },
+                          "submit": {
+                            "type": "string"
+                          },
+                          "create_time": {
+                            "type": "string"
+                          },
+                          "update_time": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "cve",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type",
+                          "vuln_level",
+                          "description",
+                          "affected_product",
+                          "poc",
+                          "exp",
+                          "repair_suggestion",
+                          "submit",
+                          "create_time",
+                          "update_time"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "id",
+                          "cve",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type",
+                          "vuln_level",
+                          "description",
+                          "affected_product",
+                          "poc",
+                          "exp",
+                          "repair_suggestion",
+                          "submit",
+                          "create_time",
+                          "update_time"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "message"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-214413362-run",
+        "security": []
+      }
+    },
+    "/api/v1/upload": {
+      "post": {
+        "summary": "上传文件",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjg3MzYwNDksInVzZXJuYW1lIjoiYWRtaW4ifQ.NkRw1JX-vgnrztYaMSQoldsxtgo1PFVxAOzjkzxRE40",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "example": "file://C:\\Users\\Administrator\\Desktop\\ab.jpg",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222423901-run",
+        "security": []
+      }
+    },
+    "/download/file": {
+      "get": {
+        "summary": "下载文件",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "读取/下载文件",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "66aa154b-1abf-4fa1-8af1-79c13988683d",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222497514-run",
+        "security": []
+      }
+    },
+    "/api/v1/userinfo": {
+      "get": {
+        "summary": "获取用户信息",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjg4NzgxMzgsInVzZXJuYW1lIjoiYWRtaW4ifQ.ob94dabm4_Zhic3KLFMlFXG121GJ3XA_-MNtfcGRZIY",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "object",
+                      "properties": {
+                        "ID": {
+                          "type": "integer"
+                        },
+                        "Username": {
+                          "type": "string"
+                        },
+                        "Password": {
+                          "type": "string"
+                        },
+                        "Avatar": {
+                          "type": "string"
+                        },
+                        "Email": {
+                          "type": "string"
+                        },
+                        "Phone": {
+                          "type": "string"
+                        },
+                        "Ranking": {
+                          "type": "integer"
+                        },
+                        "Role": {
+                          "type": "integer"
+                        },
+                        "CreateTime": {
+                          "type": "string"
+                        },
+                        "UpdateTime": {
+                          "type": "string"
+                        },
+                        "Status": {
+                          "type": "integer"
+                        },
+                        "Token": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "ID",
+                        "Username",
+                        "Password",
+                        "Avatar",
+                        "Email",
+                        "Phone",
+                        "Ranking",
+                        "Role",
+                        "CreateTime",
+                        "UpdateTime",
+                        "Status",
+                        "Token"
+                      ],
+                      "x-apifox-ignore-properties": [],
+                      "x-apifox-orders": [
+                        "ID",
+                        "Username",
+                        "Password",
+                        "Avatar",
+                        "Email",
+                        "Phone",
+                        "Ranking",
+                        "Role",
+                        "CreateTime",
+                        "UpdateTime",
+                        "Status",
+                        "Token"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222513796-run",
+        "security": []
+      }
+    },
+    "/api/v1/updateuserinfo": {
+      "post": {
+        "summary": "修改用户个人信息",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjg4ODUxNTgsInVzZXJuYW1lIjoiYWRtaW4ifQ.G4MYCZejOwBtc-eQnvsZgrfmWmeb94wU6ZxXZ71aKrw",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "username",
+                  "email",
+                  "phone"
+                ],
+                "x-apifox-orders": [
+                  "username",
+                  "email",
+                  "phone"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "username": "",
+                "email": "admin@qq.com",
+                "phone": "134111111111"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222634693-run",
+        "security": []
+      }
+    },
+    "/api/v1/updatepassword": {
+      "post": {
+        "summary": "修改用户密码",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjg4ODUxNTgsInVzZXJuYW1lIjoiYWRtaW4ifQ.G4MYCZejOwBtc-eQnvsZgrfmWmeb94wU6ZxXZ71aKrw",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldpassword": {
+                    "type": "string"
+                  },
+                  "newpassword": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "oldpassword",
+                  "newpassword"
+                ],
+                "x-apifox-orders": [
+                  "oldpassword",
+                  "newpassword"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "oldpassword": ",?JdFy?P*D@h",
+                "newpassword": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222644057-run",
+        "security": []
+      }
+    },
+    "/api/v1/register": {
+      "post": {
+        "summary": "用户注册",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "## 用户注册\n\n### 必须参数\n\n- username\n- email\n- captcha\n- password\n\n### 可选参数\n\n- phone",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "title": "用户名"
+                  },
+                  "password": {
+                    "type": "string",
+                    "title": "密码"
+                  },
+                  "email": {
+                    "type": "string",
+                    "title": "邮箱"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "title": "手机号"
+                  },
+                  "captcha": {
+                    "type": "string",
+                    "title": "验证码"
+                  }
+                },
+                "required": [
+                  "username",
+                  "password",
+                  "email",
+                  "captcha"
+                ],
+                "x-apifox-orders": [
+                  "username",
+                  "password",
+                  "email",
+                  "phone",
+                  "captcha"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "username": "test",
+                "password": "123456",
+                "email": "",
+                "phone": "",
+                "captcha": ""
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222680165-run",
+        "security": []
+      }
+    },
+    "/api/v1/getvulnlist": {
+      "get": {
+        "summary": "分页获取漏洞列表",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "cve": {
+                            "type": "string"
+                          },
+                          "nvd": {
+                            "type": "string"
+                          },
+                          "edb": {
+                            "type": "string"
+                          },
+                          "cnnvd": {
+                            "type": "string"
+                          },
+                          "cnvd": {
+                            "type": "string"
+                          },
+                          "vuln_name": {
+                            "type": "string"
+                          },
+                          "vuln_type": {
+                            "type": "string"
+                          },
+                          "vuln_level": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "affected_product": {
+                            "type": "string"
+                          },
+                          "affected_product_version": {
+                            "type": "string"
+                          },
+                          "fofa_query": {
+                            "type": "string"
+                          },
+                          "zoomeye_query": {
+                            "type": "string"
+                          },
+                          "quake_query": {
+                            "type": "string"
+                          },
+                          "hunter_query": {
+                            "type": "string"
+                          },
+                          "google_query": {
+                            "type": "string"
+                          },
+                          "shodan_query": {
+                            "type": "string"
+                          },
+                          "censys_query": {
+                            "type": "string"
+                          },
+                          "greynoise_query": {
+                            "type": "string"
+                          },
+                          "poc": {
+                            "type": "string"
+                          },
+                          "poc_type": {
+                            "type": "string"
+                          },
+                          "exp": {
+                            "type": "string"
+                          },
+                          "exp_type": {
+                            "type": "string"
+                          },
+                          "repair_suggestion": {
+                            "type": "string"
+                          },
+                          "attachment_id": {
+                            "type": "string"
+                          },
+                          "attachment_name": {
+                            "type": "string"
+                          },
+                          "submitter": {
+                            "type": "string"
+                          },
+                          "is_public": {
+                            "type": "boolean"
+                          },
+                          "status": {
+                            "type": "integer"
+                          },
+                          "create_time": {
+                            "type": "string"
+                          },
+                          "update_time": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "cve",
+                          "nvd",
+                          "edb",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type",
+                          "vuln_level",
+                          "description",
+                          "affected_product",
+                          "affected_product_version",
+                          "fofa_query",
+                          "zoomeye_query",
+                          "quake_query",
+                          "hunter_query",
+                          "google_query",
+                          "shodan_query",
+                          "censys_query",
+                          "greynoise_query",
+                          "poc",
+                          "poc_type",
+                          "exp",
+                          "exp_type",
+                          "repair_suggestion",
+                          "attachment_id",
+                          "attachment_name",
+                          "submitter",
+                          "is_public",
+                          "status",
+                          "create_time",
+                          "update_time"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "id",
+                          "user_id",
+                          "cve",
+                          "nvd",
+                          "edb",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type",
+                          "vuln_level",
+                          "description",
+                          "affected_product",
+                          "affected_product_version",
+                          "fofa_query",
+                          "zoomeye_query",
+                          "quake_query",
+                          "hunter_query",
+                          "google_query",
+                          "shodan_query",
+                          "censys_query",
+                          "greynoise_query",
+                          "poc",
+                          "poc_type",
+                          "exp",
+                          "exp_type",
+                          "repair_suggestion",
+                          "attachment_id",
+                          "attachment_name",
+                          "submitter",
+                          "is_public",
+                          "status",
+                          "create_time",
+                          "update_time"
+                        ]
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "data",
+                    "total"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "data",
+                    "total"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222869035-run",
+        "security": []
+      }
+    },
+    "/api/v1/uservulnlist": {
+      "get": {
+        "summary": "分页获取用户提交的漏洞",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mjg5ODk4MDEsInJvbGUiOjAsInVzZXJuYW1lIjoidGVzdCJ9.e38x9gTUQeRJbM9ckaD7AKQ6MMwpGTOTJZNEiRMa-Zk",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "data",
+                    "total"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "data",
+                    "total"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-222869949-run",
+        "security": []
+      }
+    },
+    "/api/v1/getvulntypes": {
+      "get": {
+        "summary": "获取全部漏洞类型",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "value",
+                          "label"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "value",
+                          "label"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "data"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-223418801-run",
+        "security": []
+      }
+    },
+    "/api/v1/usertop": {
+      "get": {
+        "summary": "获取排行榜信息",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-223696458-run",
+        "security": []
+      }
+    },
+    "/api/v1/auditvuln": {
+      "post": {
+        "summary": "审核漏洞",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxMDQwOTgsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.H98PqHpDG3JHKX9vJ3NsQ4GqIC79s4qSqxDHzy0tLM8",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "id": "HVD-2024-0001",
+                "audit": 1,
+                "review": "",
+                "cvss": 8.5,
+                "prid": 1,
+                "erid": 1,
+                "irid": 1,
+                "orid": 0
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-223708250-run",
+        "security": []
+      }
+    },
+    "/api/v1/getsystemstatus": {
+      "get": {
+        "summary": "获取系统状态",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxMDUwNTEsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.1VzPu9xkQwhxoZuTc7GqEZycJUroZTMyeURRFD9M2Y8",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "cpu": {
+                          "type": "integer"
+                        },
+                        "disk": {
+                          "type": "integer"
+                        },
+                        "mem": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "cpu",
+                        "disk",
+                        "mem"
+                      ],
+                      "x-apifox-ignore-properties": [],
+                      "x-apifox-orders": [
+                        "cpu",
+                        "disk",
+                        "mem"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-226948777-run",
+        "security": []
+      }
+    },
+    "/api/v1/addvultype": {
+      "post": {
+        "summary": "添加漏洞类型",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "name": "test"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-227803160-run",
+        "security": []
+      }
+    },
+    "/api/v1/updatevulntype": {
+      "post": {
+        "summary": "修改漏洞类型",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxNzY2ODUsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.PAno5SIDbUyrjy-KaVVUOuEMkaeDxUgbj3qOA5uKlxE",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "id": 1,
+                "name": "信息泄露"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-227803436-run",
+        "security": []
+      }
+    },
+    "/api/v1/getunauditlist": {
+      "get": {
+        "summary": "分页获取未审核漏洞列表",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxODc3NjQsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.8xwlv6fxPQJsrKzi5gestIeJv3l2VhOPMXaPjyXjRok",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "cve": {
+                            "type": "string"
+                          },
+                          "nvd": {
+                            "type": "string"
+                          },
+                          "edb": {
+                            "type": "string"
+                          },
+                          "cnnvd": {
+                            "type": "string"
+                          },
+                          "cnvd": {
+                            "type": "string"
+                          },
+                          "vuln_name": {
+                            "type": "string"
+                          },
+                          "vuln_type_id": {
+                            "type": "integer"
+                          },
+                          "vuln_type": {
+                            "type": "string"
+                          },
+                          "vuln_level": {
+                            "type": "string"
+                          },
+                          "cvss": {
+                            "type": "integer"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "affected_product": {
+                            "type": "string"
+                          },
+                          "affected_product_version": {
+                            "type": "string"
+                          },
+                          "fofa_query": {
+                            "type": "string"
+                          },
+                          "zoomeye_query": {
+                            "type": "string"
+                          },
+                          "quake_query": {
+                            "type": "string"
+                          },
+                          "hunter_query": {
+                            "type": "string"
+                          },
+                          "google_query": {
+                            "type": "string"
+                          },
+                          "shodan_query": {
+                            "type": "string"
+                          },
+                          "censys_query": {
+                            "type": "string"
+                          },
+                          "greynoise_query": {
+                            "type": "string"
+                          },
+                          "poc": {
+                            "type": "string"
+                          },
+                          "poc_type": {
+                            "type": "string"
+                          },
+                          "exp": {
+                            "type": "string"
+                          },
+                          "exp_type": {
+                            "type": "string"
+                          },
+                          "repair_suggestion": {
+                            "type": "string"
+                          },
+                          "attachment_id": {
+                            "type": "string"
+                          },
+                          "attachment_name": {
+                            "type": "string"
+                          },
+                          "submitter": {
+                            "type": "string"
+                          },
+                          "is_public": {
+                            "type": "boolean"
+                          },
+                          "status": {
+                            "type": "integer"
+                          },
+                          "review_comments": {
+                            "type": "string"
+                          },
+                          "create_time": {
+                            "type": "string"
+                          },
+                          "update_time": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "cve",
+                          "nvd",
+                          "edb",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type_id",
+                          "vuln_type",
+                          "vuln_level",
+                          "cvss",
+                          "description",
+                          "affected_product",
+                          "affected_product_version",
+                          "fofa_query",
+                          "zoomeye_query",
+                          "quake_query",
+                          "hunter_query",
+                          "google_query",
+                          "shodan_query",
+                          "censys_query",
+                          "greynoise_query",
+                          "poc",
+                          "poc_type",
+                          "exp",
+                          "exp_type",
+                          "repair_suggestion",
+                          "attachment_id",
+                          "attachment_name",
+                          "submitter",
+                          "is_public",
+                          "status",
+                          "review_comments",
+                          "create_time",
+                          "update_time"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "id",
+                          "user_id",
+                          "cve",
+                          "nvd",
+                          "edb",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type_id",
+                          "vuln_type",
+                          "vuln_level",
+                          "cvss",
+                          "description",
+                          "affected_product",
+                          "affected_product_version",
+                          "fofa_query",
+                          "zoomeye_query",
+                          "quake_query",
+                          "hunter_query",
+                          "google_query",
+                          "shodan_query",
+                          "censys_query",
+                          "greynoise_query",
+                          "poc",
+                          "poc_type",
+                          "exp",
+                          "exp_type",
+                          "repair_suggestion",
+                          "attachment_id",
+                          "attachment_name",
+                          "submitter",
+                          "is_public",
+                          "status",
+                          "review_comments",
+                          "create_time",
+                          "update_time"
+                        ]
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "data",
+                    "total"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "data",
+                    "total"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-227893836-run",
+        "security": []
+      }
+    },
+    "/api/v1/getauditedlist": {
+      "get": {
+        "summary": "分页获取已审核漏洞列表",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAxODc3NjQsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.8xwlv6fxPQJsrKzi5gestIeJv3l2VhOPMXaPjyXjRok",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "type": "integer"
+                          },
+                          "cve": {
+                            "type": "string"
+                          },
+                          "nvd": {
+                            "type": "string"
+                          },
+                          "edb": {
+                            "type": "string"
+                          },
+                          "cnnvd": {
+                            "type": "string"
+                          },
+                          "cnvd": {
+                            "type": "string"
+                          },
+                          "vuln_name": {
+                            "type": "string"
+                          },
+                          "vuln_type_id": {
+                            "type": "integer"
+                          },
+                          "vuln_type": {
+                            "type": "string"
+                          },
+                          "vuln_level": {
+                            "type": "string"
+                          },
+                          "cvss": {
+                            "type": "number"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "affected_product": {
+                            "type": "string"
+                          },
+                          "affected_product_version": {
+                            "type": "string"
+                          },
+                          "fofa_query": {
+                            "type": "string"
+                          },
+                          "zoomeye_query": {
+                            "type": "string"
+                          },
+                          "quake_query": {
+                            "type": "string"
+                          },
+                          "hunter_query": {
+                            "type": "string"
+                          },
+                          "google_query": {
+                            "type": "string"
+                          },
+                          "shodan_query": {
+                            "type": "string"
+                          },
+                          "censys_query": {
+                            "type": "string"
+                          },
+                          "greynoise_query": {
+                            "type": "string"
+                          },
+                          "poc": {
+                            "type": "string"
+                          },
+                          "poc_type": {
+                            "type": "string"
+                          },
+                          "exp": {
+                            "type": "string"
+                          },
+                          "exp_type": {
+                            "type": "string"
+                          },
+                          "repair_suggestion": {
+                            "type": "string"
+                          },
+                          "attachment_id": {
+                            "type": "string"
+                          },
+                          "attachment_name": {
+                            "type": "string"
+                          },
+                          "submitter": {
+                            "type": "string"
+                          },
+                          "is_public": {
+                            "type": "boolean"
+                          },
+                          "status": {
+                            "type": "integer"
+                          },
+                          "review_comments": {
+                            "type": "string"
+                          },
+                          "create_time": {
+                            "type": "string"
+                          },
+                          "update_time": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "cve",
+                          "nvd",
+                          "edb",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type_id",
+                          "vuln_type",
+                          "vuln_level",
+                          "cvss",
+                          "description",
+                          "affected_product",
+                          "affected_product_version",
+                          "fofa_query",
+                          "zoomeye_query",
+                          "quake_query",
+                          "hunter_query",
+                          "google_query",
+                          "shodan_query",
+                          "censys_query",
+                          "greynoise_query",
+                          "poc",
+                          "poc_type",
+                          "exp",
+                          "exp_type",
+                          "repair_suggestion",
+                          "attachment_id",
+                          "attachment_name",
+                          "submitter",
+                          "is_public",
+                          "status",
+                          "review_comments",
+                          "create_time",
+                          "update_time"
+                        ],
+                        "x-apifox-ignore-properties": [],
+                        "x-apifox-orders": [
+                          "id",
+                          "user_id",
+                          "cve",
+                          "nvd",
+                          "edb",
+                          "cnnvd",
+                          "cnvd",
+                          "vuln_name",
+                          "vuln_type_id",
+                          "vuln_type",
+                          "vuln_level",
+                          "cvss",
+                          "description",
+                          "affected_product",
+                          "affected_product_version",
+                          "fofa_query",
+                          "zoomeye_query",
+                          "quake_query",
+                          "hunter_query",
+                          "google_query",
+                          "shodan_query",
+                          "censys_query",
+                          "greynoise_query",
+                          "poc",
+                          "poc_type",
+                          "exp",
+                          "exp_type",
+                          "repair_suggestion",
+                          "attachment_id",
+                          "attachment_name",
+                          "submitter",
+                          "is_public",
+                          "status",
+                          "review_comments",
+                          "create_time",
+                          "update_time"
+                        ]
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "data",
+                    "total"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "data",
+                    "total"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-227894113-run",
+        "security": []
+      }
+    },
+    "/api/v1/getsysconfig": {
+      "get": {
+        "summary": "获取系统配置信息",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAyODMxNzEsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.iHTJSSXJstNME_jvH1N9kVqeynU-08eytTXB4p8-G0Y",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "emailconf": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "email_host": {
+                              "type": "string"
+                            },
+                            "email_port": {
+                              "type": "integer"
+                            },
+                            "email_user": {
+                              "type": "string"
+                            },
+                            "email_password": {
+                              "type": "string"
+                            },
+                            "email_sender": {
+                              "type": "string"
+                            },
+                            "create_time": {
+                              "type": "string"
+                            },
+                            "update_time": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "email_host",
+                            "email_port",
+                            "email_user",
+                            "email_password",
+                            "email_sender",
+                            "create_time",
+                            "update_time"
+                          ],
+                          "x-apifox-ignore-properties": [],
+                          "x-apifox-orders": [
+                            "id",
+                            "email_host",
+                            "email_port",
+                            "email_user",
+                            "email_password",
+                            "email_sender",
+                            "create_time",
+                            "update_time"
+                          ]
+                        },
+                        "jwtconf": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "jwt_secret": {
+                              "type": "string"
+                            },
+                            "jwt_expires": {
+                              "type": "integer"
+                            },
+                            "create_time": {
+                              "type": "string"
+                            },
+                            "update_time": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "jwt_secret",
+                            "jwt_expires",
+                            "create_time",
+                            "update_time"
+                          ],
+                          "x-apifox-ignore-properties": [],
+                          "x-apifox-orders": [
+                            "id",
+                            "jwt_secret",
+                            "jwt_expires",
+                            "create_time",
+                            "update_time"
+                          ]
+                        },
+                        "noticeconf": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "type": {
+                              "type": "integer"
+                            },
+                            "secret": {
+                              "type": "string"
+                            },
+                            "webhook": {
+                              "type": "string"
+                            },
+                            "create_time": {
+                              "type": "string"
+                            },
+                            "update_time": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "type",
+                            "secret",
+                            "webhook",
+                            "create_time",
+                            "update_time"
+                          ],
+                          "x-apifox-ignore-properties": [],
+                          "x-apifox-orders": [
+                            "id",
+                            "type",
+                            "secret",
+                            "webhook",
+                            "create_time",
+                            "update_time"
+                          ]
+                        },
+                        "sysconf": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer"
+                            },
+                            "user_register": {
+                              "type": "boolean"
+                            },
+                            "user_display": {
+                              "type": "string"
+                            },
+                            "max_attempts": {
+                              "type": "integer"
+                            },
+                            "lockout_duration": {
+                              "type": "integer"
+                            },
+                            "create_time": {
+                              "type": "string"
+                            },
+                            "update_time": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "user_register",
+                            "user_display",
+                            "max_attempts",
+                            "lockout_duration",
+                            "create_time",
+                            "update_time"
+                          ],
+                          "x-apifox-ignore-properties": [],
+                          "x-apifox-orders": [
+                            "id",
+                            "user_register",
+                            "user_display",
+                            "max_attempts",
+                            "lockout_duration",
+                            "create_time",
+                            "update_time"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "emailconf",
+                        "jwtconf",
+                        "noticeconf",
+                        "sysconf"
+                      ],
+                      "x-apifox-ignore-properties": [],
+                      "x-apifox-orders": [
+                        "emailconf",
+                        "jwtconf",
+                        "noticeconf",
+                        "sysconf"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-228435557-run",
+        "security": []
+      }
+    },
+    "/api/v1/updatesysconfig": {
+      "post": {
+        "summary": "更新系统配置",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzAyODMxNzEsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.iHTJSSXJstNME_jvH1N9kVqeynU-08eytTXB4p8-G0Y",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {},
+                "x-apifox-ignore-properties": [],
+                "x-apifox-orders": []
+              },
+              "example": {
+                "emailconf": {
+                  "id": 0,
+                  "email_host": "1234",
+                  "email_port": 1234,
+                  "email_user": "1234",
+                  "email_password": "1234124",
+                  "email_sender": "12341234",
+                  "create_time": "0001-01-01T00:00:00Z",
+                  "update_time": "0001-01-01T00:00:00Z"
+                },
+                "jwtconf": {
+                  "id": 1,
+                  "jwt_secret": "bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=+",
+                  "jwt_expires": "1200",
+                  "create_time": "2024-10-16T17:31:15.1146947+08:00",
+                  "update_time": "0001-01-01T00:00:00Z"
+                },
+                "noticeconf": {
+                  "id": 0,
+                  "type": 2,
+                  "secret": "",
+                  "webhook": "123412412",
+                  "create_time": "0001-01-01T00:00:00Z",
+                  "update_time": "0001-01-01T00:00:00Z"
+                },
+                "sysconf": {
+                  "id": 1,
+                  "user_register": true,
+                  "user_display": "匿名",
+                  "max_attempts": "3",
+                  "lockout_duration": "6000",
+                  "create_time": "2024-10-16T17:31:15.0322273+08:00",
+                  "update_time": "0001-01-01T00:00:00Z"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "请求有误",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "err": {
+                      "type": "object",
+                      "properties": {
+                        "Value": {
+                          "type": "string"
+                        },
+                        "Type": {
+                          "type": "object",
+                          "properties": {},
+                          "x-apifox-ignore-properties": [],
+                          "x-apifox-orders": []
+                        },
+                        "Offset": {
+                          "type": "integer"
+                        },
+                        "Struct": {
+                          "type": "string"
+                        },
+                        "Field": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "Value",
+                        "Type",
+                        "Offset",
+                        "Struct",
+                        "Field"
+                      ],
+                      "x-apifox-ignore-properties": [],
+                      "x-apifox-orders": [
+                        "Value",
+                        "Type",
+                        "Offset",
+                        "Struct",
+                        "Field"
+                      ]
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "err",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "err",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-228497807-run",
+        "security": []
+      }
+    },
+    "/api/v1/getscorerules": {
+      "get": {
+        "summary": "获取评分规则",
+        "x-apifox-folder": "管理员接口",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "管理员接口"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzA0NTY1MjgsInJvbGUiOjEsInVzZXJuYW1lIjoiYWRtaW4ifQ.jX64Zw7M9X31A8vEHZrfp4_tUeyI1aBQV4Yy3IPCXJE",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "exprules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "rule": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "rule"
+                            ],
+                            "x-apifox-ignore-properties": [],
+                            "x-apifox-orders": [
+                              "id",
+                              "rule"
+                            ]
+                          }
+                        },
+                        "incidencerules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "rule": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "rule"
+                            ],
+                            "x-apifox-ignore-properties": [],
+                            "x-apifox-orders": [
+                              "id",
+                              "rule"
+                            ]
+                          }
+                        },
+                        "otherrules": {
+                          "type": "null"
+                        },
+                        "pocrules": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "integer"
+                              },
+                              "rule": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "rule"
+                            ],
+                            "x-apifox-ignore-properties": [],
+                            "x-apifox-orders": [
+                              "id",
+                              "rule"
+                            ]
+                          }
+                        }
+                      },
+                      "required": [
+                        "exprules",
+                        "incidencerules",
+                        "otherrules",
+                        "pocrules"
+                      ],
+                      "x-apifox-ignore-properties": [],
+                      "x-apifox-orders": [
+                        "exprules",
+                        "incidencerules",
+                        "otherrules",
+                        "pocrules"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "data"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "data"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-229315352-run",
+        "security": []
+      }
+    },
+    "/api/v1/getcaptcha": {
+      "get": {
+        "summary": "获取验证码",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "example@qq.com",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "msg"
+                  ],
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": [
+                    "code",
+                    "msg"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-234775220-run",
+        "security": []
+      }
+    },
+    "/api/v1/getvulntype": {
+      "get": {
+        "summary": "分页获取漏洞类型",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "1",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "example": "15",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-235205542-run",
+        "security": []
+      }
+    },
+    "/": {
+      "post": {
+        "summary": "忘记密码",
+        "x-apifox-folder": "无需登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "无需登录"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "captcha": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "password",
+                  "email",
+                  "captcha"
+                ],
+                "x-apifox-orders": [
+                  "password",
+                  "email",
+                  "captcha"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "password": "Test1234",
+                "email": "aa@qq.com",
+                "captcha": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-235217075-run",
+        "security": []
+      }
+    },
+    "/api/v1/editvuln": {
+      "post": {
+        "summary": "编辑用户提交的漏洞",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "type": "integer"
+                  },
+                  "cve": {
+                    "type": "string"
+                  },
+                  "nvd": {
+                    "type": "string"
+                  },
+                  "edb": {
+                    "type": "string"
+                  },
+                  "cnnvd": {
+                    "type": "string"
+                  },
+                  "cnvd": {
+                    "type": "string"
+                  },
+                  "vuln_name": {
+                    "type": "string"
+                  },
+                  "vuln_type_id": {
+                    "type": "integer"
+                  },
+                  "vuln_type": {
+                    "type": "string"
+                  },
+                  "vuln_level": {
+                    "type": "string"
+                  },
+                  "cvss": {
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "affected_product": {
+                    "type": "string"
+                  },
+                  "affected_product_version": {
+                    "type": "string"
+                  },
+                  "fofa_query": {
+                    "type": "string"
+                  },
+                  "zoomeye_query": {
+                    "type": "string"
+                  },
+                  "quake_query": {
+                    "type": "string"
+                  },
+                  "hunter_query": {
+                    "type": "string"
+                  },
+                  "google_query": {
+                    "type": "string"
+                  },
+                  "shodan_query": {
+                    "type": "string"
+                  },
+                  "censys_query": {
+                    "type": "string"
+                  },
+                  "greynoise_query": {
+                    "type": "string"
+                  },
+                  "poc": {
+                    "type": "string"
+                  },
+                  "poc_type": {
+                    "type": "string"
+                  },
+                  "exp": {
+                    "type": "string"
+                  },
+                  "exp_type": {
+                    "type": "string"
+                  },
+                  "repair_suggestion": {
+                    "type": "string"
+                  },
+                  "attachment_id": {
+                    "type": "string"
+                  },
+                  "attachment_name": {
+                    "type": "string"
+                  },
+                  "is_public": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "type": "integer"
+                  },
+                  "review_comments": {
+                    "type": "string"
+                  },
+                  "create_time": {
+                    "type": "string"
+                  },
+                  "update_time": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "x-apifox-orders": [
+                  "id",
+                  "user_id",
+                  "cve",
+                  "nvd",
+                  "edb",
+                  "cnnvd",
+                  "cnvd",
+                  "vuln_name",
+                  "vuln_type_id",
+                  "vuln_type",
+                  "vuln_level",
+                  "cvss",
+                  "description",
+                  "affected_product",
+                  "affected_product_version",
+                  "fofa_query",
+                  "zoomeye_query",
+                  "quake_query",
+                  "hunter_query",
+                  "google_query",
+                  "shodan_query",
+                  "censys_query",
+                  "greynoise_query",
+                  "poc",
+                  "poc_type",
+                  "exp",
+                  "exp_type",
+                  "repair_suggestion",
+                  "attachment_id",
+                  "attachment_name",
+                  "is_public",
+                  "status",
+                  "review_comments",
+                  "create_time",
+                  "update_time"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "id": "HVD-2024-0002",
+                "user_id": 3,
+                "cve": "",
+                "nvd": "",
+                "edb": "",
+                "cnnvd": "",
+                "cnvd": "",
+                "vuln_name": "test",
+                "vuln_type_id": 1,
+                "vuln_type": "信息泄露",
+                "vuln_level": "Low",
+                "cvss": 1,
+                "description": "1",
+                "affected_product": "1",
+                "affected_product_version": "1",
+                "fofa_query": "",
+                "zoomeye_query": "",
+                "quake_query": "",
+                "hunter_query": "",
+                "google_query": "",
+                "shodan_query": "",
+                "censys_query": "",
+                "greynoise_query": "",
+                "poc": "",
+                "poc_type": "xray",
+                "exp": "",
+                "exp_type": "xray",
+                "repair_suggestion": "1",
+                "attachment_id": "",
+                "attachment_name": "",
+                "submitter": "test",
+                "is_public": true,
+                "status": 0,
+                "review_comments": "",
+                "create_time": "2024-11-19T15:42:09.701131+08:00",
+                "update_time": "0001-01-01T00:00:00Z"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-235227923-run",
+        "security": []
+      }
+    },
+    "/api/v1/updateavatar": {
+      "post": {
+        "summary": "修改头像",
+        "x-apifox-folder": "需要登录",
+        "x-apifox-status": "released",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "需要登录"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "",
+            "required": false,
+            "example": "",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/5134016/apis/api-235234380-run",
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {}
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8123",
+      "description": "开发环境"
+    },
+    {
+      "url": "http://127.0.0.1:8123",
+      "description": "测试环境"
+    }
+  ]
+}

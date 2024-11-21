@@ -1,7 +1,7 @@
 <template>
     <el-menu class="el-menu" mode="horizontal" :ellipsis="false">
       <el-menu-item index="0">
-        <img style="width: 50px" src="/avatar.svg" alt="Element logo" />
+        <img style="width: 50px" src="/avatar.svg" alt="logo" />
       </el-menu-item>
       <el-menu-item index="1" @click="GotoIndex">{{ t('app.webui.home') }}</el-menu-item>
       <el-menu-item index="2" @click="SubmitVuln">{{ t('app.webui.submitvuln') }}</el-menu-item>

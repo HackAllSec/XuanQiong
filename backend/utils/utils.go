@@ -18,18 +18,43 @@ func GenerateRandomJwtSecret() string {
     return base64.URLEncoding.EncodeToString(randomBytes)
 }
 
-// generateRandomPassword 生成包含特殊字符的随机密码
-func GenerateRandomPassword(length int64) (string, error) {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/"
-    password := make([]byte, length)
-    _, err := rand.Read(password)
+// generateRandomChars 生成包含特殊字符的随机密码
+func GenerateRandomChars(length int64, chartype int64) (string, error) {
+    const numChars = "0123456789"
+    const specChars = "!@#$%^&*()-_=+[]{}|;:,.<>?"
+    const lowerChars = "abcdefghijklmnopqrstuvwxyz"
+    const upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    var chars string
+    //const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?/"
+    randomBytes := make([]byte, length)
+    _, err := rand.Read(randomBytes)
     if err != nil {
         return "", err
     }
-    for i, b := range password {
-        password[i] = chars[int(b)%len(chars)]
+    // 纯数字
+    if chartype == 1 {
+        chars = numChars
     }
-    return string(password), nil
+    // 纯小写字母
+    if chartype == 2 {
+        chars = lowerChars
+    }
+    // 纯大写字母
+    if chartype == 3 {
+        chars = upperChars
+    }
+    // 字母+数字
+    if chartype == 4 {
+        chars = numChars + lowerChars + upperChars
+    }
+    // 字母+数字+特殊符号
+    if chartype == 5 {
+        chars = numChars + lowerChars + upperChars + specChars
+    }
+    for i, b := range randomBytes {
+        randomBytes[i] = chars[int(b)%len(chars)]
+    }
+    return string(randomBytes), nil
 }
 
 func GenJWTToken(username string, role int64, expires int64, secret string) (string, error) {

@@ -122,7 +122,13 @@ export default {
             auditing: '审核中',
             reviewcomments: '审核意见',
             cvsserror: 'CVSS 值错误',
-            edit: '编辑'
+            edit: '编辑',
+            captcha: '验证码',
+            getcaptcha: '获取验证码',
+            captchasucc: '验证码获取成功',
+            captchafail: '验证码获取失败',
+            captchaerr: '验证码错误',
+            restfail: '重置密码失败，请检查后重试'
         }
     }
 };

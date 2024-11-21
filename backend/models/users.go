@@ -236,8 +236,16 @@ func UpdateUserPassword(userid uint64, oldpassword string, newpassword string) e
 }
 
 // 用户注册
-func Register(username string, password string, email string, phone string) int64 {
+func Register(username, password, email, phone, captcha string) int64 {
     var user types.XqUser
+    var verifycode types.XqVerifyCode
+    if captcha == "" {
+        return 6
+    }
+    db.Where("email = ?", email).Where("expired_time > ?", time.Now()).First(&verifycode)
+    if verifycode.Code != captcha {
+        return 6
+    }
     res := db.Where("username = ?", username).First(&user)
     if res.RowsAffected != 0 {
         return 2
@@ -265,6 +273,27 @@ func Register(username string, password string, email string, phone string) int6
     }
     db.Create(&userData)
     return 1
+}
+
+// 忘记密码
+func ForgetPassword(email, captcha, password string) error {
+    var user types.XqUser
+    var verifycode types.XqVerifyCode
+    if captcha == "" {
+        return fmt.Errorf("Invalid captcha")
+    }
+    db.Where("email = ?", email).Where("expired_time > ?", time.Now()).First(&verifycode)
+    if verifycode.Code != captcha {
+        return fmt.Errorf("Invalid captcha")
+    }
+    res := db.Where("email = ?", email).First(&user)
+    if res.RowsAffected == 0 {
+        return fmt.Errorf("User not found")
+    }
+    user.Password = utils.GenPasswordHash(password)
+    user.UpdateTime = time.Now()
+    db.Save(&user)
+    return nil
 }
 
 // 获取用户提交的漏洞

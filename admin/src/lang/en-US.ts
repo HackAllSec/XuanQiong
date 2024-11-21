@@ -43,6 +43,7 @@ export default {
             user: 'User',
             confirmpassword: 'Confirmpassword',
             submit: 'Submit',
+            submitsuccess: 'Submit Successful',
             language: 'Language',
             loginsucc: 'Login Successful',
             welcome: 'Welcome',
@@ -148,6 +149,7 @@ export default {
             lockoutduration: 'Lockout Duration',
             emailserver: 'Sender Email Server',
             emailuser: 'Sender Email User Address',
+            emailsender: 'Sender Name',
             emailport: 'Port',
             emailpasswd: 'Sender Email Password',
             jwtconfig: 'JWT Config',
@@ -159,7 +161,15 @@ export default {
             invalidinput: 'Invalid input',
             nopermation: 'You do not have permission to access',
             modify: 'Modify',
-            userdisplay: 'Deleted user name display'
+            userdisplay: 'Deleted user name display',
+            needemail: 'Registration and password recovery need to send verification code, please configure email correctly',
+            savesuccess: 'Save Successful',
+            savefail: 'Save Failed',
+            captcha: 'Captcha',
+            getcaptcha: 'Get Captcha',
+            captchasucc: 'Captcha Successful',
+            captchafail: 'Captcha Failed',
+            restfail: 'Reset Password Failed, please check and try again'
         }
     }
 };
