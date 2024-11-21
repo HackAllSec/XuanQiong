@@ -19,10 +19,13 @@
 - GORM
 - JWT
 
-支持漏洞提交、漏洞审核、漏洞搜索、漏洞排行榜、消息推送等功能。
 支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。
 支持JWT、Webhook、邮件通知等。
 内置漏洞类型，漏洞评分规则，积分计算规则查看[积分规则](ScoreRules.md)。
+
+演示环境：[https://demo.hackall.cn](https://demo.hackall.cn)  
+管理员账号：admin/Admin@123  
+普通用户账号：test/123456  
 
 ### 用户界面功能
 
