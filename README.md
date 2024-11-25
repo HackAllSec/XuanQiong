@@ -19,7 +19,7 @@
 - GORM
 - JWT
 
-支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。
+支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。已在MySQL和Sqlite测试，建议使用MySQL 5.x，MySQL 8.x 存在已知问题。
 支持JWT、Webhook、邮件通知等。
 内置漏洞类型，漏洞评分规则，积分计算规则查看[积分规则](ScoreRules.md)。
 
@@ -98,11 +98,11 @@ XuanQiong/
 
 ## 部署方式
 
-支持`前后端一体`和`前后端分离`
+支持`前后端一体`和`前后端分离`，如果遇到问题请查看[FAQ](FAQ.md)。
 
 ### 前后端一体
 
-直接运行`main.go`即可
+直接运行`go run main.go`即可。
 
 ### 前后端分离
 
@@ -111,6 +111,8 @@ XuanQiong/
 - 前端配置API地址，然后编译
 - 编译后的用户前端文件位于：frontend/dist目录下，复制目录下的文件到web目录即可
 - 后端配置CORS、运行模式
+
+目前需要通过修改`main.go`切换，后续优化。
 
 ## ChangeLog
 
