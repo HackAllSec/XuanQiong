@@ -49,7 +49,7 @@ export default {
             inputformaterror: 'Input format error',
             loginerr1: 'Username or password cannot be empty',
             loginerr2: 'Login request failed',
-            loginerr3: 'Your account has been locked, please contact the administrator to unlock it',
+            loginerr3: 'Your IP has been locked, please contact the administrator to unlock it',
             loginerr4: 'The username or password is incorrect, you can try',
             times: 'times',
             empty: 'There\'s nothing here',

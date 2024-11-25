@@ -49,7 +49,7 @@ export default {
             inputformaterror: '输入格式错误',
             loginerr1: '账号或密码不能为空',
             loginerr2: '登录请求失败',
-            loginerr3: '您的账户已被锁定，请联系管理员解锁',
+            loginerr3: '您的IP已被锁定，请联系管理员解锁',
             loginerr4: '用户名或密码错误，您还可以尝试',
             times: '次',
             empty: '什么都没有',

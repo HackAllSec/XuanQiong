@@ -8,7 +8,7 @@
                 </div>
                 <div>
                     <el-button type="primary" @click="dialogVisibleAdd=true">{{ t('app.webui.add') }}</el-button>
-                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteUser">{{ t('app.webui.multidelete') }}</el-button>
+                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteScoreRules">{{ t('app.webui.multidelete') }}</el-button>
                 </div>
             </div>
             <el-table :data="currentData" @selection-change="handleSelectionChange">
@@ -114,82 +114,18 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
-import { DocumentCopy } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
-const data = ref({
-    "data":[{
-            "id": 1,
-            "type": 1,
-            "rule": "Xray、Nuclei、Goby等完整Poc，误报低",
-            "score": 20,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": 2,
-            "type": 1,
-            "rule": "Xray、Nuclei、Goby等完整Poc，误报较高",
-            "score": 10,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": 3,
-            "type": 1,
-            "rule": "仅包含Payload或无法工具化的Poc",
-            "score": 5,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": 4,
-            "type": 2,
-            "rule": "Xray、Nuclei、Goby等完整Exp，误报低",
-            "score": 30,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": 5,
-            "type": 2,
-            "rule": "Xray、Nuclei、Goby等完整Exp，误报较高",
-            "score": 15,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": 6,
-            "type": 2,
-            "rule": "Xray、Nuclei、Goby等完整Exp，误报较高",
-            "score": 5,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        },
-        {
-            "id": 7,
-            "type": 3,
-            "rule": "互联网资产数大于 5000",
-            "score": 30,
-            "coefficient": 1,
-            "create_time": "2024-10-23T16:20:32.31+08:00",
-            "update_time": "0001-01-01T00:00:00Z"
-        }
-    ]})
-const vulndetail = ref({})
+const token = sessionStorage.getItem('token')
+const data = ref({})
 const search = ref('')
-const mountedFunctions = []//fetchVulnList]
+const mountedFunctions = [fetchScoreRules]
 const currentPage = ref(1);
 const pageSize = ref(15);
 const totalItems = ref(0)
 const dialogVisibleAdd = ref(false)
 const dialogVisibleEdit = ref(false)
+const multipleSelection = ref([])
 const scoreruleForm = ref({})
 const typelist = ref([
     {"id": 1, "type": t('app.webui.pocscorerule')},
@@ -200,7 +136,7 @@ const typelist = ref([
 const multideleteVisible = ref(true)
 
 const handleSelectionChange = (val) => {
-    multideleteVisible.value = val.id
+    multipleSelection.value = val
     if (val.length > 0) {
         multideleteVisible.value = false
     } else {
@@ -229,7 +165,7 @@ const currentData = computed(() => {
     const start = 0;
     const end = start + pageSize.value;
     //console.log(start, end)
-    console.log(data.value)
+    //console.log(data.value)
     if (search.value.trim() != '') {
         // 过滤数据
         return data.value.data.filter(item => {
@@ -249,13 +185,13 @@ const currentData = computed(() => {
 function handleSizeChange(size: number) {
   pageSize.value = size;
   currentPage.value = 1; // 每次改变条目数时重置到第一页
-  fetchVulnList();
+  fetchScoreRules();
 }
 
 // 处理当前页变化
 async function handleCurrentChange(page: number) {
     currentPage.value = page;
-    await fetchVulnList();
+    await fetchScoreRules();
 }
 
 onMounted(() => {
@@ -264,24 +200,29 @@ onMounted(() => {
   });
 });
 
-async function fetchVulnList() {
+async function fetchScoreRules() {
     try {
-        const response = await api.get(`/api/v1/getvulnlist?page=${currentPage.value}&limit=${pageSize.value}`)
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`  // 使用Bearer schema
+            }
+        };
+        const response = await api.get(`/api/v1/getscorerules?page=${currentPage.value}&limit=${pageSize.value}`, config)
+        if (response.data.code != 1) {
+            // 清空token，返回登录页
+            sessionStorage.removeItem("token")
+            sessionStorage.removeItem("username")
+
+        }
         data.value = response.data
         totalItems.value = response.data.total
-        typefilter.value = response.data.data.reduce((acc, item) => {
-            if (!acc.some(i => i.value === item.vuln_type)) {
-                acc.push({ text: item.vuln_type, value: item.vuln_type });
-            }
-            return acc;
-        }, []);
     } catch (error) {
         // 处理请求错误
         //ElMessage.error(t('app.webui.loginerr2'));
     }
 }
 
-function multiDeleteUser() {
+function multiDeleteScoreRules() {
     ElMessageBox.confirm(
     t('app.webui.deletenotice'),
     t('app.webui.confirmdelete'),
@@ -291,11 +232,29 @@ function multiDeleteUser() {
       type: 'warning',
     }
   )
-    .then(() => {
-      ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
+    .then(async () => {
+        const data = {
+            "ids": multipleSelection.value.map(item => item.id)
+        }
+        try {
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            };
+            const response = await api.post('/api/v1/multidelscorerules', data, config)
+            if (response.data.code == 1) {
+                ElMessage.success(t('app.webui.delsuccess'));
+                fetchScoreRules()
+                multideleteVisible.value = false
+            } else if (response.data.code == 0) {
+                ElMessage.error(t('app.webui.needlogin'));
+            } else {
+                ElMessage.error(t('app.webui.deletefail'));
+            }
+        } catch (error) {
+            
+        }
     })
     .catch(() => {
       
@@ -312,12 +271,41 @@ const handleDelete = (index, row) => {
       type: 'warning',
     }
   )
-    .then(() => {
-        ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
-      console.log(index,row)
+    .then(async () => {
+        try {
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            }
+            const response = await api.post("/api/v1/delscorerule", {id: row.id}, config)
+            if (response.data.code == 1) {
+                ElMessage({
+                    type: 'success',
+                    message: t('app.webui.delsuccess'),
+                })
+                fetchScoreRules()
+                dialogVisibleEdit.value = false
+                return
+            } else if (response.data.code == 2) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.invalidinput'),
+                })
+                return
+            }  else if (response.data.code == 3) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.delfail'),
+                })
+                return
+            } else {
+                // 返回登录界面
+            }     
+        } catch (error) {
+            // 处理请求错误
+            //ElMessage.error(t('app.webui.loginerr2'));
+        }
     })
     .catch(() => {
       
@@ -336,13 +324,65 @@ const resetForm = () => {
         "coefficient": 1
     }
 }
-const addScorerule = () => {
-    console.log(scoreruleForm.value)
-    dialogVisibleAdd.value = false
+const addScorerule = async () => {
+    //console.log(scoreruleForm.value)
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+        scoreruleForm.value.score = Number(scoreruleForm.value.score)
+        scoreruleForm.value.coefficient = Number(scoreruleForm.value.coefficient)
+        const response = await api.post('/api/v1/addscorerule', scoreruleForm.value, config)
+        if (response.data.code == 1) {
+            fetchScoreRules()
+            ElMessage.success(t('app.webui.addsuccess'));
+            dialogVisibleAdd.value = false
+        } else if (response.data.code == 2) {
+            ElMessage.error(t('app.webui.invalidinput'))
+            return
+        }  else if (response.data.code == 3) {
+            ElMessage.error(t('app.webui.addfail'))
+            return
+        } else {
+            // 返回登录界面
+        }
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
 }
-const editScorerule = () => {
-    console.log(scoreruleForm.value)
-    dialogVisibleEdit.value = false
+const editScorerule = async () => {
+    //console.log(scoreruleForm.value)
+    try {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+        scoreruleForm.value.score = Number(scoreruleForm.value.score)
+        scoreruleForm.value.coefficient = Number(scoreruleForm.value.coefficient)
+        const response = await api.post("/api/v1/editscorerule", scoreruleForm.value, config)
+        //console.log(response)
+        if (response.data.code == 1) {
+            fetchScoreRules()
+            ElMessage.success(t('app.webui.addsuccess'));
+            dialogVisibleEdit.value = false
+            return
+        } else if (response.data.code == 2) {
+            ElMessage.error(t('app.webui.invalidinput'))
+            return
+        }  else if (response.data.code == 3) {
+            ElMessage.error(t('app.webui.modifyfail'))
+            return
+        } else {
+            // 返回登录界面
+        }
+    } catch (error) {
+        // 处理请求错误
+        //ElMessage.error(t('app.webui.loginerr2'));
+    }
 }
 </script>
 <style scoped>

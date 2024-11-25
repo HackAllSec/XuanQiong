@@ -143,45 +143,45 @@ type XqVulnerability struct {
 
 // Lockip 锁定IP表
 type XqLockip struct {
-    ID             uint64    `gorm:"primaryKey"`
-    ClientIP       string
-    LockoutUntil   *time.Time
-    Status         int64
-    CreateTime     time.Time
-    UpdateTime     time.Time
+    ID             uint64     `gorm:"primaryKey" json:"id"`
+    ClientIP       string     `json:"client_ip"`
+    LockoutUntil   *time.Time `json:"lockout_until"`
+    Status         int64      `json:"status"`
+    CreateTime     time.Time  `json:"create_time"`
+    UpdateTime     time.Time  `json:"update_time"`
 }
 
 // 附件表
 type XqAttachment struct {
-    ID          string    `gorm:"primaryKey"`
-    UserID      uint64
-    Name        string
-    Type        string
-    Data        []byte
-    Status      int64
-    CreateTime  time.Time
-    UpdateTime  time.Time
+    ID          string    `gorm:"primaryKey" json:"id"`
+    UserID      uint64    `json:"user_id"`
+    Name        string    `json:"name"`
+    Type        string    `json:"type"`
+    Data        []byte    `json:"data"`
+    Status      int64     `json:"status"`
+    CreateTime  time.Time `json:"create_time"`
+    UpdateTime  time.Time `json:"update_time"`
 }
 
 // 用户ranking明细表
 type XqRankingDetail struct {
-    ID          uint64    `gorm:"primaryKey"`
-    UserID      uint64
-    VulnID      string
-    Ranking     int64
-    CreateTime  time.Time
-    UpdateTime  time.Time
+    ID          uint64    `gorm:"primaryKey" json:"id"`
+    UserID      uint64    `json:"user_id"`
+    VulnID      string    `json:"vuln_id"`
+    Ranking     int64     `json:"ranking"`
+    CreateTime  time.Time `json:"create_time"`
+    UpdateTime  time.Time `json:"update_time"`
 }
 
 // 评分规则表
 type XqScoreRule struct {
-    ID              uint64    `gorm:"primaryKey"`
-    Type            int64
-    Rule            string
-    Score           float64
-    Coefficient     float64
-    CreateTime      time.Time
-    UpdateTime      time.Time
+    ID              uint64    `gorm:"primaryKey" json:"id"`
+    Type            int64     `json:"type"`
+    Rule            string    `json:"rule"`
+    Score           float64   `json:"score"`
+    Coefficient     float64   `json:"coefficient"`
+    CreateTime      time.Time `json:"create_time"`
+    UpdateTime      time.Time `json:"update_time"`
 }
 
 // 验证码表

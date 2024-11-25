@@ -198,7 +198,7 @@
                 <div style="display: flex; width: 80%; gap: 1%;">
                     <el-input v-model="search" :placeholder="t('app.webui.search')" clearable style="width: 30%;" />
                 </div>
-                <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteUser">{{ t('app.webui.multidelete') }}</el-button>
+                <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteVulns">{{ t('app.webui.multidelete') }}</el-button>
             </div>
             <el-table :data="currentData" @selection-change="handleSelectionChange" @cell-mouse-enter="cellMouseEnter" @cell-mouse-leave="cellMouseLeave" @cell-click="cellClick">
                 <el-table-column type="selection" width="55" />
@@ -285,10 +285,9 @@ import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
 import { DocumentCopy, UploadFilled } from '@element-plus/icons-vue'
-import { useRoute } from 'vue-router'
-
 
 const { t } = useI18n()
+const token = sessionStorage.getItem('token')
 const poc = ref('xray')
 const exp = ref('xray')
 const vulntype = ref([])
@@ -302,6 +301,7 @@ const currentPage = ref(1);
 const pageSize = ref(15);
 const totalItems = ref(0)
 const multideleteVisible = ref(true)
+const multipleSelection = ref([])
 const showvulndetail = ref(false)
 const showedit = ref(false)
 const form = ref({
@@ -366,13 +366,32 @@ const form = ref({
         }
     }
 const handleSelectionChange = (val) => {
-    multideleteVisible.value = val.id
+    multipleSelection.value = val
     if (val.length > 0) {
         multideleteVisible.value = false
     } else {
         multideleteVisible.value = true
     }
 }
+const handleSuccess = (response) => {
+    ElMessage.success(t('app.webui.uploadsucc'))
+    form.value.attachment_id = response.file_id
+}
+const handleRemove = async () => {
+        //console.log("删除文件")
+        try {
+            const config = {
+                headers: {
+                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
+                }
+            };
+            const response = await api.get('/delete/file?id=' + form.value.attachment_id, config)
+            form.value.attachment_id = ''
+        } catch (error) {
+            // 处理请求错误
+            //console.error(error);
+        }
+    }
 function sortIsPublic(a, b) {
     if (a.is_public && !b.is_public) return -1;
     if (!a.is_public && b.is_public) return 1;
@@ -448,7 +467,7 @@ async function getVulnDetail(id) {
         try {
             const config = {
                 headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
+                    Authorization: `Bearer ${token}`  // 使用Bearer schema
                 }
             };
             const response = await api.get('/api/v1/getvulndtl?id=' + id, config)
@@ -488,33 +507,49 @@ async function fetchVulnList() {
     }
 }
 
-function multiDeleteUser() {
+function multiDeleteVulns() {
     ElMessageBox.confirm(
-    t('app.webui.deletenotice'),
-    t('app.webui.confirmdelete'),
-    {
-      confirmButtonText: t('app.webui.confirm'),
-      cancelButtonText: t('app.webui.cancel'),
-      type: 'warning',
-    }
-  )
-    .then(() => {
-      ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
+        t('app.webui.deletenotice'),
+        t('app.webui.confirmdelete'),
+        {
+            confirmButtonText: t('app.webui.confirm'),
+            cancelButtonText: t('app.webui.cancel'),
+            type: 'warning',
+        }
+    )
+    .then(async () => {
+        const data = {
+            "ids": multipleSelection.value.map(item => item.id)
+        }
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+            const response = await api.post('/api/v1/multidelvulns', data, config)
+            if (response.data.code == 1) {
+                ElMessage.success(t('app.webui.delsuccess'));
+                fetchVulnList()
+            } else if (response.data.code == 0) {
+                ElMessage.error(t('app.webui.needlogin'));
+            } else {
+                ElMessage.error(t('app.webui.deletefail'));
+            }
+        } catch (error) {
+        }
     })
-    .catch(() => {
-      
+    .catch((error) => {
+        console.log(error)
     })
 }
 const handleEdit = async (index, row) => {
-    console.log(row.id)
+    //console.log(row.id)
     await getVulnDetail(row.id)
-    console.log(vulndetail.value)
+    //console.log(vulndetail.value)
     form.value = vulndetail.value.data
     showedit.value = true
-    console.log(form.value)
+    //console.log(form.value)
 }
 const handleDelete = (index, row) => {
     ElMessageBox.confirm(
@@ -526,20 +561,82 @@ const handleDelete = (index, row) => {
       type: 'warning',
     }
   )
-    .then(() => {
-        ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
-      console.log(index,row)
+    .then(async () => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const response = await api.post("/api/v1/delvuln", {id: row.id}, config)
+            if (response.data.code == 1) {
+                ElMessage({
+                    type: 'success',
+                    message: t('app.webui.delsuccess'),
+                })
+                fetchVulnList()
+                return
+            } else if (response.data.code == 2) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.invalidinput'),
+                })
+                return
+            }  else if (response.data.code == 3) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.delfail'),
+                })
+                return
+            } else {
+                // 返回登录界面
+            }     
+        } catch (error) {
+            // 处理请求错误
+            //ElMessage.error(t('app.webui.loginerr2'));
+        }
     })
     .catch(() => {
       
     })
 }
 
-function onSubmit() {
-    console.log(form.value)
+async function onSubmit() {
+    //console.log(form.value)
+    try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const response = await api.post("/api/v1/editvuln", form.value, config)
+            if (response.data.code == 1) {
+                ElMessage({
+                    type: 'success',
+                    message: t('app.webui.modifysucc'),
+                })
+                fetchVulnList()
+                showedit.value = false
+                return
+            } else if (response.data.code == 2) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.invalidinput'),
+                })
+                return
+            }  else if (response.data.code == 3) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.modifyfail'),
+                })
+                return
+            } else {
+                // 返回登录界面
+            }     
+        } catch (error) {
+            // 处理请求错误
+            //ElMessage.error(t('app.webui.loginerr2'));
+        }
 }
 const typefilterHandler = (value: string, row: any) => {
     return row.vuln_type === value

@@ -321,6 +321,7 @@ func InsertVuln(vuln types.XqVulnerability) error {
 // 编辑漏洞
 func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
     var vulnerability types.XqVulnerability
+    var attachment types.XqAttachment
     res := db.Where("id = ?", vuln.ID).First(&vulnerability)
     if res.RowsAffected == 0 {
         return fmt.Errorf("漏洞不存在")
@@ -337,12 +338,26 @@ func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
     if err != nil {
         return err
     }
+    if vuln.AttachmentID != "" {
+        db.Where("id = ?", vuln.AttachmentID).First(&attachment)
+        vuln.AttachmentName = attachment.Name
+    }
     vuln.ReviewComments = vulnerability.ReviewComments
     vuln.UserID = vulnerability.UserID
     vuln.Status = 0
     vuln.UpdateTime = time.Now()
     err = db.Save(&vuln).Error
     return err
+}
+
+// 删除漏洞
+func DeleteVuln(id string) error {
+    var vulnerability types.XqVulnerability
+    res := db.Where("id = ?", id).First(&vulnerability).RowsAffected
+    if res == 0 {
+        return fmt.Errorf("漏洞不存在")
+    }
+    return db.Delete(&vulnerability).Error
 }
 
 // 搜索漏洞信息
@@ -503,4 +518,101 @@ func UpdateVlunType(id uint64, name string) error {
     vulnType.Name = name
     vulnType.UpdateTime = time.Now()
     return db.Save(&vulnType).Error
+}
+
+// 获取全部评分规则
+func GetAllScoreRules() map[string]interface{} {
+    var allRules []types.XqScoreRule
+    db.Find(&allRules) // 一次性查询所有规则
+
+    pocRuleList := getRuleList(filterRulesByType(allRules, 1))
+    expRuleList := getRuleList(filterRulesByType(allRules, 2))
+    incidenceRuleList := getRuleList(filterRulesByType(allRules, 3))
+    otherRuleList := getRuleList(filterRulesByType(allRules, 4))
+
+    // 将所有规则列表包装在一个map[string]interface{}中
+    return map[string]interface{}{
+        "pocrules":    pocRuleList,
+        "exprules":    expRuleList,
+        "incidencerules": incidenceRuleList,
+        "otherrules":  otherRuleList,
+    }
+}
+
+func getRuleList(rules []types.XqScoreRule) []map[string]interface{} {
+    if rules == nil {
+        return []map[string]interface{}{}
+    }
+    var ruleList []map[string]interface{}
+    for _, rule := range rules {
+        ruleList = append(ruleList, map[string]interface{}{
+            "id":       rule.ID,
+            "rule":     rule.Rule,
+            //"score":    rule.Score,
+            //"coefficient": rule.Coefficient,
+        })
+    }
+    return ruleList
+}
+
+func filterRulesByType(rules []types.XqScoreRule, ruleType int64) []types.XqScoreRule {
+    var filteredRules []types.XqScoreRule
+    for _, rule := range rules {
+        if rule.Type == ruleType {
+            filteredRules = append(filteredRules, rule)
+        }
+    }
+    return filteredRules
+}
+
+// 分页获取评分规则
+func GetScoreRules(page string, pageSize string) (int64, []types.XqScoreRule) {
+    var scoreRules []types.XqScoreRule
+    var totalCount int64
+    pageNum, _ := strconv.Atoi(page)
+    pageSizeNum, _ := strconv.Atoi(pageSize)
+    db.Model(&scoreRules).Count(&totalCount)
+    db.Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Find(&scoreRules)
+    return totalCount, scoreRules
+}
+
+// 删除漏洞类型
+func DeleteVulnType(id uint64) error {
+    var vulnType types.XqVulnType
+    res := db.Where("id = ?", id).First(&vulnType).RowsAffected
+    if res == 0 {
+        return fmt.Errorf("漏洞类型不存在")
+    }
+    return db.Delete(&vulnType).Error
+}
+
+// 添加评分规则
+func AddScoreRule(stype int64, rule string, score float64, coefficient float64) error {
+    return db.Create(&types.XqScoreRule{
+        Type: stype,
+        Rule: rule,
+        Score: score,
+        Coefficient: coefficient,
+        CreateTime: time.Now(),
+    }).Error
+}
+
+// 编辑评分规则
+func EditScoreRule(scorerule types.XqScoreRule) error {
+    var scoreRule types.XqScoreRule
+    res := db.Where("id = ?", scorerule.ID).First(&scoreRule).RowsAffected
+    if res == 0 {
+        return fmt.Errorf("评分规则不存在")
+    }
+    scoreRule.Type = scorerule.Type
+    scoreRule.Rule = scorerule.Rule
+    scoreRule.Score = scorerule.Score
+    scoreRule.Coefficient = scorerule.Coefficient
+    scoreRule.UpdateTime = time.Now()
+    return db.Save(&scoreRule).Error
+}
+
+// 删除评分规则
+func DeleteScoreRule(id uint64) error {
+    return db.Delete(&types.XqScoreRule{ID: id}).Error
 }

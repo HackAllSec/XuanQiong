@@ -58,11 +58,11 @@ Ordinary user accounts：test/123456
 |Create Users|Create administrator and normal users|✅|✅|
 |View Users|Page view user list|✅|✅|
 |Modify user information|Modify administrator or regular user information, including password, email, phone number, status, etc|✅|✅|
-|Delete Users|Delete administrator or regular user information|✅|❌Multiple delete to be completed|
+|Delete Users|Delete administrator or regular user information|✅|✅|
 |Dashboard|Display the total number of vulnerabilities, PoC, Exp, recent additions, total number of users, total number of administrators, CPU, memory, and disk usage|✅|✅|
 |System Setting|Function start stop, login lock policy configuration, email configuration, JWT configuration, Webhook notification configuration|✅|✅|
 |Vulnerability management|Add, modify, and delete vulnerability types, view, update, and review vulnerabilities, import and export vulnerabilities|✅|❌Import and export to be completed, Multiple delete to be completed|
-|Scoring rule management|Add, modify, and delete rating rules|✅|❌Multiple delete to be completed|
+|Scoring rule management|Add, modify, and delete rating rules|✅|✅|
 |Language switching|Supports both Chinese and English|✅|✅|
 |Push messages|Support DingTalk and WxWork webhook notifications|❌|❌|
 

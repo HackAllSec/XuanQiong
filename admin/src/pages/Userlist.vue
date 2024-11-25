@@ -8,7 +8,7 @@
                 </div>
                 <div>
                     <el-button type="primary" @click="dialogVisibleAdd = true">{{ t('app.webui.add') }}</el-button>
-                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteUser">{{ t('app.webui.multidelete') }}</el-button>
+                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteUsers">{{ t('app.webui.multidelete') }}</el-button>
                 </div>
             </div>
             <el-table :data="currentData" @selection-change="handleSelectionChange">
@@ -225,7 +225,7 @@ async function getUsers() {
         //ElMessage.error(t('app.webui.loginerr2'));
     }
 }
-function multiDeleteUser() {
+function multiDeleteUsers() {
     ElMessageBox.confirm(
         t('app.webui.deletenotice'),
         t('app.webui.confirmdelete'),
@@ -245,10 +245,11 @@ function multiDeleteUser() {
                     'Authorization': `Bearer ${token}`
                 }
             };
-            const response = await api.post('/api/v1/multideleteusers', data, config)
+            const response = await api.post('/api/v1/multidelusers', data, config)
             if (response.data.code == 1) {
+                ElMessage.success(t('app.webui.delsuccess'));
                 getUsers()
-                ElMessage.success(t('app.webui.deletecomplete'));
+                multideleteVisible.value = false
             } else if (response.data.code == 0) {
                 ElMessage.error(t('app.webui.needlogin'));
             } else {
@@ -264,7 +265,6 @@ function multiDeleteUser() {
 }
 
 const handleEdit = (index, row) => {
-    console.log("xxx",row)
     userForm.value.id = row.id
     userForm.value.role = row.role
     userForm.value.username = row.username
@@ -291,7 +291,6 @@ const handleDelete = (index, row) => {
         }
     )
     .then(async () => {
-        console.log(JSON.stringify({id: row.id}))
         try {
             const config = {
                 headers: {
@@ -354,7 +353,7 @@ async function addUser () {
             getUsers()
             ElMessage.success(t('app.webui.addsuccess'));
             dialogVisibleAdd.value = false
-            console.log(userForm.value)
+            //console.log(userForm.value)
         } else if (response.data.code == 0) {
             ElMessage.error(t('app.webui.needlogin'));
         } else {

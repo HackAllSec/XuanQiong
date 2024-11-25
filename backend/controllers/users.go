@@ -14,6 +14,7 @@ func Login(c *gin.Context) {
     LoginPolicy, _, _, _ := models.GetSystemConfig()
     if models.IsLocked(c.ClientIP()) {
         c.JSON(200, gin.H{"code": 0, "msg": "Too many login attempts. Please try again later."})
+        maxAttempts = 0
         return
     }
     var data map[string]interface{}
@@ -345,13 +346,23 @@ func AuditVuln(c *gin.Context) {
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 }
 
-// 获取评分规则
-func GetScoreRules(c *gin.Context) {
+// 批量删除用户
+func MultiDeleteUsers(c *gin.Context) {
     token := c.Request.Header.Get("Authorization")
     currentUser := models.GetUserByToken(token)
     if currentUser != nil && currentUser.Role == 1 {
-        rules := models.GetScoreRules()
-        c.JSON(200, gin.H{"code": 1, "data": rules})
+        var data map[string]interface{}
+        if err := c.ShouldBindJSON(&data); err != nil {
+            c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
+            return
+        }
+        ids, _ := data["ids"].([]interface{})
+        err := models.MultiDelete("user", ids)
+        if err != nil {
+            c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
+            return
+        }
+        c.JSON(200, gin.H{"code": 1, "msg": "Delete Successfully"})
         return
     }
     c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})

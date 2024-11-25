@@ -9,7 +9,6 @@
                 <span></span>
             </div>
             <el-table :data="currentData">
-                <el-table-column type="selection" width="55" />
                 <el-table-column prop="id" :label="t('app.webui.id')" sortable width="180" />
                 <el-table-column prop="vuln_name" :label="t('app.webui.name')" />
                 <el-table-column prop="vuln_type" :filters="typefilter" :filter-method="typefilterHandler" :label="t('app.webui.type')" width="180" />
@@ -378,7 +377,7 @@ async function getRules() {
                 'Authorization': `Bearer ${token}`  // 使用Bearer schema
             }
         };
-        const response = await api.get("/api/v1/getscorerules", config)
+        const response = await api.get("/api/v1/getallscorerules", config)
         if (response.data.code == 0) {
             sessionStorage.removeItem('token')
             sessionStorage.removeItem('username')

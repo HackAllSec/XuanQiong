@@ -1,6 +1,7 @@
 package models
 
 import (
+    "fmt"
     "mime"
     "time"
 
@@ -205,4 +206,20 @@ func sendEmail(email, captcha string) error {
         "\r\n请注意为了您的账户安全，请勿将验证码透露给任何人，验证码有效期为5分钟。")
     d := gomail.NewDialer(emailConfig.EmailHost, int(emailConfig.EmailPort), emailConfig.EmailUser, emailConfig.EmailPassword)
     return d.DialAndSend(m)
+}
+
+// 批量删除
+func MultiDelete(model string, ids []interface{}) error {
+    switch model {
+        case "user":
+            return db.Delete(&types.XqUser{}, ids).Error
+        case "vuln":
+            return db.Delete(&types.XqVulnerability{}, ids).Error
+        case "vulntype":
+            return db.Delete(&types.XqVulnType{}, ids).Error
+        case "scorerule":
+            return db.Delete(&types.XqScoreRule{}, ids).Error
+        default:
+            return fmt.Errorf("不支持的模型")
+    }
 }

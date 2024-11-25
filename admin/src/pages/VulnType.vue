@@ -8,7 +8,7 @@
                 </div>
                 <div>
                     <el-button type="primary" @click="dialogVisibleAdd=true">{{ t('app.webui.add') }}</el-button>
-                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteUser">{{ t('app.webui.multidelete') }}</el-button>
+                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteVulnTypes">{{ t('app.webui.multidelete') }}</el-button>
                 </div>
             </div>
             <el-table :data="currentData" @selection-change="handleSelectionChange">
@@ -76,12 +76,11 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
-import { DocumentCopy } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
 const data = ref({})
 const search = ref('')
-const token = ref(sessionStorage.getItem('token'))
+const token = sessionStorage.getItem('token')
 const mountedFunctions = [fetchVulnType]
 const currentPage = ref(1);
 const pageSize = ref(15);
@@ -89,10 +88,11 @@ const totalItems = ref(0)
 const dialogVisibleAdd = ref(false)
 const dialogVisibleEdit = ref(false)
 const vulntypeForm = ref({})
+const multipleSelection = ref([])
 const multideleteVisible = ref(true)
 
 const handleSelectionChange = (val) => {
-    multideleteVisible.value = val.id
+    multipleSelection.value = val
     if (val.length > 0) {
         multideleteVisible.value = false
     } else {
@@ -122,7 +122,7 @@ const currentData = computed(() => {
     const start = 0;
     const end = start + pageSize.value;
     //console.log(start, end)
-    console.log(data.value)
+    //console.log(data.value)
     if (search.value.trim() != '') {
         // 过滤数据
         return data.value.data.filter(item => {
@@ -158,19 +158,19 @@ onMounted(() => {
 });
 
 async function fetchVulnType() {
-    console.log(data.value)
+    //console.log(data.value)
     try {
         const response = await api.get(`/api/v1/getvulntype?page=${currentPage.value}&limit=${pageSize.value}`)
         data.value = response.data
         totalItems.value = response.data.total
-        console.log(data.value)
+        //console.log(data.value)
     } catch (error) {
         // 处理请求错误
         //ElMessage.error(t('app.webui.loginerr2'));
     }
 }
 
-function multiDeleteUser() {
+function multiDeleteVulnTypes() {
     ElMessageBox.confirm(
     t('app.webui.deletenotice'),
     t('app.webui.confirmdelete'),
@@ -180,11 +180,28 @@ function multiDeleteUser() {
       type: 'warning',
     }
   )
-    .then(() => {
-      ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
+    .then(async () => {
+        const data = {
+            "ids": multipleSelection.value.map(item => item.id)
+        }
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+            const response = await api.post('/api/v1/multidelvulntypes', data, config)
+            if (response.data.code == 1) {
+                ElMessage.success(t('app.webui.delsuccess'));
+                fetchVulnType()
+            } else if (response.data.code == 0) {
+                ElMessage.error(t('app.webui.needlogin'));
+            } else {
+                ElMessage.error(t('app.webui.deletefail'));
+            }
+        } catch (error) {
+            
+        }
     })
     .catch(() => {
       
@@ -201,27 +218,56 @@ const handleDelete = (index, row) => {
       type: 'warning',
     }
   )
-    .then(() => {
-        ElMessage({
-        type: 'success',
-        message: t('app.webui.deletecomplete'),
-      })
-      console.log(index,row)
+    .then(async () => {
+        try {
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const response = await api.post("/api/v1/delvulntype", {id: row.id}, config)
+            if (response.data.code == 1) {
+                ElMessage({
+                    type: 'success',
+                    message: t('app.webui.delsuccess'),
+                })
+                fetchVulnType()
+                dialogVisibleAdd.value = false
+                return
+            } else if (response.data.code == 2) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.invalidinput'),
+                })
+                return
+            }  else if (response.data.code == 3) {
+                ElMessage({
+                    type: 'error',
+                    message: t('app.webui.delfail'),
+                })
+                return
+            } else {
+                // 返回登录界面
+            }     
+        } catch (error) {
+            // 处理请求错误
+            //ElMessage.error(t('app.webui.loginerr2'));
+        }
     })
     .catch(() => {
       
     })
 }
 async function addVulnType() {
-    console.log(vulntypeForm.value)
+    //console.log(vulntypeForm.value)
     try {
         const config = {
             headers: {
-                Authorization: 'Bearer ' + token.value
+                Authorization: `Bearer ${token}`
             }
         }
         const response = await api.post("/api/v1/addvulntype", vulntypeForm.value, config)
-        console.log(response)
+        //console.log(response)
         if (response.data.code == 1) {
             ElMessage({
                 type: 'success',
@@ -244,22 +290,22 @@ async function addVulnType() {
             return
         } else {
             // 返回登录界面
-        }     
+        }
     } catch (error) {
         // 处理请求错误
         //ElMessage.error(t('app.webui.loginerr2'));
     }
 }
 const editVulnType = () => {
-    console.log(vulntypeForm.value)
+    //console.log(vulntypeForm.value)
     try {
         const config = {
             headers: {
-                Authorization: 'Bearer ' + token.value
+                Authorization: `Bearer ${token}`
             }
         }
         const response = api.post("/api/v1/updatevulntype", vulntypeForm.value, config)
-        console.log(response)
+        //console.log(response)
         if (response.data.code == 1) {
             ElMessage({
                 type: 'success',

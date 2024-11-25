@@ -113,9 +113,13 @@
                     sessionStorage.setItem('avatar', '/download/file?id=' + response.data.avatar);
                 }
                 router.push('/')
-            } else {
-                ElMessage.error(response.data.msg);
-            }
+            } else if (response.data.code == 0){
+                ElMessage.error(t('app.webui.loginerr3'));
+            } else if (response.data.code == 2) {
+                ElMessage.error(t('app.webui.inputformaterror'));
+            } else if (response.data.code == 3) {
+                ElMessage.error(t('app.webui.loginerr4') + ' ' + response.data.times + ' ' + t('app.webui.times'))
+            } else {}
         } catch (error) {
             // 处理请求错误
             console.error(error);
