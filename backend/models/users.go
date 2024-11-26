@@ -89,6 +89,7 @@ func CreateUser(username string, password string, email string, phone string, ro
             Phone:      phone,
             Role:       role,
             CreateTime: time.Now(),
+            UpdateTime: time.Now(),
             Status:     1,
         }
         db.Create(&userData)
@@ -270,6 +271,7 @@ func Register(username, password, email, phone, captcha string) int64 {
         Role:     0,
         Status:   1,
         CreateTime: time.Now(),
+        UpdateTime: time.Now(),
     }
     db.Create(&userData)
     return 1

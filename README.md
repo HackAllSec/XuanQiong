@@ -19,8 +19,8 @@
 - GORM
 - JWT
 
-支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。已在MySQL和Sqlite测试，建议使用MySQL 5.x，MySQL 8.x 存在已知问题。
-支持JWT、Webhook、邮件通知等。
+支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。  
+支持JWT、Webhook、邮件通知等。  
 内置漏洞类型，漏洞评分规则，积分计算规则查看[积分规则](ScoreRules.md)。
 
 演示环境：[https://demo.hackall.cn](https://demo.hackall.cn)  
@@ -98,21 +98,25 @@ XuanQiong/
 
 ## 部署方式
 
-支持`前后端一体`和`前后端分离`，如果遇到问题请查看[FAQ](FAQ.md)。
+支持`前后端一体`和`前后端分离`，已在 MySQL 和 Sqlite 测试，建议使用MySQL。如果遇到问题请查看[FAQ](FAQ.md)。  
+**使用 sqlite 时，需要设置环境变量 `CGO_ENABLED=1` 后重新 build，Releases 中的二进制文件使用 `CGO_ENABLED=0` 编译。**  
 
-### 前后端一体
+### 前后端一体化
 
-直接运行`go run main.go`即可。
+默认使用一体化模式启动，步骤如下：
+- 修改 `config.yaml` 中的数据库配置，修改数据库名称，初始化时自动创建数据库
+- 运行 `go run main.go` 或 Releases 中的二进制文件即可
+
+启动后随机生成管理员密码
 
 ### 前后端分离
 
-用户前端文件和管理员前端文件独立，可分别部署在不同web目录
+用户前端文件和管理员前端文件独立，可分别部署在不同web目录下。后台服务通过 `config.yaml` 中的 `start_mode` 参数切换启动模式。
 
-- 前端配置API地址，然后编译
-- 编译后的用户前端文件位于：frontend/dist目录下，复制目录下的文件到web目录即可
-- 后端配置CORS、运行模式
-
-目前需要通过修改`main.go`切换，后续优化。
+- 前端配置 `src/api.ts` 中 baseURL 地址，然后编译
+- 编译后的用户前端文件位于：`frontend/dist` 目录下，复制目录下的文件到 web 目录即可
+- 编译后的管理员前端文件位于：`admin/dist` 目录下，复制目录下的文件到 web 目录即可
+- 后端配置CORS、运行模式，修改 `config.yaml` 中的 `start_mode`, `allow_origins`, `allow_methods` 和 `allow_headers` 参数，然后运行即可
 
 ## ChangeLog
 

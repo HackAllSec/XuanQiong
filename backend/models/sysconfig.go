@@ -95,6 +95,7 @@ func LockIP(ip string, duration int64) {
     db.Raw("SELECT * FROM xq_lockips WHERE client_ip = ?", ip).Scan(&lockip)
     lockoutUntil := time.Now().Add(time.Duration(duration) * time.Second)
     lockip.CreateTime = time.Now()
+    lockip.UpdateTime = time.Now()
     lockip.ClientIP = ip
     lockip.Status = 1
     lockip.LockoutUntil = &lockoutUntil

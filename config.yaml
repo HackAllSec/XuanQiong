@@ -8,13 +8,14 @@ database:
     port: 3306             # 数据库端口（MySQL 默认3306，PostgreSQL 默认5432，SQLServer 默认1433，Oracle 默认1521）
     user: "username"       # 数据库用户名
     password: "password"   # 数据库密码
-    name: "dbname"         # 数据库名称
+    name: "xuanqiong"      # 数据库名称
     charset: "utf8mb4"     # MySQL 字符编码，其他数据库类型无效
     file: "vuln.db"        # SQLite 数据库文件路径（仅对 SQLite 有效）
 
 # 服务器配置
 server:
   mode: "release"                     # 设置运行模式，可选值: debug, release, test
+  start_mode: "all"                   # 设置启动模式，可选值: api, all
   host: ""                            # 服务器监听地址，默认监听所有地址
   port: 8123                          # 服务器监听端口
   read_timeout: 10                    # 读取超时时间，单位：秒
@@ -23,6 +24,9 @@ server:
   static_url: "/assets"               # 前端静态资源访问路径，同存放css、js文件的目录一致，如物理路径frontend/dist/assets，通过URL：/assets/xxx.js访问
   admin_path: "admin/dist"            # 后台管理页面静态资源物理路径
   admin_static_url: "/static"         # 后台静态资源访问路径
+  allow_origins: "http://localhost:3000,http://example.com"             # 允许跨域的域名，多个域名用逗号隔开
+  allow_methods: "GET,POST,HEAD"                                        # 允许的请求方法，多个请求方法用逗号隔开
+  allow_headers: "Origin,Content-Length,Content-Type,Authorization"     # 允许的请求头，多个请求头用逗号隔开
 
 # 日志配置
 log:

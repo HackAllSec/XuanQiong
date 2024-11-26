@@ -310,6 +310,7 @@ func InsertVuln(vuln types.XqVulnerability) error {
     vuln.ID = hvdid
     vuln.Status = 0
     vuln.CreateTime = time.Now()
+    vuln.UpdateTime = time.Now()
     err = db.Create(&vuln).Error
     if err != nil {
         return err
@@ -505,6 +506,7 @@ func AddVulnType(name string) error {
     }
     vulnType.Name = name
     vulnType.CreateTime = time.Now()
+    vulnType.UpdateTime = time.Now()
     return db.Create(&vulnType).Error
 }
 
@@ -594,6 +596,7 @@ func AddScoreRule(stype int64, rule string, score float64, coefficient float64) 
         Score: score,
         Coefficient: coefficient,
         CreateTime: time.Now(),
+        UpdateTime: time.Now(),
     }).Error
 }
 

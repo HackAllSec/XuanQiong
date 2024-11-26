@@ -20,6 +20,7 @@ type Config struct {
     } `yaml:"database"`
     Server struct {
         Mode           string `yaml:"mode"`
+        StartMode      string `yaml:"start_mode"`
         Host           string `yaml:"host"`
         Port           int64 `yaml:"port"`
         ReadTimeout    int64 `yaml:"read_timeout"`
@@ -28,6 +29,9 @@ type Config struct {
         StaticUrl      string `yaml:"static_url"`
         AdminPath      string `yaml:"admin_path"`
         AdminStaticUrl string `yaml:"admin_static_url"`
+        AllowOrigins   string `yaml:"allow_origins"`
+        AllowMethods   string `yaml:"allow_methods"`
+        AllowHeaders   string `yaml:"allow_headers"`
     } `yaml:"server"`
     Log struct {
         Level string `yaml:"level"`

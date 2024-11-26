@@ -4,7 +4,9 @@ import (
     "fmt"
     "os"
     "strconv"
+    "strings"
 
+    "github.com/gin-contrib/cors"
     "github.com/gin-gonic/gin"
     "xuanqiong/backend/controllers"
     "xuanqiong/backend/config"
@@ -25,6 +27,11 @@ func init() {
             gin.SetMode(gin.DebugMode)
     }
     route = gin.Default()
+    fmt.Println("Welcome to XuanQiong",config.Version)
+    fmt.Println("Server running on " + config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
+}
+
+func defineRouter() {
     // 无需登录
     route.POST(apiuri + "/register", controllers.Register)
     route.POST(apiuri + "/login", controllers.Login)
@@ -75,22 +82,35 @@ func init() {
     route.POST(apiuri + "/multidelscorerules", controllers.MultiDeleteScoreRules)
     route.POST(apiuri + "/delvuln", controllers.DeleteVuln)
     route.POST(apiuri + "/multidelvulns", controllers.MultiDeleteVulns)
-    
-    fmt.Println("Welcome to XuanQiong",config.Version)
-    fmt.Println("Server running on " + config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
 }
 
 // 前后端分离的路由
-func InitRoutes() {
+func api() {
+    // 配置CORS
+    corsConfig := cors.DefaultConfig()
+    corsConfig.AllowOrigins = strings.Split(config.Config.Server.AllowOrigins, ",")
+    corsConfig.AllowMethods = strings.Split(config.Config.Server.AllowMethods, ",")
+    corsConfig.AllowHeaders = strings.Split(config.Config.Server.AllowHeaders, ",")
+    
+    route.Use(cors.New(corsConfig))
+    defineRouter()
+
+    // 添加调试输出
+    fmt.Println("CORS Configuration:")
+    fmt.Printf("AllowOrigins: %v\n", corsConfig.AllowOrigins)
+    fmt.Printf("AllowMethods: %v\n", corsConfig.AllowMethods)
+    fmt.Printf("AllowHeaders: %v\n", corsConfig.AllowHeaders)
+
     route.Run(config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
 }
 
 // 前后端不分离的路由
-func StartServer() {
+func all() {
     frontendPath := config.Config.Server.FrontendPath
     frontendStaticUrl := config.Config.Server.StaticUrl
     adminPath := config.Config.Server.AdminPath
     AdminStaticUrl := config.Config.Server.AdminStaticUrl
+    defineRouter()
     // 前端静态文件
     route.Static(frontendStaticUrl, frontendPath + frontendStaticUrl)
     route.Static(AdminStaticUrl, adminPath + AdminStaticUrl)
@@ -118,4 +138,13 @@ func StartServer() {
         c.HTML(404, "", nil)
     })
     route.Run(config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
+}
+
+func StartServer(){
+    switch config.Config.Server.StartMode {
+        case "api":
+            api()
+        case "all":
+            all()
+    }
 }
