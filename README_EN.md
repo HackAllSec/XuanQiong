@@ -98,19 +98,26 @@ XuanQiong/
 
 ## Deployment method
 
-Support `Front and rear integrated` and `Front and rear separation`.
+Support `front and backend integrated` and `front and backend separation`. It has been tested in MySQL and SQLite, it is recommended to use MySQL. If you encounter any problems, please refer to the [FAQ](FAQ.md).
 
-### Front and rear integrated
+When using SQLite, you need to set the environment variable `CGO-ENABLED=1`, and then rebuild. The binary files in Releases are compiled using `CGO-ENABLED=0`.
 
-Just run `main. go` directly.
+### Front and backend integrated
 
-### Front and rear separation
+Start using this mode by default, the steps are as follows:
+- Modify the database configuration in `config. yaml`, change the database name, and automatically create the database during initialization.
+- Just run the binary files in releases or `go run main.go`.
 
-User front-end files and administrator front-end files are independent and can be deployed separately in different web directories
+After startup, an admin password will be randomly generated.
 
-- Configure API address on the front-end and then compile it
-- The compiled user frontend files are located in the frontend/dist directory. Simply copy the files from the directory to the web directory
-- Backend configuration CORS and running mode
+### Front and backend separation
+
+User front-end files and administrator front-end files are independent and can be deployed separately in different web directories. The backend service switches the startup mode through the `start_made` parameter in `config.yaml`.
+
+- Configure the `baseURL` address in `src/api.ts` for the frontend, and then compile it.
+- The compiled user frontend files are located in the `frontend/dist` directory. Simply copy the files from the directory to the web directory.
+- The compiled admin frontend files are located in the `admin/dist` directory. Simply copy the files from the directory to the web directory.
+- Backend configuration CORS and start_mode, modify the `start_made`, `allow_origins`, `allow_methods`, and `allow_headers` parameters in `config.yaml`, and then run it.
 
 ## ChangeLog
 
