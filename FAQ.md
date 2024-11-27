@@ -9,3 +9,6 @@ character-set-server=utf8mb4
 collation-server=utf8mb4_unicode_ci
 ```
 ![](images/faq/my_cnf.png)
+
+2. 发生 `Error creating database: Error 1044 (42000): Access denied for user` 说明当前数据库用户无法创建数据库，需要使用高权限用户创建 `config.yaml` 中 `database -> connection -> name` 对应的数据库。
+3. 首次启动没有显示用户名和密码，请检查数据库是否为空
