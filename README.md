@@ -104,8 +104,8 @@ XuanQiong/
 ### 前后端一体化
 
 默认使用一体化模式启动，步骤如下：
-- 修改 `config.yaml` 中的数据库配置，修改数据库名称，初始化时自动创建数据库
-- 运行 `go run main.go` 或 Releases 中的二进制文件即可
+- 修改 `config.yaml` 中的数据库配置，修改数据库名称，初始化时自动创建数据库。
+- 运行 `go run main.go` 或 Releases 中的二进制文件即可。
 
 启动后随机生成管理员密码
 
@@ -113,10 +113,10 @@ XuanQiong/
 
 用户前端文件和管理员前端文件独立，可分别部署在不同web目录下。后台服务通过 `config.yaml` 中的 `start_mode` 参数切换启动模式。
 
-- 前端配置 `src/api.ts` 中 baseURL 地址，然后编译
-- 编译后的用户前端文件位于：`frontend/dist` 目录下，复制目录下的文件到 web 目录即可
-- 编译后的管理员前端文件位于：`admin/dist` 目录下，复制目录下的文件到 web 目录即可
-- 后端配置CORS、运行模式，修改 `config.yaml` 中的 `start_mode`, `allow_origins`, `allow_methods` 和 `allow_headers` 参数，然后运行即可
+- 前端配置 `src/api.ts` 中 baseURL 地址，然后编译。
+- 编译后的用户前端文件位于：`frontend/dist` 目录下，复制目录下的文件到 web 目录即可。
+- 编译后的管理员前端文件位于：`admin/dist` 目录下，复制目录下的文件到 web 目录即可。
+- 后端配置CORS、运行模式，修改 `config.yaml` 中的 `start_mode`, `allow_origins`, `allow_methods` 和 `allow_headers` 参数，然后运行即可。
 
 ## ChangeLog
 
