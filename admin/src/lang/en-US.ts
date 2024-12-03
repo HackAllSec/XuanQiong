@@ -174,7 +174,11 @@ export default {
             getcaptcha: 'Get Captcha',
             captchasucc: 'Captcha Successful',
             captchafail: 'Captcha Failed',
-            restfail: 'Reset Password Failed, please check and try again'
+            restfail: 'Reset Password Failed, please check and try again',
+            forgotnotice: 'You can use the following steps to reset the password of your admin account:',
+            fstep1: '1. Delete the admin account from the xq_users table',
+            fstep2: '2. Restart the service program',
+            forgotnotice2: 'At this point, the system will reinitialize the password for the admin user.'
         }
     }
 };

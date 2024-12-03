@@ -5,7 +5,7 @@ import zhCN from './lang/zh-CN';
 import enUS from './lang/en-US';
 
 export const i18n = createI18n({
-  locale: 'en-US', // 默认语言
+  locale: 'zh-CN', // 默认语言
   messages: {
     'zh-CN': {
       ...zhCn,

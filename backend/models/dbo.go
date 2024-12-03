@@ -220,6 +220,11 @@ func init() {
     if !allTablesExist {
         initDatabase()
     }
+    res := db.Where("username = 'admin'").First(&types.XqUser{}).RowsAffected
+    if res == 0 {
+        log.Println("Resetting admin password...")
+        initAdminPassword()
+    }
 }
 
 // generateDSN 根据配置生成 DSN

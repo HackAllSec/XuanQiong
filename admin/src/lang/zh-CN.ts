@@ -174,7 +174,11 @@ export default {
             getcaptcha: '获取验证码',
             captchasucc: '验证码获取成功',
             captchafail: '验证码获取失败',
-            restfail: '重置密码失败，请检查后重试'
+            restfail: '重置密码失败，请检查后重试',
+            forgotnotice: '您可以使用以下步骤重置 admin 账户的密码：',
+            fstep1: '1. 删除 xq_users 表中的 admin 账户',
+            fstep2: '2. 重新启动服务程序',
+            forgotnotice2: '此时系统将重新初始化 admin 用户的密码。'
         }
     }
 };
