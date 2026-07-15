@@ -278,13 +278,15 @@ Connection: close
     });
     async function checkFrom () {
         const id = route.query.id
-        if (route.redirectedFrom?.path === '/myvulns' && id) {
-            const response = await api.get('/api/v1/getvulndtl?id=' + id)
+        if (typeof id === 'string' && id) {
+            showback.value = true
+            const response = await api.get('/api/v1/getvulndtl?id=' + encodeURIComponent(id))
             if (response.data.code === 1 && response.data.data?.id === id) {
                 form.value = response.data.data
                 url.value = '/api/v1/editvuln'
+            } else {
+                ElMessage.error(t('app.webui.submitfail'))
             }
-            showback.value = true
         }
     }
     

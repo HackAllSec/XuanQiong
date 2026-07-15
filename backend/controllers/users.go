@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"strconv"
 	"sync"
 	"xuanqiong/backend/models"
 )
@@ -399,7 +400,8 @@ func MultiDeleteUsers(c *gin.Context) {
 		}
 		ids, _ := data["ids"].([]interface{})
 		for _, id := range ids {
-			if userID, ok := id.(float64); ok && uint64(userID) == currentUser.ID {
+			userID, ok := normalizeDeleteUserID(id)
+			if ok && userID == currentUser.ID {
 				c.JSON(200, gin.H{"code": 0, "msg": "You can't delete yourself"})
 				return
 			}
@@ -413,6 +415,24 @@ func MultiDeleteUsers(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+func normalizeDeleteUserID(value interface{}) (uint64, bool) {
+	switch v := value.(type) {
+	case float64:
+		if v < 0 || v != float64(uint64(v)) {
+			return 0, false
+		}
+		return uint64(v), true
+	case string:
+		id, err := strconv.ParseUint(v, 10, 64)
+		if err != nil {
+			return 0, false
+		}
+		return id, true
+	default:
+		return 0, false
+	}
 }
 
 func parseRoleIDs(value interface{}) []uint64 {

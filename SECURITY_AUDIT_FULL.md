@@ -173,11 +173,11 @@
   - `README.md`
   - `README_EN.md`
   - `config.yaml`
-- 影响：项目已要求应用层只使用 `X-Auth-Token`，但 API 文档仍大量声明 `Authorization` header，并包含示例 JWT、示例管理员密码、示例 `jwt_secret`、邮件密码和 Webhook 值。部署方或二次开发者可能继续按旧 `Authorization` 契约接入，触发 Basic Auth 冲突或绕开当前安全设计；公开文档中的默认口令说明也会误导部署安全基线。
+- 影响：项目已要求应用层只使用 `X-Auth-Token`，但 API 文档曾大量声明 `Authorization` header，并包含示例 JWT、示例管理员密码、示例 `jwt_secret`、邮件密码和 Webhook 值。部署方或二次开发者可能继续按旧 `Authorization` 契约接入，触发 Basic Auth 冲突或绕开当前安全设计；公开文档中的默认口令说明也会误导部署安全基线。
 - 证据链：
-  - OpenAPI/Apifox 中多个接口 header 仍为 `Authorization`。
-  - `README.md` / `README_EN.md` 仍写有管理员账号 `admin/Admin@123`，但当前代码已随机生成初始密码。
-  - `config.yaml` 示例 CORS 头仍包含 `Authorization`，未显式列出 `X-Auth-Token`。
+  - OpenAPI/Apifox/HTML 导出文档中多个接口 header 曾为 `Authorization`。
+  - `README.md` / `README_EN.md` 曾写有固定默认管理员凭据，但当前代码已随机生成初始密码。
+  - `config.yaml` 示例 CORS 头曾包含 `Authorization`，未显式列出 `X-Auth-Token`。
 - 修复建议：统一更新 API 文档、README 和示例配置，删除真实形态的 JWT/密钥样例，用占位符替代；文档层面明确应用鉴权只允许 `X-Auth-Token`，`Authorization` 仅保留给代理层 Basic Auth。
 
 ### 17. MEDIUM - 后台漏洞列表权限变量作用域错误导致按钮鉴权和上传头失效
