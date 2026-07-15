@@ -316,7 +316,12 @@ func Register(username, password, email, phone, captcha string) int64 {
 		CreateTime:          time.Now(),
 		UpdateTime:          time.Now(),
 	}
-	db.Create(&userData)
+	if err := db.Create(&userData).Error; err != nil {
+		return 0
+	}
+	if err := EnsureUserRoleByCode(userData.ID, "user"); err != nil {
+		return 0
+	}
 	db.Model(&verifycode).Updates(map[string]interface{}{
 		"code":         "",
 		"expired_time": time.Now(),

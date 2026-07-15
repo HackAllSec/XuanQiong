@@ -309,6 +309,10 @@ func Register(c *gin.Context) {
 		c.JSON(200, gin.H{"code": 6, "msg": "Captcha error"})
 		return
 	}
+	if err != 1 {
+		c.JSON(200, gin.H{"code": 0, "msg": "Register failed"})
+		return
+	}
 	c.JSON(200, gin.H{"code": 1, "msg": "Register successfully"})
 }
 
