@@ -202,12 +202,7 @@ onMounted(() => {
 
 async function fetchScoreRules() {
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
-        const response = await api.get(`/api/v1/getscorerules?page=${currentPage.value}&limit=${pageSize.value}`, config)
+        const response = await api.get(`/api/v1/getscorerules?page=${currentPage.value}&limit=${pageSize.value}`)
         if (response.data.code != 1) {
             // 清空token，返回登录页
             sessionStorage.removeItem("token")
@@ -237,12 +232,7 @@ function multiDeleteScoreRules() {
             "ids": multipleSelection.value.map(item => item.id)
         }
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            };
-            const response = await api.post('/api/v1/multidelscorerules', data, config)
+            const response = await api.post('/api/v1/multidelscorerules', data)
             if (response.data.code == 1) {
                 ElMessage.success(t('app.webui.delsuccess'));
                 fetchScoreRules()
@@ -273,12 +263,7 @@ const handleDelete = (index, row) => {
   )
     .then(async () => {
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-            const response = await api.post("/api/v1/delscorerule", {id: row.id}, config)
+            const response = await api.post("/api/v1/delscorerule", {id: row.id})
             if (response.data.code == 1) {
                 ElMessage({
                     type: 'success',
@@ -327,14 +312,9 @@ const resetForm = () => {
 const addScorerule = async () => {
     //console.log(scoreruleForm.value)
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }
         scoreruleForm.value.score = Number(scoreruleForm.value.score)
         scoreruleForm.value.coefficient = Number(scoreruleForm.value.coefficient)
-        const response = await api.post('/api/v1/addscorerule', scoreruleForm.value, config)
+        const response = await api.post('/api/v1/addscorerule', scoreruleForm.value)
         if (response.data.code == 1) {
             fetchScoreRules()
             ElMessage.success(t('app.webui.addsuccess'));
@@ -356,14 +336,9 @@ const addScorerule = async () => {
 const editScorerule = async () => {
     //console.log(scoreruleForm.value)
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        }
         scoreruleForm.value.score = Number(scoreruleForm.value.score)
         scoreruleForm.value.coefficient = Number(scoreruleForm.value.coefficient)
-        const response = await api.post("/api/v1/editscorerule", scoreruleForm.value, config)
+        const response = await api.post("/api/v1/editscorerule", scoreruleForm.value)
         //console.log(response)
         if (response.data.code == 1) {
             fetchScoreRules()

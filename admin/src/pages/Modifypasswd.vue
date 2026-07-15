@@ -50,16 +50,11 @@ const changeButtonstatus = () => {
 async function changePassword() {
     console.log(oldpassword,newpassword,confirmpassword)
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
         const data = {
             "oldpassword": oldpassword.value,
             "newpassword": newpassword.value
         }
-        const response = await api.post('/api/v1/updatepassword', data, config)
+        const response = await api.post('/api/v1/updatepassword', data)
         if (response.data.code == 0) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')

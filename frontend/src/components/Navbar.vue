@@ -106,12 +106,7 @@
   async function logout() {
     try {
       const token = sessionStorage.getItem('token')
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        };
-        const response = await api.get('/api/v1/logout', config)
+        const response = await api.get('/api/v1/logout')
         clearAuthSession()
         location.reload();
     } catch (error) {

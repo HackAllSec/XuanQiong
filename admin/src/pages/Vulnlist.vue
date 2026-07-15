@@ -381,12 +381,7 @@ const handleSuccess = (response) => {
 const handleRemove = async () => {
         //console.log("删除文件")
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
-            const response = await api.get('/delete/file?id=' + form.value.attachment_id, config)
+            const response = await api.get('/delete/file?id=' + form.value.attachment_id)
             form.value.attachment_id = ''
         } catch (error) {
             // 处理请求错误
@@ -467,12 +462,7 @@ async function getVulnDetail(id) {
     const token = sessionStorage.getItem('token')
     const uploadHeaders = getUploadHeaders()
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
-            const response = await api.get('/api/v1/getvulndtl?id=' + id, config)
+            const response = await api.get('/api/v1/getvulndtl?id=' + id)
             if (token && response.data.code == 0) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')
@@ -524,12 +514,7 @@ function multiDeleteVulns() {
             "ids": multipleSelection.value.map(item => item.id)
         }
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            };
-            const response = await api.post('/api/v1/multidelvulns', data, config)
+            const response = await api.post('/api/v1/multidelvulns', data)
             if (response.data.code == 1) {
                 ElMessage.success(t('app.webui.delsuccess'));
                 fetchVulnList()
@@ -565,12 +550,7 @@ const handleDelete = (index, row) => {
   )
     .then(async () => {
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-            const response = await api.post("/api/v1/delvuln", {id: row.id}, config)
+            const response = await api.post("/api/v1/delvuln", {id: row.id})
             if (response.data.code == 1) {
                 ElMessage({
                     type: 'success',
@@ -606,12 +586,7 @@ const handleDelete = (index, row) => {
 async function onSubmit() {
     //console.log(form.value)
     try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-            const response = await api.post("/api/v1/editvuln", form.value, config)
+            const response = await api.post("/api/v1/editvuln", form.value)
             if (response.data.code == 1) {
                 ElMessage({
                     type: 'success',

@@ -59,12 +59,7 @@
     });
     async function getUserinfo() {
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            }
-            const response = await api.get('/api/v1/userinfo', config)
+            const response = await api.get('/api/v1/userinfo')
             userinfo.value = response.data.data
             if (token && response.data.code == 0) {
                 sessionStorage.removeItem('token')
@@ -106,17 +101,12 @@
     const modifyUserInfo = async () => {
         console.log(userinfo.value)
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
             const data = {
                 "username": userinfo.value.username,
                 "email": userinfo.value.email,
                 "phone": userinfo.value.phone
             }
-            const response = await api.post('/api/v1/updateuserinfo', data, config)
+            const response = await api.post('/api/v1/updateuserinfo', data)
             if (response.data.code == 0) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')

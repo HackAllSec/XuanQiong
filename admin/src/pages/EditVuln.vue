@@ -254,12 +254,7 @@ Connection: close
     const handleRemove = async () => {
         //console.log("删除文件")
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
-            const response = await api.get('/delete/file?id=' + form.value.attachment_id, config)
+            const response = await api.get('/delete/file?id=' + form.value.attachment_id)
             form.value.attachment_id = ''
         } catch (error) {
             // 处理请求错误
@@ -269,12 +264,7 @@ Connection: close
     const onSubmit = async () => {
         //console.log(form.value)
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
-            const response = await api.post(url.value, form.value, config)
+            const response = await api.post(url.value, form.value)
             if (response.data.code == 0) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')

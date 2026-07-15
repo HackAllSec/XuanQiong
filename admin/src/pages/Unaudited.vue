@@ -300,12 +300,7 @@ const goBack = () => {
 const handleAudit = async (index, row) => {
     console.log(index, row);
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
-        const response = await api.get('/api/v1/getvulndtl?id=' + row.id, config)
+        const response = await api.get('/api/v1/getvulndtl?id=' + row.id)
         if (token && response.data.code == 0) {
             sessionStorage.removeItem('token')
             sessionStorage.removeItem('username')
@@ -324,13 +319,8 @@ const handleAudit = async (index, row) => {
 
 async function submitAudit() {
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
         audit.value.cvss = Number(audit.value.cvss)
-        const response = await api.post("/api/v1/auditvuln", audit.value, config)
+        const response = await api.post("/api/v1/auditvuln", audit.value)
         if (response.data.code == 0) {
             sessionStorage.removeItem('token')
             sessionStorage.removeItem('username')
@@ -350,12 +340,7 @@ async function submitAudit() {
 
 async function getUnauthVulns() {
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
-        const response = await api.get(`/api/v1/getunauditlist?page=${currentPage.value}&limit=${pageSize.value}`, config)
+        const response = await api.get(`/api/v1/getunauditlist?page=${currentPage.value}&limit=${pageSize.value}`)
         data.value = response.data
         totalItems.value = response.data.total
         typefilter.value = response.data.data.reduce((acc, item) => {
@@ -372,12 +357,7 @@ async function getUnauthVulns() {
 
 async function getRules() {
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
-        const response = await api.get("/api/v1/getallscorerules", config)
+        const response = await api.get("/api/v1/getallscorerules")
         if (response.data.code == 0) {
             sessionStorage.removeItem('token')
             sessionStorage.removeItem('username')

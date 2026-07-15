@@ -185,12 +185,7 @@ function multiDeleteVulnTypes() {
             "ids": multipleSelection.value.map(item => item.id)
         }
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            };
-            const response = await api.post('/api/v1/multidelvulntypes', data, config)
+            const response = await api.post('/api/v1/multidelvulntypes', data)
             if (response.data.code == 1) {
                 ElMessage.success(t('app.webui.delsuccess'));
                 fetchVulnType()
@@ -220,12 +215,7 @@ const handleDelete = (index, row) => {
   )
     .then(async () => {
         try {
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            }
-            const response = await api.post("/api/v1/delvulntype", {id: row.id}, config)
+            const response = await api.post("/api/v1/delvulntype", {id: row.id})
             if (response.data.code == 1) {
                 ElMessage({
                     type: 'success',
@@ -261,12 +251,7 @@ const handleDelete = (index, row) => {
 async function addVulnType() {
     //console.log(vulntypeForm.value)
     try {
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-        const response = await api.post("/api/v1/addvulntype", vulntypeForm.value, config)
+        const response = await api.post("/api/v1/addvulntype", vulntypeForm.value)
         //console.log(response)
         if (response.data.code == 1) {
             ElMessage({
@@ -299,12 +284,7 @@ async function addVulnType() {
 const editVulnType = () => {
     //console.log(vulntypeForm.value)
     try {
-        const config = {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }
-        const response = api.post("/api/v1/updatevulntype", vulntypeForm.value, config)
+        const response = api.post("/api/v1/updatevulntype", vulntypeForm.value)
         //console.log(response)
         if (response.data.code == 1) {
             ElMessage({

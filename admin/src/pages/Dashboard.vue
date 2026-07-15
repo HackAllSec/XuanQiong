@@ -153,12 +153,7 @@
   async function getSystem() {
     const token = sessionStorage.getItem('token')
     try {
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${token}`  // 使用Bearer schema
-        }
-      };
-      const response = await api.get('/api/v1/getsystemstatus', config)
+      const response = await api.get('/api/v1/getsystemstatus')
       if (response.data.code != 1) {
         clearInterval(intervalId);
         // 返回登录页

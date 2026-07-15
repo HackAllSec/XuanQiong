@@ -246,12 +246,7 @@ const goBack = () => {
 const cellClick = async (row, cell) => {
     if (cell.no == 0 || cell.no == 1) {
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
-            const response = await api.get('/api/v1/getvulndtl?id=' + row.id, config)
+            const response = await api.get('/api/v1/getvulndtl?id=' + row.id)
             if (token && response.data.code == 0) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')
@@ -275,12 +270,7 @@ onMounted(() => {
 
 async function getAuditedVulns() {
     try {
-        const config = {
-            headers: {
-                'Authorization': `Bearer ${token}`  // 使用Bearer schema
-            }
-        };
-        const response = await api.get(`/api/v1/getauditedlist?page=${currentPage.value}&limit=${pageSize.value}`, config)
+        const response = await api.get(`/api/v1/getauditedlist?page=${currentPage.value}&limit=${pageSize.value}`)
         data.value = response.data
         totalItems.value = response.data.total
         typefilter.value = response.data.data.reduce((acc, item) => {

@@ -366,12 +366,7 @@ const cellClick = async (row, cell) => {
     if (cell.no == 0 || cell.no == 1) {
         const token = sessionStorage.getItem('token')
         try {
-            const config = {
-                headers: {
-                    'Authorization': `Bearer ${token}`  // 使用Bearer schema
-                }
-            };
-            const response = await api.get('/api/v1/getvulndtl?id=' + row.id, config)
+            const response = await api.get('/api/v1/getvulndtl?id=' + row.id)
             if (token && response.data.code == 0) {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')
