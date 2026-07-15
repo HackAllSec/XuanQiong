@@ -11,4 +11,7 @@ export interface LoginResponse {
     avatar?: string;
     times?: number;
     force_password_change?: boolean;
+    permissions?: string[];
+    roles?: string[];
+    role_ids?: number[];
 }

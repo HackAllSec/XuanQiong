@@ -1,8 +1,9 @@
 <template>
-    <el-footer>Copyright © 2024. Hack All Sec rights reserved.</el-footer>
+    <el-footer>{{ branding.footerText }}</el-footer>
 </template>
 
 <script lang="ts" setup>
+import { brandingState as branding } from '../branding'
 </script>
 
 <style>

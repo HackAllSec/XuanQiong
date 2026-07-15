@@ -1,8 +1,9 @@
 <template>
     <el-menu class="el-menu" mode="horizontal" :ellipsis="false">
       <el-menu-item index="0">
-        <img style="width: 50px" src="/avatar.svg" alt="logo" />
+        <img style="width: 50px" :src="branding.logoUrl" alt="logo" />
       </el-menu-item>
+      <span class="brand-name">{{ branding.siteName }}</span>
       <el-menu-item index="1" @click="GotoIndex">{{ t('app.webui.home') }}</el-menu-item>
       <el-menu-item index="2" @click="SubmitVuln">{{ t('app.webui.submitvuln') }}</el-menu-item>
       <el-menu-item index="3" @click="Ranklist">{{ t('app.webui.rankinglist') }}</el-menu-item>
@@ -50,11 +51,17 @@
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n';
   import api from '../api'
+  import { clearAuthSession } from '../auth'
+  import { brandingState as branding, loadBranding } from '../branding'
 
   const router = useRouter()
   const { t, locale } = useI18n();
   const username = sessionStorage.getItem('username')
   const avatar = sessionStorage.getItem('avatar')
+
+  onMounted(() => {
+    loadBranding()
+  })
 
   const changelanguage = (language) => {
     locale.value = language;
@@ -85,10 +92,10 @@
     router.push('/ranklist');
   }
   function Help() {
-    window.open('https://github.com/HackAllSec/XuanQiong');
+    window.open(branding.helpUrl);
   }
   function Suggest() {
-    window.open('https://github.com/HackAllSec/XuanQiong/issues');
+    window.open(branding.suggestUrl);
   }
   function Searchvuln() {
     router.push('/search');
@@ -105,9 +112,7 @@
             }
         };
         const response = await api.get('/api/v1/logout', config)
-        sessionStorage.removeItem('username');
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('avatar');
+        clearAuthSession()
         location.reload();
     } catch (error) {
         // 处理请求错误
@@ -126,6 +131,11 @@
 }
   .el-menu--horizontal > .el-menu-item:nth-child(1) {
     margin-right: auto;
+  }
+  .brand-name {
+    color: #fff;
+    font-weight: bold;
+    margin-right: 16px;
   }
   </style>
   

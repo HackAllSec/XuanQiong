@@ -39,6 +39,43 @@ func GetSystemConfig() (types.XqSystemConfig, types.XqEmailConfig, types.XqJwtCo
 	return LoginPolicy, emailConfig, jwtConfig, noticeConfig
 }
 
+func GetBrandPublicConfig() types.BrandPublicConfig {
+	sysConf, _, _, _ := GetSystemConfig()
+	brand := types.BrandPublicConfig{
+		SiteName:      sysConf.SiteName,
+		FrontendTitle: sysConf.FrontendTitle,
+		AdminTitle:    sysConf.AdminTitle,
+		FooterText:    sysConf.FooterText,
+		HelpURL:       sysConf.HelpURL,
+		SuggestURL:    sysConf.SuggestURL,
+	}
+	if brand.SiteName == "" {
+		brand.SiteName = "玄穹漏洞库平台"
+	}
+	if brand.FrontendTitle == "" {
+		brand.FrontendTitle = brand.SiteName
+	}
+	if brand.AdminTitle == "" {
+		brand.AdminTitle = "玄穹后台管理系统"
+	}
+	if brand.FooterText == "" {
+		brand.FooterText = "Copyright © 2024. Hack All Sec rights reserved."
+	}
+	if brand.HelpURL == "" {
+		brand.HelpURL = "https://github.com/HackAllSec/XuanQiong"
+	}
+	if brand.SuggestURL == "" {
+		brand.SuggestURL = "https://github.com/HackAllSec/XuanQiong/issues"
+	}
+	if sysConf.LogoAttachmentID != "" {
+		brand.LogoURL = "/download/file?id=" + sysConf.LogoAttachmentID
+	}
+	if sysConf.FaviconAttachmentID != "" {
+		brand.FaviconURL = "/download/file?id=" + sysConf.FaviconAttachmentID
+	}
+	return brand
+}
+
 // 更新系统配置
 func UpdateSystemConfig(configData types.SystemConfigData) error {
 	var err error

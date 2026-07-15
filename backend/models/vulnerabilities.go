@@ -511,6 +511,13 @@ func CanAccessAttachment(attachmentID string, userid uint64, roleid int64) (type
 		return attachment, nil
 	}
 
+	var sysConf types.XqSystemConfig
+	if db.Select("logo_attachment_id, favicon_attachment_id").First(&sysConf).RowsAffected == 1 {
+		if sysConf.LogoAttachmentID == attachmentID || sysConf.FaviconAttachmentID == attachmentID {
+			return attachment, nil
+		}
+	}
+
 	return types.XqAttachment{}, fmt.Errorf("Permission denied")
 }
 

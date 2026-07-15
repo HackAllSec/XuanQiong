@@ -41,7 +41,7 @@ func GetVulnList(c *gin.Context) {
 func GetUnauditList(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
 		total, data := models.GetUnauditList(page, limit)
@@ -55,7 +55,7 @@ func GetUnauditList(c *gin.Context) {
 func GetAuditedList(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
 		total, data := models.GetAuditedList(page, limit)
@@ -126,7 +126,7 @@ func EditVuln(c *gin.Context) {
 func DeleteVuln(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -148,7 +148,7 @@ func DeleteVuln(c *gin.Context) {
 func MultiDeleteVulns(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -233,7 +233,7 @@ func DeleteFile(c *gin.Context) {
 	fileId := c.Query("id")
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		err := models.DeleteFile(fileId, currentUser.ID)
 		if err != nil {
 			c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
@@ -249,7 +249,7 @@ func DeleteFile(c *gin.Context) {
 func AddVulnType(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(200, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -271,7 +271,7 @@ func AddVulnType(c *gin.Context) {
 func UpdateVulnType(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var vulntype types.XqVulnType
 		if err := c.ShouldBindJSON(&vulntype); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -292,7 +292,7 @@ func UpdateVulnType(c *gin.Context) {
 func DeleteVulnType(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -314,7 +314,7 @@ func DeleteVulnType(c *gin.Context) {
 func MultiDeleteVulnTypes(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -336,7 +336,7 @@ func MultiDeleteVulnTypes(c *gin.Context) {
 func GetAllScoreRules(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		rules := models.GetAllScoreRules()
 		c.JSON(200, gin.H{"code": 1, "data": rules})
 		return
@@ -348,7 +348,7 @@ func GetAllScoreRules(c *gin.Context) {
 func GetScoreRules(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
 		total, data := models.GetScoreRules(page, limit)
@@ -362,7 +362,7 @@ func GetScoreRules(c *gin.Context) {
 func AddScoreRule(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -387,7 +387,7 @@ func AddScoreRule(c *gin.Context) {
 func EditScoreRule(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var scorerule types.XqScoreRule
 		if err := c.ShouldBindJSON(&scorerule); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -408,7 +408,7 @@ func EditScoreRule(c *gin.Context) {
 func DeleteScoreRule(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
@@ -429,7 +429,7 @@ func DeleteScoreRule(c *gin.Context) {
 func MultiDeleteScoreRules(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})

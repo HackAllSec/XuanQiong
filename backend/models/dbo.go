@@ -24,12 +24,26 @@ var (
 
 func initDatabase() {
 	log.Println("Initializing Database...")
-	db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
-		&types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
-		&types.XqRankingDetail{}, &types.XqScoreRule{}, &types.XqVerifyCode{})
+        db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
+                &types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
+                &types.XqRankingDetail{}, &types.XqScoreRule{}, &types.XqVerifyCode{}, &types.XqRole{},
+                &types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{})
 	res := db.First(&types.XqSystemConfig{})
 	if res.RowsAffected == 0 {
-		db.Create(&types.XqSystemConfig{UserRegister: false, UserDisplay: "佚名", MaxAttempts: 5, LockoutDuration: 3600, CreateTime: time.Now(), UpdateTime: time.Now()})
+                db.Create(&types.XqSystemConfig{
+                        UserRegister:       false,
+                        UserDisplay:        "佚名",
+                        MaxAttempts:        5,
+                        LockoutDuration:    3600,
+                        SiteName:           "玄穹漏洞库平台",
+                        FrontendTitle:      "玄穹漏洞库平台",
+                        AdminTitle:         "玄穹后台管理系统",
+                        FooterText:         "Copyright © 2024. Hack All Sec rights reserved.",
+                        HelpURL:            "https://github.com/HackAllSec/XuanQiong",
+                        SuggestURL:         "https://github.com/HackAllSec/XuanQiong/issues",
+                        CreateTime:         time.Now(),
+                        UpdateTime:         time.Now(),
+                })
 	}
 	res = db.First(&types.XqJwtConfig{})
 	if res.RowsAffected == 0 {
@@ -76,6 +90,9 @@ func initDatabase() {
 		db.Create(&types.XqScoreRule{Type: 3, Rule: "互联网资产数介于 1000 到 5000", Score: 20, Coefficient: 1.0, CreateTime: time.Now(), UpdateTime: time.Now()})
 		db.Create(&types.XqScoreRule{Type: 3, Rule: "互联网资产数小于 1000", Score: 10, Coefficient: 1.0, CreateTime: time.Now(), UpdateTime: time.Now()})
 	}
+        if err := syncRBACDefaults(); err != nil {
+                log.Fatalf("Error syncing RBAC defaults: %v", err)
+        }
 	log.Println("Database initialized successfully!")
 	initAdminPassword()
 }
@@ -208,6 +225,11 @@ func init() {
 		&types.XqEmailConfig{},
 		&types.XqNoticeConfig{},
 		&types.XqUser{},
+                &types.XqRole{},
+                &types.XqPermission{},
+                &types.XqRolePermission{},
+                &types.XqUserRole{},
+                &types.XqAuditLog{},
 		&types.XqAttachment{},
 		&types.XqVulnerability{},
 		&types.XqScoreRule{},
@@ -221,6 +243,12 @@ func init() {
 	if !allTablesExist {
 		initDatabase()
 	}
+        if err := db.AutoMigrate(&types.XqRole{}, &types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{}); err != nil {
+                log.Fatalf("Error migrating RBAC tables: %v", err)
+        }
+        if err := syncRBACDefaults(); err != nil {
+                log.Fatalf("Error syncing RBAC defaults: %v", err)
+        }
 	res := db.Where("username = 'admin'").First(&types.XqUser{}).RowsAffected
 	if res == 0 {
 		log.Println("Resetting admin password...")

@@ -2,6 +2,7 @@
 
 import { createRouter, createWebHashHistory, RouterOptions, Router, RouteRecordRaw } from 'vue-router'
 import { jwtDecode } from 'jwt-decode'
+import { canAccessAdminPanel, clearAuthSession } from '../auth'
 //由于router的API默认使用了类型进行初始化，内部包含类型定义，所以本文内部代码中的所有数据类型是可以省略的
 //RouterRecordRaw是路由组件对象
 const routes: RouteRecordRaw[] = [
@@ -30,6 +31,11 @@ router.beforeEach((to, from, next) => {
       next('/')
       return
     }
+    if (to.path !== '/login' && to.path !== '/forgotpwd' && !canAccessAdminPanel()) {
+      clearAuthSession()
+      next('/login')
+      return
+    }
     next();
   });
   
@@ -40,16 +46,12 @@ router.beforeEach((to, from, next) => {
             const decodedToken = jwtDecode(token)
             let currentTime = Math.floor(Date.now() / 1000)
             if (currentTime > decodedToken.exp) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                console.log("路由删除token1")
+                clearAuthSession()
                 location.reload();
                 return;
             }
         } catch (error) {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('username')
-            console.log("路由删除token2")
+            clearAuthSession()
             location.reload();
             return;
         }

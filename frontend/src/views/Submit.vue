@@ -91,7 +91,7 @@
             </el-form-item>
             
             <el-form-item :label="t('app.webui.attachfile')" style="width: 100%">
-                <el-upload class="upload-demo" drag accept=".zip,.doc,.docx,.pdf,.txt" action="/api/v1/upload" :headers="{'Authorization': `Bearer ${token}`}" :on-success="handleSuccess" :on-remove="handleRemove" style="width: 90%">
+                <el-upload class="upload-demo" drag accept=".zip,.doc,.docx,.pdf,.txt" action="/api/v1/upload" :headers="uploadHeaders" :on-success="handleSuccess" :on-remove="handleRemove" style="width: 90%">
                     <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                     <div class="el-upload__text">
                         {{ t('app.webui.draguplaod') }} <em>{{ t('app.webui.clickupload') }}</em>
@@ -118,12 +118,14 @@
     import { onMounted } from 'vue';
     import { useI18n } from 'vue-i18n';
     import api from '../api'
+    import { getUploadHeaders } from '../auth'
     import { checkLogin } from '../utils'
 
     const { t } = useI18n()
     const route = useRoute();
     const router = useRouter()
     const token = sessionStorage.getItem('token')
+    const uploadHeaders = getUploadHeaders()
     const url = ref('/api/v1/addvuln')
     const showback = ref(false)
     const poc = ref('xray')

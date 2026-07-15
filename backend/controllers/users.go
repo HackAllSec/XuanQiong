@@ -30,7 +30,17 @@ func Login(c *gin.Context) {
 	loginUser := models.CheckLogin(username, password)
 	if loginUser != nil {
 		clearLoginAttempts(clientIP)
-		c.JSON(200, gin.H{"code": 1, "msg": "Login Successful", "username": loginUser.Username, "avatar": loginUser.Avatar, "token": loginUser.Token, "force_password_change": loginUser.ForcePasswordChange})
+		c.JSON(200, gin.H{
+			"code":                  1,
+			"msg":                   "Login Successful",
+			"username":              loginUser.Username,
+			"avatar":                loginUser.Avatar,
+			"token":                 loginUser.Token,
+			"force_password_change": loginUser.ForcePasswordChange,
+			"permissions":           models.GetUserPermissionCodes(loginUser.ID),
+			"roles":                 models.GetUserRoleNames(loginUser.ID),
+			"role_ids":              models.GetUserRoleIDs(loginUser.ID),
+		})
 	} else {
 		attemptsLeft := increaseLoginAttempts(clientIP, LoginPolicy.MaxAttempts)
 		if attemptsLeft <= 0 {
@@ -79,7 +89,7 @@ func Logout(c *gin.Context) {
 func CreateUser(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -89,8 +99,8 @@ func CreateUser(c *gin.Context) {
 		password, _ := data["password"].(string)
 		email, _ := data["email"].(string)
 		phone, _ := data["phone"].(string)
-		role, _ := data["role"].(float64)
-		err := models.CreateUser(username, password, email, phone, int64(role))
+		roleIDs := parseRoleIDs(data["role_ids"])
+		err := models.CreateUserWithRoles(username, password, email, phone, roleIDs)
 		if err == nil {
 			c.JSON(200, gin.H{"code": 1, "msg": "User created successfully."})
 			return
@@ -106,7 +116,7 @@ func CreateUser(c *gin.Context) {
 func DeleteUser(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -136,7 +146,7 @@ func DeleteUser(c *gin.Context) {
 func GetUsers(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
 		total, users := models.GetUsers(page, limit)
@@ -150,14 +160,13 @@ func GetUsers(c *gin.Context) {
 func UpdateUser(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input1"})
 			return
 		}
 		userid, _ := data["id"].(float64)
-		role, _ := data["role"].(float64)
 		username, ok := data["username"].(string)
 		if !ok {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input3"})
@@ -167,7 +176,8 @@ func UpdateUser(c *gin.Context) {
 		email, _ := data["email"].(string)
 		phone, _ := data["phone"].(string)
 		status, _ := data["status"].(float64)
-		err := models.UpdateUser(uint64(userid), int64(role), username, password, email, phone, int64(status))
+		roleIDs := parseRoleIDs(data["role_ids"])
+		err := models.UpdateUserWithRoles(uint64(userid), username, password, email, phone, int64(status), roleIDs)
 		if err != nil {
 			c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
 			return
@@ -187,7 +197,10 @@ func GetUserInfo(c *gin.Context) {
 		c.JSON(200, gin.H{"code": 1, "data": gin.H{"username": currentUser.Username,
 			"avatar": currentUser.Avatar, "email": currentUser.Email,
 			"phone": currentUser.Phone, "ranking": currentUser.Ranking,
-			"total": totalCount, "authed": authCount},
+			"total": totalCount, "authed": authCount,
+			"permissions": models.GetUserPermissionCodes(currentUser.ID),
+			"roles":       models.GetUserRoleNames(currentUser.ID),
+			"role_ids":    models.GetUserRoleIDs(currentUser.ID)},
 		})
 		return
 	}
@@ -341,7 +354,7 @@ func GetUserTop10(c *gin.Context) {
 func AuditVuln(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -370,7 +383,7 @@ func AuditVuln(c *gin.Context) {
 func MultiDeleteUsers(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
@@ -386,4 +399,18 @@ func MultiDeleteUsers(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
+}
+
+func parseRoleIDs(value interface{}) []uint64 {
+	items, ok := value.([]interface{})
+	if !ok {
+		return nil
+	}
+	result := make([]uint64, 0, len(items))
+	for _, item := range items {
+		if roleID, ok := item.(float64); ok && roleID > 0 {
+			result = append(result, uint64(roleID))
+		}
+	}
+	return result
 }

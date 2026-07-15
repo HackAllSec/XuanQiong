@@ -2,7 +2,7 @@
     <div style="width: 70%; height: 90vh; margin: auto;">
         <el-card style="padding: 30px; font-weight: bold; font-size: 20px;" :header="t('app.webui.myprofile')">
             <div style="display: flex; font-weight: lighter; font-size: 14px;">
-                <el-upload accept=".png,.jpg" action="/api/v1/updateavatar" :on-success="handleSuccess" :headers="{'Authorization': `Bearer ${token}`}" :before-upload="beforeUpload">
+                <el-upload accept=".png,.jpg" action="/api/v1/updateavatar" :on-success="handleSuccess" :headers="uploadHeaders" :before-upload="beforeUpload">
                     <el-avatar size="large" :src="avatar"></el-avatar>
                 </el-upload>
                 <div style="margin-left: auto; display: flex; align-items: center;">
@@ -43,9 +43,11 @@
     import { useI18n } from 'vue-i18n';
     import { checkLogin } from '../utils'
     import api from '../api'
+    import { getUploadHeaders } from '../auth'
 
     const { t } = useI18n();
     const token = sessionStorage.getItem('token')
+    const uploadHeaders = getUploadHeaders()
     const userinfo = ref({})
     const buttonstatus = ref(true)
     const mountedFunctions = [checkLogin, getUserinfo]

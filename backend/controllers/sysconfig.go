@@ -10,7 +10,7 @@ import (
 func GetSystemStatus(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		data := models.GetSystemStatus()
 		c.JSON(200, gin.H{"code": 1, "data": data})
 		return
@@ -22,7 +22,7 @@ func GetSystemStatus(c *gin.Context) {
 func GetSystemConfig(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		sysconf, emailconf, jwtconf, noticeconf := models.GetSystemConfig()
 		c.JSON(200, gin.H{"code": 1, "data": gin.H{"sysconf": sysconf, "emailconf": emailconf, "jwtconf": jwtconf, "noticeconf": noticeconf}})
 		return
@@ -34,7 +34,7 @@ func GetSystemConfig(c *gin.Context) {
 func UpdateSystemConfig(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
-	if currentUser != nil && currentUser.Role == 1 {
+	if currentUser != nil {
 		var configData types.SystemConfigData
 		if err := c.ShouldBindJSON(&configData); err != nil {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid input", "err": err})
@@ -68,4 +68,8 @@ func GetCaptcha(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"code": 1, "msg": "Send email success"})
+}
+
+func GetBrandConfig(c *gin.Context) {
+	c.JSON(200, gin.H{"code": 1, "data": models.GetBrandPublicConfig()})
 }

@@ -94,10 +94,24 @@ func CreateUser(username string, password string, email string, phone string, ro
 			Status:              1,
 		}
 		db.Create(&userData)
+		if role == 1 {
+			_ = AssignRoleByCode(userData.ID, "super_admin")
+		}
 		return nil
 	} else {
 		return fmt.Errorf("User %s already exists.", username)
 	}
+}
+
+func CreateUserWithRoles(username string, password string, email string, phone string, roleIDs []uint64) error {
+	if err := CreateUser(username, password, email, phone, 0); err != nil {
+		return err
+	}
+	user := GetUserByUsername(username)
+	if user == nil {
+		return fmt.Errorf("User not found.")
+	}
+	return UpdateUserRoles(user.ID, roleIDs)
 }
 
 // 删除用户
@@ -145,8 +159,15 @@ func UpdateUser(userid uint64, role int64, username string, password string, ema
 	return nil
 }
 
+func UpdateUserWithRoles(userid uint64, username string, password string, email string, phone string, status int64, roleIDs []uint64) error {
+	if err := UpdateUser(userid, 0, username, password, email, phone, status); err != nil {
+		return err
+	}
+	return UpdateUserRoles(userid, roleIDs)
+}
+
 // 分页获取所有用户
-func GetUsers(page string, pageSize string) (int64, []types.XqUser) {
+func GetUsers(page string, pageSize string) (int64, []map[string]interface{}) {
 	var users []types.XqUser
 	var totalCount int64
 	pageNum, _ := strconv.Atoi(page)
@@ -155,8 +176,21 @@ func GetUsers(page string, pageSize string) (int64, []types.XqUser) {
 	db.Select("id, username, role, email, phone, create_time, status").
 		Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).
 		Find(&users)
-	//db.Select("id, username, role, create_time, status").Find(&users)
-	return totalCount, users
+	result := make([]map[string]interface{}, 0, len(users))
+	for _, user := range users {
+		result = append(result, map[string]interface{}{
+			"id":          user.ID,
+			"username":    user.Username,
+			"role":        user.Role,
+			"email":       user.Email,
+			"phone":       user.Phone,
+			"create_time": user.CreateTime,
+			"status":      user.Status,
+			"role_ids":    GetUserRoleIDs(user.ID),
+			"roles":       GetUserRoleNames(user.ID),
+		})
+	}
+	return totalCount, result
 }
 
 // 修改头像

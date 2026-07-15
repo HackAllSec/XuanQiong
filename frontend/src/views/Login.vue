@@ -40,6 +40,7 @@
     import { ref } from 'vue'
     import { User, Lock } from '@element-plus/icons-vue'
     import api from '../api'
+    import { persistLoginSession } from '../auth'
     import { LoginPayload, LoginResponse } from '../types'
     import { useRouter } from 'vue-router'
     import { onMounted } from 'vue';
@@ -78,18 +79,10 @@
                     type: 'success',
                 });
                 await new Promise((resolve) => setTimeout(resolve, 1000))
-                sessionStorage.setItem('token', response.data.token);
-                sessionStorage.setItem('username', response.data.username);
-                if (response.data.avatar != '') {
-                    sessionStorage.setItem('avatar', '/download/file?id=' + response.data.avatar);
-                } else {
-                    sessionStorage.setItem('avatar', '/avatar.svg');
-                }
+                persistLoginSession(response.data)
                 if (response.data.force_password_change) {
-                    sessionStorage.setItem('force_password_change', '1');
                     router.push('/modifypwd')
                 } else {
-                    sessionStorage.removeItem('force_password_change');
                     router.push('/')
                 }
             }

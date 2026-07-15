@@ -1,5 +1,6 @@
 import { useRouter } from 'vue-router';
 import { jwtDecode } from 'jwt-decode'
+import { clearAuthSession } from './auth';
 export function formatDate(datetime) {
   const date = new Date(datetime);
   const year = date.getFullYear();
@@ -20,17 +21,13 @@ export function checkLogin() {
         const decodedToken = jwtDecode(token)
         const currentTime = Math.floor(Date.now() / 1000)
         if (currentTime > decodedToken.exp) {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('username')
-            sessionStorage.removeItem('avatar')
+            clearAuthSession()
             location.reload();
             return;
         }
       } catch (error) {
         console.log(error)
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('username')
-        sessionStorage.removeItem('avatar')
+        clearAuthSession()
         location.reload();
         return;
       }

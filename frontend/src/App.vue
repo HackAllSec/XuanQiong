@@ -14,13 +14,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, onMounted } from 'vue';
 import Navbar from './components/Navbar.vue';
 import Footer from './components/Footer.vue';
 
 import { useI18n } from 'vue-i18n';
 import zhCn from 'element-plus/es/locale/lang/zh-cn';
 import en from 'element-plus/es/locale/lang/en';
+import { loadBranding } from './branding';
 
 export default defineComponent({
   name: 'App',
@@ -30,6 +31,9 @@ export default defineComponent({
   },
   setup() {
     const { locale } = useI18n();
+    onMounted(() => {
+      loadBranding();
+    });
     // 计算属性，根据vue-i18n的locale值返回对应的Element Plus语言包
     const elementPlusLocale = computed(() => {
       if (locale.value === 'zh-CN') {

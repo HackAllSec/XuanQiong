@@ -1,6 +1,6 @@
 <template>
     <div class="login-container">
-        <el-card class="login-card" :header="t('app.webui.login')" shadow="always">
+        <el-card class="login-card" :header="branding.adminTitle" shadow="always">
             <el-input
                 v-model="uname"
                 maxlength="50"
@@ -44,31 +44,26 @@
     import { onMounted } from 'vue';
     import { jwtDecode } from 'jwt-decode'
     import { useI18n } from 'vue-i18n';
+    import { brandingState as branding, loadBranding } from '../branding';
+    import { canAccessAdminPanel, clearAuthSession, persistLoginSession } from '../auth';
 
     const { t, locale } = useI18n();
     function performAction() {
         let token = sessionStorage.getItem('token');
         if (token) {
             try {
-                const decodedToken = jwtDecode(token)
-                if (decodedToken.role != 1) {
-                    //ElMessage.error('您没有权限访问该页面');
-                    sessionStorage.removeItem('token')
-                    sessionStorage.removeItem('username')
-                    sessionStorage.removeItem('avatar')
+                const decodedToken: any = jwtDecode(token)
+                if (!canAccessAdminPanel()) {
+                    clearAuthSession()
                     return;
                 }
                 let currentTime = Math.floor(Date.now() / 1000)
                 if (currentTime > decodedToken.exp) {
-                    sessionStorage.removeItem('token')
-                    sessionStorage.removeItem('username')
-                    sessionStorage.removeItem('avatar')
+                    clearAuthSession()
                     return;
                 }
             } catch (error) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload();
                 return;
             }
@@ -76,7 +71,10 @@
         }
     }
 
-    onMounted(performAction);
+    onMounted(() => {
+        loadBranding();
+        performAction();
+    });
     const router = useRouter();
     const uname = ref('');
     const passwd = ref('');
@@ -91,11 +89,9 @@
                 username: uname.value,
                 password: passwd.value,
             } as LoginPayload);
-            console.log(response.data);
             // 检查登录是否成功
             if (response.data.token) {
-                const decodedToken = jwtDecode(response.data.token)
-                if (decodedToken.role != 1) {
+                if (!(response.data.permissions || []).includes('admin.panel.access')) {
                     ElMessage.error(t('app.webui.nopermation'));
                     return;
                 }
@@ -105,18 +101,7 @@
                     type: 'success',
                 });
                 await new Promise((resolve) => setTimeout(resolve, 1000))
-                sessionStorage.setItem('token', response.data.token);
-                sessionStorage.setItem('username', response.data.username);
-                if (response.data.avatar == '') {
-                    sessionStorage.setItem('avatar', '/avatar.svg');
-                } else {
-                    sessionStorage.setItem('avatar', '/download/file?id=' + response.data.avatar);
-                }
-                if (response.data.force_password_change) {
-                    sessionStorage.setItem('force_password_change', '1');
-                } else {
-                    sessionStorage.removeItem('force_password_change');
-                }
+                persistLoginSession(response.data)
                 router.push('/')
             } else if (response.data.code == 0){
                 ElMessage.error(t('app.webui.loginerr3'));
