@@ -88,14 +88,35 @@ func UpdateSystemConfig(configData types.SystemConfigData) error {
 	configData.JwtConfig.UpdateTime = time.Now()
 
 	db.First(&sysConf)
-	err = db.Model(&sysConf).Updates(configData.SysConfig).Error
+	err = db.Model(&sysConf).Updates(map[string]interface{}{
+		"user_register":         configData.SysConfig.UserRegister,
+		"user_display":          configData.SysConfig.UserDisplay,
+		"max_attempts":          configData.SysConfig.MaxAttempts,
+		"lockout_duration":      configData.SysConfig.LockoutDuration,
+		"site_name":             configData.SysConfig.SiteName,
+		"frontend_title":        configData.SysConfig.FrontendTitle,
+		"admin_title":           configData.SysConfig.AdminTitle,
+		"logo_attachment_id":    configData.SysConfig.LogoAttachmentID,
+		"favicon_attachment_id": configData.SysConfig.FaviconAttachmentID,
+		"footer_text":           configData.SysConfig.FooterText,
+		"help_url":              configData.SysConfig.HelpURL,
+		"suggest_url":           configData.SysConfig.SuggestURL,
+		"update_time":           configData.SysConfig.UpdateTime,
+	}).Error
 	if err != nil {
 		return err
 	}
 	res := db.First(&emailConfig).RowsAffected
 	if res != 0 {
 		configData.EmailConfig.UpdateTime = time.Now()
-		err = db.Model(&emailConfig).Updates(configData.EmailConfig).Error
+		err = db.Model(&emailConfig).Updates(map[string]interface{}{
+			"email_host":     configData.EmailConfig.EmailHost,
+			"email_port":     configData.EmailConfig.EmailPort,
+			"email_user":     configData.EmailConfig.EmailUser,
+			"email_password": configData.EmailConfig.EmailPassword,
+			"email_sender":   configData.EmailConfig.EmailSender,
+			"update_time":    configData.EmailConfig.UpdateTime,
+		}).Error
 		if err != nil {
 			return err
 		}
@@ -108,14 +129,23 @@ func UpdateSystemConfig(configData types.SystemConfigData) error {
 	}
 
 	db.First(&jwtConfig)
-	err = db.Model(&jwtConfig).Updates(configData.JwtConfig).Error
+	err = db.Model(&jwtConfig).Updates(map[string]interface{}{
+		"jwt_secret":  configData.JwtConfig.JwtSecret,
+		"jwt_expires": configData.JwtConfig.JwtExpires,
+		"update_time": configData.JwtConfig.UpdateTime,
+	}).Error
 	if err != nil {
 		return err
 	}
 	res = db.First(&noticeConfig).RowsAffected
 	if res != 0 {
 		configData.NoticeConfig.UpdateTime = time.Now()
-		err = db.Model(&noticeConfig).Updates(configData.NoticeConfig).Error
+		err = db.Model(&noticeConfig).Updates(map[string]interface{}{
+			"type":        configData.NoticeConfig.Type,
+			"secret":      configData.NoticeConfig.Secret,
+			"webhook":     configData.NoticeConfig.Webhook,
+			"update_time": configData.NoticeConfig.UpdateTime,
+		}).Error
 		if err != nil {
 			return err
 		}

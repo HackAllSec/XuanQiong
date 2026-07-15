@@ -3,8 +3,8 @@
     <div class="toolbar">
       <el-input v-model="search" :placeholder="t('app.webui.search')" clearable class="search-input" />
       <div class="toolbar-actions">
-        <el-button type="primary" @click="openCreateDialog">{{ t('app.webui.add') }}</el-button>
-        <el-button :disabled="selectedRows.length === 0" type="danger" @click="multiDeleteUsers">
+        <el-button v-if="canCreate" type="primary" @click="openCreateDialog">{{ t('app.webui.add') }}</el-button>
+        <el-button v-if="canDelete" :disabled="selectedRows.length === 0" type="danger" @click="multiDeleteUsers">
           {{ t('app.webui.multidelete') }}
         </el-button>
       </div>
@@ -35,8 +35,8 @@
       </el-table-column>
       <el-table-column :label="t('app.webui.operate')" width="180">
         <template #default="{ row }">
-          <el-button size="small" type="primary" @click="openEditDialog(row)">{{ t('app.webui.edit') }}</el-button>
-          <el-button size="small" type="danger" @click="deleteUser(row)">{{ t('app.webui.delete') }}</el-button>
+          <el-button v-if="canUpdate" size="small" type="primary" @click="openEditDialog(row)">{{ t('app.webui.edit') }}</el-button>
+          <el-button v-if="canDelete" size="small" type="danger" @click="deleteUser(row)">{{ t('app.webui.delete') }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -91,8 +91,12 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatDate } from '../utils'
 import api from '../api'
+import { hasPermission } from '../auth'
 
 const { t } = useI18n()
+const canCreate = hasPermission('user.create')
+const canUpdate = hasPermission('user.update')
+const canDelete = hasPermission('user.delete')
 
 const search = ref('')
 const users = ref<any[]>([])

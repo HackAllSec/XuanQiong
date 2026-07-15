@@ -66,7 +66,7 @@
                 </el-table-column>
                 <el-table-column :label="t('app.webui.operate')" width="140">
                     <template #default="scope">
-                        <el-button size="small" type="primary" @click="handleAudit(scope.$index, scope.row)">{{ t('app.webui.audit') }}</el-button>
+                        <el-button v-if="canAuditWrite" size="small" type="primary" @click="handleAudit(scope.$index, scope.row)">{{ t('app.webui.audit') }}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -197,7 +197,7 @@
         </el-card>
         <div style="margin-top: 1%;">
             <el-button @click="goBack">{{ t('app.webui.cancel') }}</el-button>
-            <el-button type="primary" @click="submitAudit">{{ t('app.webui.confirm') }}</el-button>
+            <el-button v-if="canAuditWrite" type="primary" @click="submitAudit">{{ t('app.webui.confirm') }}</el-button>
         </div>
     </div>
 </template>
@@ -207,8 +207,10 @@ import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
 import { DocumentCopy } from '@element-plus/icons-vue'
+import { hasPermission } from '../auth'
 
 const { t } = useI18n()
+const canAuditWrite = hasPermission('vuln.audit.write')
 const showvulndetail = ref(false)
 const token = sessionStorage.getItem('token')
 const typefilter = ref([])

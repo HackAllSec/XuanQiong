@@ -111,6 +111,9 @@ func CreateUserWithRoles(username string, password string, email string, phone s
 	if user == nil {
 		return fmt.Errorf("User not found.")
 	}
+	if len(roleIDs) == 0 {
+		return EnsureUserRoleByCode(user.ID, "user")
+	}
 	return UpdateUserRoles(user.ID, roleIDs)
 }
 

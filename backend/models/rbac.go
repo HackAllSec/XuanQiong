@@ -37,7 +37,13 @@ var defaultPermissions = []types.XqPermission{
 	{Code: "score.rule.manage", Name: "管理评分规则", Category: "score", Description: "允许增删改评分规则"},
 	{Code: "profile.read", Name: "查看个人资料", Category: "profile", Description: "允许查看个人资料"},
 	{Code: "profile.update", Name: "编辑个人资料", Category: "profile", Description: "允许编辑个人资料"},
+	{Code: "profile.avatar.update", Name: "修改头像", Category: "profile", Description: "允许修改个人头像"},
 	{Code: "password.update", Name: "修改密码", Category: "profile", Description: "允许修改个人密码"},
+	{Code: "vuln.self.read", Name: "查看本人漏洞", Category: "vulnerability", Description: "允许查看本人提交的漏洞"},
+	{Code: "vuln.submit", Name: "提交漏洞", Category: "vulnerability", Description: "允许提交漏洞"},
+	{Code: "vuln.edit", Name: "编辑本人漏洞", Category: "vulnerability", Description: "允许编辑本人提交的漏洞"},
+	{Code: "attachment.upload", Name: "上传附件", Category: "attachment", Description: "允许上传附件"},
+	{Code: "attachment.delete", Name: "删除本人附件", Category: "attachment", Description: "允许删除本人附件"},
 }
 
 var defaultRoles = []struct {
@@ -76,7 +82,13 @@ var defaultRoles = []struct {
 			"score.rule.manage",
 			"profile.read",
 			"profile.update",
+			"profile.avatar.update",
 			"password.update",
+			"vuln.self.read",
+			"vuln.submit",
+			"vuln.edit",
+			"attachment.upload",
+			"attachment.delete",
 		},
 	},
 	{
@@ -94,7 +106,10 @@ var defaultRoles = []struct {
 			"score.rule.read",
 			"profile.read",
 			"profile.update",
+			"profile.avatar.update",
 			"password.update",
+			"attachment.upload",
+			"attachment.delete",
 		},
 	},
 	{
@@ -108,7 +123,25 @@ var defaultRoles = []struct {
 			"audit.log.read",
 			"profile.read",
 			"profile.update",
+			"profile.avatar.update",
 			"password.update",
+		},
+	},
+	{
+		Name:        "普通用户",
+		Code:        "user",
+		Description: "允许使用前台基础功能",
+		IsSystem:    true,
+		PermissionCodes: []string{
+			"profile.read",
+			"profile.update",
+			"profile.avatar.update",
+			"password.update",
+			"vuln.self.read",
+			"vuln.submit",
+			"vuln.edit",
+			"attachment.upload",
+			"attachment.delete",
 		},
 	},
 }
@@ -172,9 +205,56 @@ func syncRBACDefaults() error {
 		}
 	}
 
-	var adminUser types.XqUser
-	if db.Where("username = ?", "admin").First(&adminUser).RowsAffected == 1 {
-		if err := AssignRoleByCode(adminUser.ID, "super_admin"); err != nil {
+	var legacyAdmins []types.XqUser
+	db.Where("role = ? AND status = ?", 1, 1).Find(&legacyAdmins)
+	for _, adminUser := range legacyAdmins {
+		if err := EnsureUserRoleByCode(adminUser.ID, "super_admin"); err != nil {
+			return err
+		}
+	}
+
+	var legacyUsers []types.XqUser
+	db.Where("role = ? AND status = ?", 0, 1).Find(&legacyUsers)
+	for _, user := range legacyUsers {
+		if len(GetUserRoleIDs(user.ID)) == 0 {
+			if err := EnsureUserRoleByCode(user.ID, "user"); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func EnsureUserRoleByCode(userID uint64, roleCode string) error {
+	var role types.XqRole
+	if db.Where("code = ?", roleCode).First(&role).RowsAffected != 1 {
+		return fmt.Errorf("role %s not found", roleCode)
+	}
+
+	var existing types.XqUserRole
+	if db.Where("user_id = ? AND role_id = ?", userID, role.ID).First(&existing).RowsAffected == 1 {
+		return nil
+	}
+	if err := db.Create(&types.XqUserRole{
+		UserID:     userID,
+		RoleID:     role.ID,
+		CreateTime: time.Now(),
+		UpdateTime: time.Now(),
+	}).Error; err != nil {
+		return err
+	}
+
+	var user types.XqUser
+	if db.Where("id = ?", userID).First(&user).RowsAffected == 1 {
+		legacyRole := user.Role
+		if UserHasAnyPermission(userID, PermissionAdminPanelAccess) {
+			legacyRole = 1
+		}
+		if err := db.Model(&user).Updates(map[string]interface{}{
+			"role":        legacyRole,
+			"token":       "",
+			"update_time": time.Now(),
+		}).Error; err != nil {
 			return err
 		}
 	}
@@ -257,6 +337,7 @@ func UpdateUserRoles(userID uint64, roleIDs []uint64) error {
 	}
 	return db.Model(&user).Updates(map[string]interface{}{
 		"role":        legacyRole,
+		"token":       "",
 		"update_time": time.Now(),
 	}).Error
 }
@@ -310,7 +391,8 @@ func GetUserPermissionCodes(userID uint64) []string {
 		Select("distinct xq_permissions.code, xq_permissions.id, xq_permissions.name, xq_permissions.category, xq_permissions.description, xq_permissions.create_time, xq_permissions.update_time").
 		Joins("join xq_role_permissions on xq_role_permissions.permission_id = xq_permissions.id").
 		Joins("join xq_user_roles on xq_user_roles.role_id = xq_role_permissions.role_id").
-		Where("xq_user_roles.user_id = ?", userID).
+		Joins("join xq_roles on xq_roles.id = xq_user_roles.role_id").
+		Where("xq_user_roles.user_id = ? AND xq_roles.status = 1", userID).
 		Order("xq_permissions.code asc").
 		Scan(&permissions)
 
@@ -452,11 +534,21 @@ func DeleteRole(roleID uint64) error {
 	if role.IsSystem {
 		return fmt.Errorf("system role cannot be deleted")
 	}
+	var userRoles []types.XqUserRole
+	db.Where("role_id = ?", roleID).Find(&userRoles)
 	if err := db.Where("role_id = ?", roleID).Delete(&types.XqRolePermission{}).Error; err != nil {
 		return err
 	}
 	if err := db.Where("role_id = ?", roleID).Delete(&types.XqUserRole{}).Error; err != nil {
 		return err
 	}
-	return db.Delete(&role).Error
+	if err := db.Delete(&role).Error; err != nil {
+		return err
+	}
+	for _, userRole := range userRoles {
+		if err := UpdateUserRoles(userRole.UserID, GetUserRoleIDs(userRole.UserID)); err != nil {
+			return err
+		}
+	}
+	return nil
 }

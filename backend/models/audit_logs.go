@@ -139,6 +139,20 @@ func SanitizeRequestBody(request *http.Request, rawBody []byte) string {
 	}
 }
 
+func SanitizeResponseBody(rawBody []byte) string {
+	return sanitizeJSONBody(rawBody)
+}
+
+func ShouldCaptureRequestBody(request *http.Request) bool {
+	contentType := request.Header.Get("Content-Type")
+	if strings.Contains(contentType, "multipart/form-data") {
+		return false
+	}
+	return strings.Contains(contentType, "application/json") ||
+		strings.Contains(contentType, "application/x-www-form-urlencoded") ||
+		contentType == ""
+}
+
 func CaptureRequestBody(request *http.Request) ([]byte, error) {
 	if request.Body == nil {
 		return nil, nil

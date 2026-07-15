@@ -7,8 +7,8 @@
                     <el-input v-model="search" :placeholder="t('app.webui.search')" clearable style="width: 30%;" />
                 </div>
                 <div>
-                    <el-button type="primary" @click="dialogVisibleAdd=true">{{ t('app.webui.add') }}</el-button>
-                    <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteScoreRules">{{ t('app.webui.multidelete') }}</el-button>
+                    <el-button v-if="canManage" type="primary" @click="dialogVisibleAdd=true">{{ t('app.webui.add') }}</el-button>
+                    <el-button v-if="canManage" :disabled="multideleteVisible" type="danger" @click="multiDeleteScoreRules">{{ t('app.webui.multidelete') }}</el-button>
                 </div>
             </div>
             <el-table :data="currentData" @selection-change="handleSelectionChange">
@@ -46,8 +46,8 @@
                 </el-table-column>
                 <el-table-column :label="t('app.webui.operate')" width="140">
                     <template #default="scope">
-                        <el-button size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">{{ t('app.webui.edit') }}</el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">{{ t('app.webui.delete') }}</el-button>
+                        <el-button v-if="canManage" size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">{{ t('app.webui.edit') }}</el-button>
+                        <el-button v-if="canManage" size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">{{ t('app.webui.delete') }}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -114,8 +114,10 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
+import { hasPermission } from '../auth'
 
 const { t } = useI18n()
+const canManage = hasPermission('score.rule.manage')
 const token = sessionStorage.getItem('token')
 const data = ref({})
 const search = ref('')

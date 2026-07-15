@@ -1,4 +1,3 @@
-import { jwtDecode } from 'jwt-decode'
 import type { LoginResponse } from './types'
 
 const PERMISSIONS_KEY = 'permissions'
@@ -44,19 +43,7 @@ export function hasAnyPermission(permissions: string[]): boolean {
 
 export function canAccessAdminPanel(): boolean {
   const permissions = getStoredPermissions()
-  if (permissions.includes('admin.panel.access')) {
-    return true
-  }
-  const token = sessionStorage.getItem('token')
-  if (!token) {
-    return false
-  }
-  try {
-    const decodedToken: any = jwtDecode(token)
-    return decodedToken.role === 1
-  } catch {
-    return false
-  }
+	return permissions.includes('admin.panel.access')
 }
 
 export function persistLoginSession(response: LoginResponse) {

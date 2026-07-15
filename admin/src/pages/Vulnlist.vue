@@ -198,7 +198,7 @@
                 <div style="display: flex; width: 80%; gap: 1%;">
                     <el-input v-model="search" :placeholder="t('app.webui.search')" clearable style="width: 30%;" />
                 </div>
-                <el-button :disabled="multideleteVisible" type="danger" @click="multiDeleteVulns">{{ t('app.webui.multidelete') }}</el-button>
+                <el-button v-if="canDelete" :disabled="multideleteVisible" type="danger" @click="multiDeleteVulns">{{ t('app.webui.multidelete') }}</el-button>
             </div>
             <el-table :data="currentData" @selection-change="handleSelectionChange" @cell-mouse-enter="cellMouseEnter" @cell-mouse-leave="cellMouseLeave" @cell-click="cellClick">
                 <el-table-column type="selection" width="55" />
@@ -259,8 +259,8 @@
                 </el-table-column>
                 <el-table-column :label="t('app.webui.operate')" width="140">
                     <template #default="scope">
-                        <el-button :disabled="scope.row.status === 0" size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">{{ t('app.webui.edit') }}</el-button>
-                        <el-button :disabled="scope.row.status === 0" size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">{{ t('app.webui.delete') }}</el-button>
+                        <el-button v-if="canEdit" :disabled="scope.row.status === 0" size="small" type="primary" @click="handleEdit(scope.$index, scope.row)">{{ t('app.webui.edit') }}</el-button>
+                        <el-button v-if="canDelete" :disabled="scope.row.status === 0" size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">{{ t('app.webui.delete') }}</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -283,8 +283,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
-    import api from '../api'
-    import { getUploadHeaders } from '../auth'
+import api from '../api'
+import { getUploadHeaders, hasPermission } from '../auth'
 import { DocumentCopy, UploadFilled } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
@@ -461,6 +461,8 @@ const goBack = () => {
 async function getVulnDetail(id) {
     const token = sessionStorage.getItem('token')
     const uploadHeaders = getUploadHeaders()
+const canEdit = hasPermission('vuln.edit')
+const canDelete = hasPermission('vuln.delete')
         try {
             const response = await api.get('/api/v1/getvulndtl?id=' + id)
             if (token && response.data.code == 0) {

@@ -26,6 +26,11 @@ func (writer auditResponseWriter) Write(data []byte) (int, error) {
 
 func normalizeAccessTokenHeaderMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
+		if strings.HasPrefix(strings.ToLower(authHeader), "bearer ") && strings.TrimSpace(c.GetHeader("X-Auth-Token")) == "" {
+			c.AbortWithStatusJSON(http.StatusOK, gin.H{"code": 0, "msg": "Authorization header is not allowed. Use X-Auth-Token."})
+			return
+		}
 		if token := strings.TrimSpace(c.GetHeader("X-Auth-Token")); token != "" {
 			c.Request.Header.Set("Authorization", "Bearer "+token)
 		}
@@ -92,7 +97,7 @@ func markAuditActionMiddleware(action string) gin.HandlerFunc {
 func auditLogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var rawBody []byte
-		if shouldCaptureAudit(c.Request.Method) {
+		if shouldCaptureAudit(c.Request.Method) && models.ShouldCaptureRequestBody(c.Request) {
 			if capturedBody, err := models.CaptureRequestBody(c.Request); err == nil {
 				rawBody = capturedBody
 			}
@@ -118,7 +123,7 @@ func auditLogMiddleware() gin.HandlerFunc {
 			ClientIP:     c.ClientIP(),
 			UserAgent:    c.Request.UserAgent(),
 			RequestBody:  models.SanitizeRequestBody(c.Request, rawBody),
-			ResponseBody: recorder.body.String(),
+			ResponseBody: models.SanitizeResponseBody(recorder.body.Bytes()),
 			CreateTime:   startedAt,
 		}
 		if currentUser != nil {

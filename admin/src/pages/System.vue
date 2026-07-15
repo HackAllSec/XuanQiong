@@ -55,7 +55,7 @@
       <el-form-item :label="t('app.webui.logoattachment')">
         <div class="upload-row">
           <el-input v-model="data.sysconf.logo_attachment_id" />
-          <el-upload :headers="uploadHeaders" action="/api/v1/upload" :show-file-list="false" :on-success="handleLogoUpload">
+          <el-upload v-if="canUpdate" :headers="uploadHeaders" action="/api/v1/upload" :show-file-list="false" :on-success="handleLogoUpload">
             <el-button type="primary">{{ t('app.webui.uploadlogo') }}</el-button>
           </el-upload>
         </div>
@@ -63,7 +63,7 @@
       <el-form-item :label="t('app.webui.faviconattachment')">
         <div class="upload-row">
           <el-input v-model="data.sysconf.favicon_attachment_id" />
-          <el-upload :headers="uploadHeaders" action="/api/v1/upload" :show-file-list="false" :on-success="handleFaviconUpload">
+          <el-upload v-if="canUpdate" :headers="uploadHeaders" action="/api/v1/upload" :show-file-list="false" :on-success="handleFaviconUpload">
             <el-button type="primary">{{ t('app.webui.uploadfavicon') }}</el-button>
           </el-upload>
         </div>
@@ -99,7 +99,7 @@
   </el-card>
 
   <div class="actions">
-    <el-button v-if="readonly" type="primary" @click="readonly = false">{{ t('app.webui.edit') }}</el-button>
+    <el-button v-if="readonly && canUpdate" type="primary" @click="readonly = false">{{ t('app.webui.edit') }}</el-button>
     <template v-else>
       <el-button type="primary" @click="save">{{ t('app.webui.save') }}</el-button>
       <el-button @click="cancelEdit">{{ t('app.webui.cancel') }}</el-button>
@@ -112,11 +112,12 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import api from '../api'
 import { loadBranding } from '../branding'
-import { getUploadHeaders } from '../auth'
+import { getUploadHeaders, hasPermission } from '../auth'
 
 const { t } = useI18n()
 const readonly = ref(true)
 const uploadHeaders = getUploadHeaders()
+const canUpdate = hasPermission('system.config.update')
 
 const data = ref({
   emailconf: {

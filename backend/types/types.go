@@ -41,21 +41,21 @@ type Config struct {
 
 // 系统配置表
 type XqSystemConfig struct {
-        ID               uint64    `gorm:"primaryKey" json:"id"`
-        UserRegister     bool      `json:"user_register"`
-        UserDisplay      string    `json:"user_display"`
-        MaxAttempts      int64     `json:"max_attempts"`
-        LockoutDuration  int64     `json:"lockout_duration"`
-        SiteName         string    `json:"site_name"`
-        FrontendTitle    string    `json:"frontend_title"`
-        AdminTitle       string    `json:"admin_title"`
-        LogoAttachmentID string    `json:"logo_attachment_id"`
-        FaviconAttachmentID string `json:"favicon_attachment_id"`
-        FooterText       string    `json:"footer_text"`
-        HelpURL          string    `json:"help_url"`
-        SuggestURL       string    `json:"suggest_url"`
-        CreateTime       time.Time `json:"create_time"`
-        UpdateTime       time.Time `json:"update_time"`
+	ID                  uint64    `gorm:"primaryKey" json:"id"`
+	UserRegister        bool      `json:"user_register"`
+	UserDisplay         string    `json:"user_display"`
+	MaxAttempts         int64     `json:"max_attempts"`
+	LockoutDuration     int64     `json:"lockout_duration"`
+	SiteName            string    `json:"site_name"`
+	FrontendTitle       string    `json:"frontend_title"`
+	AdminTitle          string    `json:"admin_title"`
+	LogoAttachmentID    string    `json:"logo_attachment_id"`
+	FaviconAttachmentID string    `json:"favicon_attachment_id"`
+	FooterText          string    `json:"footer_text"`
+	HelpURL             string    `json:"help_url"`
+	SuggestURL          string    `json:"suggest_url"`
+	CreateTime          time.Time `json:"create_time"`
+	UpdateTime          time.Time `json:"update_time"`
 }
 
 // Jwt配置表
@@ -107,57 +107,57 @@ type XqUser struct {
 }
 
 type XqRole struct {
-        ID          uint64    `gorm:"primaryKey" json:"id"`
-        Name        string    `gorm:"unique" json:"name"`
-        Code        string    `gorm:"unique" json:"code"`
-        Description string    `json:"description"`
-        IsSystem    bool      `json:"is_system"`
-        Status      int64     `json:"status"`
-        CreateTime  time.Time `json:"create_time"`
-        UpdateTime  time.Time `json:"update_time"`
+	ID          uint64    `gorm:"primaryKey" json:"id"`
+	Name        string    `gorm:"unique" json:"name"`
+	Code        string    `gorm:"unique" json:"code"`
+	Description string    `json:"description"`
+	IsSystem    bool      `json:"is_system"`
+	Status      int64     `json:"status"`
+	CreateTime  time.Time `json:"create_time"`
+	UpdateTime  time.Time `json:"update_time"`
 }
 
 type XqPermission struct {
-        ID          uint64    `gorm:"primaryKey" json:"id"`
-        Code        string    `gorm:"unique" json:"code"`
-        Name        string    `json:"name"`
-        Category    string    `json:"category"`
-        Description string    `json:"description"`
-        CreateTime  time.Time `json:"create_time"`
-        UpdateTime  time.Time `json:"update_time"`
+	ID          uint64    `gorm:"primaryKey" json:"id"`
+	Code        string    `gorm:"unique" json:"code"`
+	Name        string    `json:"name"`
+	Category    string    `json:"category"`
+	Description string    `json:"description"`
+	CreateTime  time.Time `json:"create_time"`
+	UpdateTime  time.Time `json:"update_time"`
 }
 
 type XqRolePermission struct {
-        ID           uint64    `gorm:"primaryKey" json:"id"`
-        RoleID       uint64    `json:"role_id"`
-        PermissionID uint64    `json:"permission_id"`
-        CreateTime   time.Time `json:"create_time"`
-        UpdateTime   time.Time `json:"update_time"`
+	ID           uint64    `gorm:"primaryKey" json:"id"`
+	RoleID       uint64    `json:"role_id"`
+	PermissionID uint64    `json:"permission_id"`
+	CreateTime   time.Time `json:"create_time"`
+	UpdateTime   time.Time `json:"update_time"`
 }
 
 type XqUserRole struct {
-        ID         uint64    `gorm:"primaryKey" json:"id"`
-        UserID     uint64    `json:"user_id"`
-        RoleID     uint64    `json:"role_id"`
-        CreateTime time.Time `json:"create_time"`
-        UpdateTime time.Time `json:"update_time"`
+	ID         uint64    `gorm:"primaryKey" json:"id"`
+	UserID     uint64    `json:"user_id"`
+	RoleID     uint64    `json:"role_id"`
+	CreateTime time.Time `json:"create_time"`
+	UpdateTime time.Time `json:"update_time"`
 }
 
 type XqAuditLog struct {
-        ID             uint64    `gorm:"primaryKey" json:"id"`
-        UserID         uint64    `json:"user_id"`
-        Username       string    `json:"username"`
-        Action         string    `json:"action"`
-        Method         string    `json:"method"`
-        Path           string    `json:"path"`
-        StatusCode     int       `json:"status_code"`
-        ResultCode     int64     `json:"result_code"`
-        ResultMessage  string    `json:"result_message"`
-        ClientIP       string    `json:"client_ip"`
-        UserAgent      string    `json:"user_agent"`
-        RequestBody    string    `gorm:"type:text" json:"request_body"`
-        ResponseBody   string    `gorm:"type:text" json:"response_body"`
-        CreateTime     time.Time `json:"create_time"`
+	ID            uint64    `gorm:"primaryKey" json:"id"`
+	UserID        uint64    `json:"user_id"`
+	Username      string    `json:"username"`
+	Action        string    `json:"action"`
+	Method        string    `json:"method"`
+	Path          string    `json:"path"`
+	StatusCode    int       `json:"status_code"`
+	ResultCode    int64     `json:"result_code"`
+	ResultMessage string    `json:"result_message"`
+	ClientIP      string    `json:"client_ip"`
+	UserAgent     string    `json:"user_agent"`
+	RequestBody   string    `gorm:"type:text" json:"request_body"`
+	ResponseBody  string    `gorm:"type:text" json:"response_body"`
+	CreateTime    time.Time `json:"create_time"`
 }
 
 // 漏洞类型表
@@ -269,21 +269,21 @@ type SystemConfigData struct {
 }
 
 type BrandPublicConfig struct {
-        SiteName      string `json:"site_name"`
-        FrontendTitle string `json:"frontend_title"`
-        AdminTitle    string `json:"admin_title"`
-        LogoURL       string `json:"logo_url"`
-        FaviconURL    string `json:"favicon_url"`
-        FooterText    string `json:"footer_text"`
-        HelpURL       string `json:"help_url"`
-        SuggestURL    string `json:"suggest_url"`
+	SiteName      string `json:"site_name"`
+	FrontendTitle string `json:"frontend_title"`
+	AdminTitle    string `json:"admin_title"`
+	LogoURL       string `json:"logo_url"`
+	FaviconURL    string `json:"favicon_url"`
+	FooterText    string `json:"footer_text"`
+	HelpURL       string `json:"help_url"`
+	SuggestURL    string `json:"suggest_url"`
 }
 
 type RolePayload struct {
-        ID              uint64   `json:"id"`
-        Name            string   `json:"name"`
-        Code            string   `json:"code"`
-        Description     string   `json:"description"`
-        Status          int64    `json:"status"`
-        PermissionCodes []string `json:"permission_codes"`
+	ID              uint64   `json:"id"`
+	Name            string   `json:"name"`
+	Code            string   `json:"code"`
+	Description     string   `json:"description"`
+	Status          int64    `json:"status"`
+	PermissionCodes []string `json:"permission_codes"`
 }
