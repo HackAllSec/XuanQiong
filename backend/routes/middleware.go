@@ -13,26 +13,31 @@ import (
 )
 
 const currentUserContextKey = "current_user"
+const auditSkipResponseBodyKey = "audit_skip_response_body"
 
 type auditResponseWriter struct {
 	gin.ResponseWriter
-	body *bytes.Buffer
+	body    *bytes.Buffer
+	context *gin.Context
 }
 
 func (writer auditResponseWriter) Write(data []byte) (int, error) {
-	writer.body.Write(data)
+	if skipResponseBody, _ := writer.context.Get(auditSkipResponseBodyKey); skipResponseBody != true {
+		writer.body.Write(data)
+	}
 	return writer.ResponseWriter.Write(data)
 }
 
 func normalizeAccessTokenHeaderMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		if strings.HasPrefix(strings.ToLower(authHeader), "bearer ") && strings.TrimSpace(c.GetHeader("X-Auth-Token")) == "" {
+		xAuthToken := strings.TrimSpace(c.GetHeader("X-Auth-Token"))
+		if authHeader != "" && !strings.HasPrefix(strings.ToLower(authHeader), "basic ") {
 			c.AbortWithStatusJSON(http.StatusOK, gin.H{"code": 0, "msg": "Authorization header is not allowed. Use X-Auth-Token."})
 			return
 		}
-		if token := strings.TrimSpace(c.GetHeader("X-Auth-Token")); token != "" {
-			c.Request.Header.Set("Authorization", "Bearer "+token)
+		if xAuthToken != "" {
+			c.Request.Header.Set("Authorization", "Bearer "+xAuthToken)
 		}
 		c.Next()
 	}
@@ -47,9 +52,6 @@ func currentUserMiddleware() gin.HandlerFunc {
 				c.Next()
 				return
 			}
-		}
-		if apiKey := c.GetHeader("X-API-Key"); apiKey != "" {
-			c.Request.Header.Set("Authorization", "ApiKey "+apiKey)
 		}
 		if currentUser := models.GetUserByAPIKey(c.GetHeader("X-API-Key")); currentUser != nil {
 			c.Set(currentUserContextKey, currentUser)
@@ -111,7 +113,7 @@ func auditLogMiddleware() gin.HandlerFunc {
 			}
 		}
 
-		recorder := &auditResponseWriter{ResponseWriter: c.Writer, body: bytes.NewBuffer(nil)}
+		recorder := &auditResponseWriter{ResponseWriter: c.Writer, body: bytes.NewBuffer(nil), context: c}
 		c.Writer = recorder
 		startedAt := time.Now()
 		c.Next()
@@ -123,6 +125,11 @@ func auditLogMiddleware() gin.HandlerFunc {
 
 		action, _ := actionValue.(string)
 		currentUser := currentUserFromContext(c)
+		skipResponseBody, _ := c.Get(auditSkipResponseBodyKey)
+		responseBody := ""
+		if skipResponseBody != true {
+			responseBody = models.SanitizeResponseBody(recorder.body.Bytes())
+		}
 		auditLog := types.XqAuditLog{
 			Action:       action,
 			Method:       c.Request.Method,
@@ -131,7 +138,7 @@ func auditLogMiddleware() gin.HandlerFunc {
 			ClientIP:     c.ClientIP(),
 			UserAgent:    c.Request.UserAgent(),
 			RequestBody:  models.SanitizeRequestBody(c.Request, rawBody),
-			ResponseBody: models.SanitizeResponseBody(recorder.body.Bytes()),
+			ResponseBody: responseBody,
 			CreateTime:   startedAt,
 		}
 		if currentUser != nil {
@@ -146,13 +153,15 @@ func auditLogMiddleware() gin.HandlerFunc {
 			}
 		}
 
-		var responsePayload map[string]interface{}
-		if err := json.Unmarshal(recorder.body.Bytes(), &responsePayload); err == nil {
-			if code, ok := responsePayload["code"].(float64); ok {
-				auditLog.ResultCode = int64(code)
-			}
-			if message, ok := responsePayload["msg"].(string); ok {
-				auditLog.ResultMessage = message
+		if skipResponseBody != true {
+			var responsePayload map[string]interface{}
+			if err := json.Unmarshal(recorder.body.Bytes(), &responsePayload); err == nil {
+				if code, ok := responsePayload["code"].(float64); ok {
+					auditLog.ResultCode = int64(code)
+				}
+				if message, ok := responsePayload["msg"].(string); ok {
+					auditLog.ResultMessage = message
+				}
 			}
 		}
 		_ = models.CreateAuditLog(auditLog)

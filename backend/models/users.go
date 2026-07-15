@@ -60,9 +60,6 @@ func GetUserByToken(token string) *types.XqUser {
 	var jwt types.XqJwtConfig
 	db.First(&jwt)
 	if token != "" {
-		if strings.HasPrefix(token, "ApiKey ") {
-			return GetUserByAPIKey(strings.TrimPrefix(token, "ApiKey "))
-		}
 		token = strings.TrimPrefix(token, "Bearer ")
 		res := db.Raw("SELECT * FROM xq_users WHERE token = ? AND status = 1", token).Scan(&user).RowsAffected
 		if res == 0 {
@@ -520,11 +517,13 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
 	if auditedVuln.ReviewComments != "" {
 		noticeContent += "，审核意见：" + auditedVuln.ReviewComments
 	}
-	_ = SendEventNotice(EventNotice{
-		Title:   "漏洞审核通知",
-		Content: noticeContent,
-		Type:    "vuln_audit",
-	})
+	go func() {
+		_ = SendEventNotice(EventNotice{
+			Title:   "漏洞审核通知",
+			Content: noticeContent,
+			Type:    "vuln_audit",
+		})
+	}()
 	return nil
 }
 

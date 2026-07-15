@@ -218,7 +218,8 @@ export default {
             restorenotice: 'Restoring a backup overwrites current core data. Confirm the backup source and content first.',
             restoresuccess: 'Restore Successful',
             restorefail: 'Restore Failed',
-            imported: 'Imported'
+            imported: 'Imported',
+            importerrors: 'rows failed'
         }
     }
 };

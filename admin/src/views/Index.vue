@@ -145,7 +145,7 @@ const topLevelMenus = computed(() => {
   if (hasPermission('audit.log.read')) {
     items.push({ key: 'auditLogs', label: t('app.webui.auditlogs'), icon: markRaw(Files) })
   }
-  if (hasAnyPermission(['api.key.read', 'vuln.import', 'vuln.export', 'backup.manage'])) {
+  if (hasAnyPermission(['api.key.read', 'api.key.manage', 'vuln.import', 'vuln.export', 'backup.manage'])) {
     items.push({ key: 'opsCenter', label: t('app.webui.opscenter'), icon: markRaw(Tools) })
   }
   return items

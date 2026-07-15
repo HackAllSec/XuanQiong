@@ -2,7 +2,9 @@ package models
 
 import (
 	"bytes"
+	"encoding/csv"
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -63,6 +65,9 @@ func TestAPIKeyLifecycle_BitsUT(t *testing.T) {
 	if refreshed.LastUsedAt == nil {
 		t.Fatalf("api key last_used_at should be updated after use")
 	}
+	if currentUser := GetUserByToken("ApiKey " + plaintext); currentUser != nil {
+		t.Fatalf("api key must not authenticate through Authorization token path")
+	}
 	if err := DeleteAPIKey(user.ID, record.ID); err != nil {
 		t.Fatalf("delete api key: %v", err)
 	}
@@ -122,5 +127,57 @@ func TestRestoreSystemBackupSkipsEmptyCollections_BitsUT(t *testing.T) {
 	db.Model(&types.XqUser{}).Count(&count)
 	if count != 0 {
 		t.Fatalf("users after empty restore = %d, want 0", count)
+	}
+}
+
+func TestExportVulnsCSVEscapesFormulaCells_BitsUT(t *testing.T) {
+	setupModelTestDB(t)
+	if err := db.Create(&types.XqVulnerability{
+		ID:                     "HVD-2099-0001",
+		VulnName:               "=cmd",
+		VulnTypeID:             1,
+		VulnLevel:              "High",
+		CVSS:                   8.8,
+		Description:            "+payload",
+		AffectedProduct:        "@product",
+		AffectedProductVersion: "-version",
+		RepairSuggestion:       "normal",
+		Poc:                    "\t=tab-prefixed",
+		CreateTime:             time.Now(),
+		UpdateTime:             time.Now(),
+	}).Error; err != nil {
+		t.Fatalf("create vulnerability: %v", err)
+	}
+
+	var buffer bytes.Buffer
+	if err := ExportVulnsCSV(&buffer); err != nil {
+		t.Fatalf("export csv: %v", err)
+	}
+	rows, err := csv.NewReader(strings.NewReader(buffer.String())).ReadAll()
+	if err != nil {
+		t.Fatalf("read exported csv: %v", err)
+	}
+	if len(rows) != 2 {
+		t.Fatalf("csv rows = %d, want 2", len(rows))
+	}
+	for _, cell := range []string{rows[1][0], rows[1][4], rows[1][5], rows[1][6], rows[1][21]} {
+		if !strings.HasPrefix(cell, "'") {
+			t.Fatalf("formula-like cell was not escaped: %q", cell)
+		}
+	}
+}
+
+func TestCreateSystemBackupFailsOnReadError_BitsUT(t *testing.T) {
+	setupModelTestDB(t)
+	sqlDB, err := db.DB()
+	if err != nil {
+		t.Fatalf("get sql db: %v", err)
+	}
+	if err := sqlDB.Close(); err != nil {
+		t.Fatalf("close sql db: %v", err)
+	}
+	var buffer bytes.Buffer
+	if err := CreateSystemBackup(&buffer); err == nil {
+		t.Fatalf("backup should fail when database reads fail")
 	}
 }

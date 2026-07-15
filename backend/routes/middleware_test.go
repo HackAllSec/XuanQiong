@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -22,6 +23,12 @@ func TestNormalizeAccessTokenHeaderMiddleware_BitsUT(t *testing.T) {
 		{
 			name:              "reject external bearer authorization",
 			authorization:     "Bearer raw-token",
+			wantStatus:        http.StatusOK,
+			wantHandlerCalled: false,
+		},
+		{
+			name:              "reject external api key authorization",
+			authorization:     "ApiKey xqk_raw-token",
 			wantStatus:        http.StatusOK,
 			wantHandlerCalled: false,
 		},
@@ -80,5 +87,24 @@ func TestNormalizeAccessTokenHeaderMiddleware_BitsUT(t *testing.T) {
 				t.Fatalf("handlerCalled = %v, want %v", handlerCalled, tt.wantHandlerCalled)
 			}
 		})
+	}
+}
+
+func TestAuditResponseWriterSkipsConfiguredResponseBody_BitsUT(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	response := httptest.NewRecorder()
+	context, _ := gin.CreateTestContext(response)
+	context.Set(auditSkipResponseBodyKey, true)
+	buffer := bytes.NewBuffer(nil)
+	writer := auditResponseWriter{ResponseWriter: context.Writer, body: buffer, context: context}
+
+	if _, err := writer.Write([]byte("sensitive export body")); err != nil {
+		t.Fatalf("write response: %v", err)
+	}
+	if buffer.Len() != 0 {
+		t.Fatalf("audit buffer should stay empty when response body capture is skipped, got %q", buffer.String())
+	}
+	if response.Body.String() != "sensitive export body" {
+		t.Fatalf("client response body was not written")
 	}
 }

@@ -10,7 +10,7 @@
           value-format="YYYY-MM-DDTHH:mm:ssZ"
           class="toolbar-input"
         />
-        <el-button type="primary" @click="createKey">{{ t('app.webui.add') }}</el-button>
+        <el-button type="primary" :loading="creatingKey" @click="createKey">{{ t('app.webui.add') }}</el-button>
       </div>
 
       <el-alert
@@ -55,6 +55,7 @@ const apiKeys = ref<any[]>([])
 const name = ref('')
 const expiresAt = ref('')
 const generatedKey = ref('')
+const creatingKey = ref(false)
 
 async function loadKeys() {
   const response = await api.get('/api/v1/apikeys')
@@ -62,19 +63,27 @@ async function loadKeys() {
 }
 
 async function createKey() {
-  const response = await api.post('/api/v1/addapikey', {
-    name: name.value,
-    expires_at: expiresAt.value,
-  })
-  if (response.data.code === 1) {
-    generatedKey.value = response.data.api_key
-    name.value = ''
-    expiresAt.value = ''
-    ElMessage.success(t('app.webui.addsuccess'))
-    await loadKeys()
+  if (creatingKey.value) {
     return
   }
-  ElMessage.error(response.data.msg || t('app.webui.addfail'))
+  creatingKey.value = true
+  try {
+    const response = await api.post('/api/v1/addapikey', {
+      name: name.value,
+      expires_at: expiresAt.value,
+    })
+    if (response.data.code === 1) {
+      generatedKey.value = response.data.api_key
+      name.value = ''
+      expiresAt.value = ''
+      ElMessage.success(t('app.webui.addsuccess'))
+      await loadKeys()
+      return
+    }
+    ElMessage.error(response.data.msg || t('app.webui.addfail'))
+  } finally {
+    creatingKey.value = false
+  }
 }
 
 async function deleteKey(id: number) {

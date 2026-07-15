@@ -73,8 +73,7 @@ func clearLoginAttempts(ip string) {
 
 // 退出
 func Logout(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		err := models.CleanToken(currentUser.Username)
 		if err == nil {
@@ -88,8 +87,7 @@ func Logout(c *gin.Context) {
 
 // 创建用户
 func CreateUser(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -119,8 +117,7 @@ func CreateUser(c *gin.Context) {
 
 // 删除用户
 func DeleteUser(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -149,8 +146,7 @@ func DeleteUser(c *gin.Context) {
 
 // 分页获取所有用户信息
 func GetUsers(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
@@ -163,8 +159,7 @@ func GetUsers(c *gin.Context) {
 
 // 修改用户信息
 func UpdateUser(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -195,8 +190,7 @@ func UpdateUser(c *gin.Context) {
 
 // 获取当前用户信息
 func GetUserInfo(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		totalCount, authCount, _ := models.GetUservulns(currentUser.ID)
 		c.JSON(200, gin.H{"code": 1, "data": gin.H{"username": currentUser.Username,
@@ -214,8 +208,7 @@ func GetUserInfo(c *gin.Context) {
 
 // 修改头像
 func UpdateAvatar(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		file, err := c.FormFile("file")
 		if err != nil {
@@ -231,8 +224,7 @@ func UpdateAvatar(c *gin.Context) {
 
 // 修改用户个人信息
 func UpdateUserInfo(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -255,8 +247,7 @@ func UpdateUserInfo(c *gin.Context) {
 
 // 修改用户密码
 func UpdateUserPassword(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -343,8 +334,7 @@ func ForgetPassword(c *gin.Context) {
 func GetUserVulnList(c *gin.Context) {
 	page := c.Query("page")
 	limit := c.Query("limit")
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		total, data := models.GetUserVulnList(currentUser.ID, page, limit)
 		c.JSON(200, gin.H{"code": 1, "total": total, "data": data})
@@ -361,8 +351,7 @@ func GetUserTop10(c *gin.Context) {
 
 // 审核漏洞-管理员
 func AuditVuln(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -390,8 +379,7 @@ func AuditVuln(c *gin.Context) {
 
 // 批量删除用户
 func MultiDeleteUsers(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {

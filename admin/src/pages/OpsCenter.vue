@@ -10,7 +10,7 @@
           value-format="YYYY-MM-DDTHH:mm:ssZ"
           class="toolbar-input"
         />
-        <el-button v-if="canManageAPIKeys" type="primary" @click="createAPIKey">{{ t('app.webui.add') }}</el-button>
+        <el-button v-if="canManageAPIKeys" type="primary" :loading="creatingAPIKey" @click="createAPIKey">{{ t('app.webui.add') }}</el-button>
       </div>
       <el-alert
         v-if="generatedKey"
@@ -67,6 +67,7 @@
           accept=".json"
           :headers="uploadHeaders"
           :show-file-list="false"
+          :before-upload="confirmRestoreUpload"
           :on-success="handleRestore"
         >
           <el-button type="warning">{{ t('app.webui.restorebackup') }}</el-button>
@@ -91,6 +92,7 @@ const apiKeys = ref<any[]>([])
 const apiKeyName = ref('')
 const apiKeyExpiresAt = ref('')
 const generatedKey = ref('')
+const creatingAPIKey = ref(false)
 const uploadHeaders = getUploadHeaders()
 
 const canReadAPIKeys = computed(() => hasPermission('api.key.read'))
@@ -108,19 +110,27 @@ async function loadAPIKeys() {
 }
 
 async function createAPIKey() {
-  const response = await api.post('/api/v1/addapikey', {
-    name: apiKeyName.value,
-    expires_at: apiKeyExpiresAt.value,
-  })
-  if (response.data.code === 1) {
-    generatedKey.value = response.data.api_key
-    apiKeyName.value = ''
-    apiKeyExpiresAt.value = ''
-    ElMessage.success(t('app.webui.addsuccess'))
-    await loadAPIKeys()
+  if (creatingAPIKey.value) {
     return
   }
-  ElMessage.error(response.data.msg || t('app.webui.addfail'))
+  creatingAPIKey.value = true
+  try {
+    const response = await api.post('/api/v1/addapikey', {
+      name: apiKeyName.value,
+      expires_at: apiKeyExpiresAt.value,
+    })
+    if (response.data.code === 1) {
+      generatedKey.value = response.data.api_key
+      apiKeyName.value = ''
+      apiKeyExpiresAt.value = ''
+      ElMessage.success(t('app.webui.addsuccess'))
+      await loadAPIKeys()
+      return
+    }
+    ElMessage.error(response.data.msg || t('app.webui.addfail'))
+  } finally {
+    creatingAPIKey.value = false
+  }
 }
 
 async function deleteAPIKey(id: number) {
@@ -137,6 +147,15 @@ async function deleteAPIKey(id: number) {
 async function downloadFile(url: string, fallbackName: string) {
   const response = await api.get(url, { responseType: 'blob' })
   const disposition = response.headers['content-disposition'] || ''
+  if (!disposition.includes('attachment')) {
+    try {
+      const payload = JSON.parse(await response.data.text())
+      ElMessage.error(payload?.msg || t('app.webui.modifyfail'))
+    } catch {
+      ElMessage.error(t('app.webui.modifyfail'))
+    }
+    return
+  }
   const filename = disposition.match(/filename=([^;]+)/)?.[1] || fallbackName
   const blobUrl = URL.createObjectURL(response.data)
   const link = document.createElement('a')
@@ -148,10 +167,19 @@ async function downloadFile(url: string, fallbackName: string) {
 
 function handleVulnImport(response: any) {
   if (response?.code === 1) {
+    if (response.errors?.length) {
+      ElMessage.warning(`${t('app.webui.imported')}: ${response.imported || 0}, ${response.errors.length} ${t('app.webui.importerrors')}`)
+      return
+    }
     ElMessage.success(`${t('app.webui.imported')}: ${response.imported || 0}`)
     return
   }
   ElMessage.error(response?.msg || t('app.webui.modifyfail'))
+}
+
+async function confirmRestoreUpload() {
+  await ElMessageBox.confirm(t('app.webui.restorenotice'), t('app.webui.restorebackup'), { type: 'warning' })
+  return true
 }
 
 function handleRestore(response: any) {

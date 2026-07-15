@@ -218,7 +218,8 @@ export default {
             restorenotice: '恢复备份会覆盖当前核心数据，请确认备份来源可信且内容正确。',
             restoresuccess: '恢复成功',
             restorefail: '恢复失败',
-            imported: '已导入'
+            imported: '已导入',
+            importerrors: '行导入失败'
         }
     }
 };

@@ -13,6 +13,11 @@ import (
 )
 
 func currentUserFromRequest(c *gin.Context) *types.XqUser {
+	if value, exists := c.Get("current_user"); exists {
+		if currentUser, ok := value.(*types.XqUser); ok {
+			return currentUser
+		}
+	}
 	return models.GetUserByToken(c.Request.Header.Get("Authorization"))
 }
 
@@ -109,6 +114,7 @@ func ExportVulns(c *gin.Context) {
 		c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
 		return
 	}
+	c.Set("audit_skip_response_body", true)
 	filename := fmt.Sprintf("xuanqiong_vulns_%s.csv", time.Now().Format("20060102150405"))
 	c.Header("Content-Disposition", "attachment; filename="+filename)
 	c.Data(http.StatusOK, "text/csv; charset=utf-8", buffer.Bytes())
@@ -136,6 +142,10 @@ func ImportVulns(c *gin.Context) {
 	}
 	defer src.Close()
 	imported, errors := models.ImportVulnsCSV(src, currentUser.ID)
+	if imported == 0 && len(errors) > 0 {
+		c.JSON(200, gin.H{"code": 3, "imported": imported, "errors": errors, "msg": "No vulnerabilities imported"})
+		return
+	}
 	c.JSON(200, gin.H{"code": 1, "imported": imported, "errors": errors})
 }
 
@@ -145,6 +155,7 @@ func ExportBackup(c *gin.Context) {
 		c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
 		return
 	}
+	c.Set("audit_skip_response_body", true)
 	filename := fmt.Sprintf("xuanqiong_backup_%s.json", time.Now().Format("20060102150405"))
 	c.Header("Content-Disposition", "attachment; filename="+filename)
 	c.Data(http.StatusOK, "application/json; charset=utf-8", buffer.Bytes())

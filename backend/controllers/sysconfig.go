@@ -8,8 +8,7 @@ import (
 
 // 获取系统状态-管理员
 func GetSystemStatus(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		data := models.GetSystemStatus()
 		c.JSON(200, gin.H{"code": 1, "data": data})
@@ -20,8 +19,7 @@ func GetSystemStatus(c *gin.Context) {
 
 // 获取系统配置
 func GetSystemConfig(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		sysconf, emailconf, jwtconf, noticeconf := models.GetSystemConfig()
 		if emailconf.EmailPassword != "" {
@@ -41,8 +39,7 @@ func GetSystemConfig(c *gin.Context) {
 
 // 更新系统配置
 func UpdateSystemConfig(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var configData types.SystemConfigData
 		if err := c.ShouldBindJSON(&configData); err != nil {

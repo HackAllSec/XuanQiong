@@ -34,31 +34,31 @@ func ExportVulnsCSV(writer io.Writer) error {
 	}
 	for _, vuln := range vulns {
 		row := []string{
-			vuln.VulnName,
+			escapeCSVCell(vuln.VulnName),
 			strconv.FormatUint(vuln.VulnTypeID, 10),
-			vuln.VulnLevel,
+			escapeCSVCell(vuln.VulnLevel),
 			strconv.FormatFloat(vuln.CVSS, 'f', -1, 64),
-			vuln.Description,
-			vuln.AffectedProduct,
-			vuln.AffectedProductVersion,
-			vuln.RepairSuggestion,
-			vuln.CVE,
-			vuln.NVD,
-			vuln.EDB,
-			vuln.CNNVD,
-			vuln.CNVD,
-			vuln.FofaQuery,
-			vuln.ZoomEyeQuery,
-			vuln.QuakeQuery,
-			vuln.HunterQuery,
-			vuln.GoogleQuery,
-			vuln.ShodanQuery,
-			vuln.CensysQuery,
-			vuln.GreynoiseQuery,
-			vuln.Poc,
-			vuln.PocType,
-			vuln.Exp,
-			vuln.ExpType,
+			escapeCSVCell(vuln.Description),
+			escapeCSVCell(vuln.AffectedProduct),
+			escapeCSVCell(vuln.AffectedProductVersion),
+			escapeCSVCell(vuln.RepairSuggestion),
+			escapeCSVCell(vuln.CVE),
+			escapeCSVCell(vuln.NVD),
+			escapeCSVCell(vuln.EDB),
+			escapeCSVCell(vuln.CNNVD),
+			escapeCSVCell(vuln.CNVD),
+			escapeCSVCell(vuln.FofaQuery),
+			escapeCSVCell(vuln.ZoomEyeQuery),
+			escapeCSVCell(vuln.QuakeQuery),
+			escapeCSVCell(vuln.HunterQuery),
+			escapeCSVCell(vuln.GoogleQuery),
+			escapeCSVCell(vuln.ShodanQuery),
+			escapeCSVCell(vuln.CensysQuery),
+			escapeCSVCell(vuln.GreynoiseQuery),
+			escapeCSVCell(vuln.Poc),
+			escapeCSVCell(vuln.PocType),
+			escapeCSVCell(vuln.Exp),
+			escapeCSVCell(vuln.ExpType),
 			strconv.FormatBool(vuln.IsPublic),
 		}
 		if err := csvWriter.Write(row); err != nil {
@@ -67,6 +67,19 @@ func ExportVulnsCSV(writer io.Writer) error {
 	}
 	csvWriter.Flush()
 	return csvWriter.Error()
+}
+
+func escapeCSVCell(value string) string {
+	trimmed := strings.TrimLeft(value, " \t\r\n")
+	if trimmed == "" {
+		return value
+	}
+	switch trimmed[0] {
+	case '=', '+', '-', '@':
+		return "'" + value
+	default:
+		return value
+	}
 }
 
 func ImportVulnsCSV(reader io.Reader, userID uint64) (int, []string) {
@@ -182,24 +195,58 @@ type BackupAPIKey struct {
 
 func CreateSystemBackup(writer io.Writer) error {
 	backup := SystemBackup{Version: 1, CreatedAt: time.Now()}
-	db.Find(&backup.SystemConfigs)
-	db.Find(&backup.JwtConfigs)
-	db.Find(&backup.EmailConfigs)
-	db.Find(&backup.NoticeConfigs)
-	db.Find(&backup.Users)
-	db.Find(&backup.Roles)
-	db.Find(&backup.Permissions)
-	db.Find(&backup.RolePermissions)
-	db.Find(&backup.UserRoles)
-	db.Find(&backup.VulnTypes)
-	db.Find(&backup.Vulnerabilities)
-	db.Find(&backup.Attachments)
-	db.Find(&backup.ScoreRules)
-	db.Find(&backup.RankingDetails)
-	db.Find(&backup.Messages)
-	db.Find(&backup.AuditLogs)
+	if err := findBackupRecords("system_configs", &backup.SystemConfigs); err != nil {
+		return err
+	}
+	if err := findBackupRecords("jwt_configs", &backup.JwtConfigs); err != nil {
+		return err
+	}
+	if err := findBackupRecords("email_configs", &backup.EmailConfigs); err != nil {
+		return err
+	}
+	if err := findBackupRecords("notice_configs", &backup.NoticeConfigs); err != nil {
+		return err
+	}
+	if err := findBackupRecords("users", &backup.Users); err != nil {
+		return err
+	}
+	if err := findBackupRecords("roles", &backup.Roles); err != nil {
+		return err
+	}
+	if err := findBackupRecords("permissions", &backup.Permissions); err != nil {
+		return err
+	}
+	if err := findBackupRecords("role_permissions", &backup.RolePermissions); err != nil {
+		return err
+	}
+	if err := findBackupRecords("user_roles", &backup.UserRoles); err != nil {
+		return err
+	}
+	if err := findBackupRecords("vuln_types", &backup.VulnTypes); err != nil {
+		return err
+	}
+	if err := findBackupRecords("vulnerabilities", &backup.Vulnerabilities); err != nil {
+		return err
+	}
+	if err := findBackupRecords("attachments", &backup.Attachments); err != nil {
+		return err
+	}
+	if err := findBackupRecords("score_rules", &backup.ScoreRules); err != nil {
+		return err
+	}
+	if err := findBackupRecords("ranking_details", &backup.RankingDetails); err != nil {
+		return err
+	}
+	if err := findBackupRecords("messages", &backup.Messages); err != nil {
+		return err
+	}
+	if err := findBackupRecords("audit_logs", &backup.AuditLogs); err != nil {
+		return err
+	}
 	var apiKeys []types.XqAPIKey
-	db.Find(&apiKeys)
+	if err := findBackupRecords("api_keys", &apiKeys); err != nil {
+		return err
+	}
 	backup.APIKeys = make([]BackupAPIKey, 0, len(apiKeys))
 	for _, apiKey := range apiKeys {
 		backup.APIKeys = append(backup.APIKeys, BackupAPIKey{
@@ -220,6 +267,13 @@ func CreateSystemBackup(writer io.Writer) error {
 	encoder := json.NewEncoder(writer)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(backup)
+}
+
+func findBackupRecords(name string, dest interface{}) error {
+	if err := db.Find(dest).Error; err != nil {
+		return fmt.Errorf("backup %s: %w", name, err)
+	}
+	return nil
 }
 
 func RestoreSystemBackup(reader io.Reader) error {

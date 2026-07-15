@@ -39,8 +39,7 @@ func GetVulnList(c *gin.Context) {
 
 // 分页获取待审核漏洞列表
 func GetUnauditList(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
@@ -53,8 +52,7 @@ func GetUnauditList(c *gin.Context) {
 
 // 分页获取已审核漏洞列表
 func GetAuditedList(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
@@ -68,8 +66,7 @@ func GetAuditedList(c *gin.Context) {
 // 获取漏洞详细信息，登录和未登录情况
 func GetVulnDetail(c *gin.Context) {
 	id := c.Query("id")
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		canReadSensitive := models.UserHasAnyPermission(currentUser.ID, "vuln.read", "vuln.audit.read")
 		res := models.GetVulnDetailAuthed(id, currentUser.ID, canReadSensitive)
@@ -82,8 +79,7 @@ func GetVulnDetail(c *gin.Context) {
 
 // 添加漏洞信息
 func AddVuln(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var vulnerabilities types.XqVulnerability
 		if err := c.ShouldBindJSON(&vulnerabilities); err != nil {
@@ -104,8 +100,7 @@ func AddVuln(c *gin.Context) {
 
 // 编辑漏洞
 func EditVuln(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var vulnerabilities types.XqVulnerability
 		if err := c.ShouldBindJSON(&vulnerabilities); err != nil {
@@ -126,8 +121,7 @@ func EditVuln(c *gin.Context) {
 
 // 删除漏洞
 func DeleteVuln(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -148,8 +142,7 @@ func DeleteVuln(c *gin.Context) {
 
 // 批量删除漏洞
 func MultiDeleteVulns(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -190,8 +183,7 @@ func SearchVulnAdv(c *gin.Context) {
 
 // 上传文件
 func UploadFile(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		file, err := c.FormFile("file")
 		if err != nil {
@@ -216,8 +208,7 @@ func UploadFile(c *gin.Context) {
 // 获取文件内容
 func DownloadFile(c *gin.Context) {
 	fileId := c.Query("id")
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	var userid uint64
 	var roleid int64
 	if currentUser != nil {
@@ -239,8 +230,7 @@ func DownloadFile(c *gin.Context) {
 // 管理员删除文件
 func DeleteFile(c *gin.Context) {
 	fileId := c.Query("id")
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		err := models.DeleteFile(fileId, currentUser.ID)
 		if err != nil {
@@ -255,8 +245,7 @@ func DeleteFile(c *gin.Context) {
 
 // 添加漏洞类型
 func AddVulnType(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -277,8 +266,7 @@ func AddVulnType(c *gin.Context) {
 
 // 更新漏洞类型
 func UpdateVulnType(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var vulntype types.XqVulnType
 		if err := c.ShouldBindJSON(&vulntype); err != nil {
@@ -298,8 +286,7 @@ func UpdateVulnType(c *gin.Context) {
 
 // 删除漏洞类型
 func DeleteVulnType(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -320,8 +307,7 @@ func DeleteVulnType(c *gin.Context) {
 
 // 批量删除漏洞类型
 func MultiDeleteVulnTypes(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -342,8 +328,7 @@ func MultiDeleteVulnTypes(c *gin.Context) {
 
 // 获取全部评分规则
 func GetAllScoreRules(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		rules := models.GetAllScoreRules()
 		c.JSON(200, gin.H{"code": 1, "data": rules})
@@ -354,8 +339,7 @@ func GetAllScoreRules(c *gin.Context) {
 
 // 分页获取评分规则
 func GetScoreRules(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		page := c.Query("page")
 		limit := c.Query("limit")
@@ -368,8 +352,7 @@ func GetScoreRules(c *gin.Context) {
 
 // 添加评分规则
 func AddScoreRule(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -393,8 +376,7 @@ func AddScoreRule(c *gin.Context) {
 
 // 编辑评分规则
 func EditScoreRule(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var scorerule types.XqScoreRule
 		if err := c.ShouldBindJSON(&scorerule); err != nil {
@@ -414,8 +396,7 @@ func EditScoreRule(c *gin.Context) {
 
 // 删除评分规则
 func DeleteScoreRule(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
@@ -435,8 +416,7 @@ func DeleteScoreRule(c *gin.Context) {
 
 // 批量删除评分规则
 func MultiDeleteScoreRules(c *gin.Context) {
-	token := c.Request.Header.Get("Authorization")
-	currentUser := models.GetUserByToken(token)
+	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
 		var data map[string]interface{}
 		if err := c.ShouldBindJSON(&data); err != nil {
