@@ -5,6 +5,10 @@ export interface LoginPayload {
   
 export interface LoginResponse {
     msg: string;
+    code?: number;
     token: string;
     username: string;
+    avatar?: string;
+    times?: number;
+    force_password_change?: boolean;
 }

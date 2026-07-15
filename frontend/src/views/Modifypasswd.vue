@@ -17,8 +17,10 @@ import { GoldMedal } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n';
 import { checkLogin } from '../utils';
 import api from '../api';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
+const router = useRouter();
 const buttonstatus = ref(true)
 const token = sessionStorage.getItem('token')
 const oldpassword = ref('')
@@ -74,9 +76,12 @@ async function changePassword() {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')
                 sessionStorage.removeItem('avatar')
+                sessionStorage.removeItem('force_password_change')
                 location.reload()
         } else if (response.data.code == 1) {
+            sessionStorage.removeItem('force_password_change')
             ElMessage.success(t('app.webui.modifysucc'))
+            router.push('/')
         } else if (response.data.code == 3) {
             ElMessage.error(t('app.webui.oldpassworderr'))
         } else {

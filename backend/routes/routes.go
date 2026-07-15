@@ -12,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"xuanqiong/backend/config"
 	"xuanqiong/backend/controllers"
+	"xuanqiong/backend/models"
 )
 
 var (
@@ -57,8 +58,33 @@ func init() {
 		gin.SetMode(gin.DebugMode)
 	}
 	route = gin.Default()
+	route.Use(passwordChangeRequiredMiddleware())
 	fmt.Println("Welcome to XuanQiong", config.Version)
 	fmt.Println("Server running on " + config.Config.Server.Host + ":" + strconv.FormatInt(config.Config.Server.Port, 10))
+}
+
+func passwordChangeRequiredMiddleware() gin.HandlerFunc {
+	allowedPaths := map[string]bool{
+		apiuri + "/login":          true,
+		apiuri + "/logout":         true,
+		apiuri + "/updatepassword": true,
+	}
+
+	return func(c *gin.Context) {
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			c.Next()
+			return
+		}
+
+		currentUser := models.GetUserByToken(token)
+		if currentUser == nil || !currentUser.ForcePasswordChange || allowedPaths[c.Request.URL.Path] {
+			c.Next()
+			return
+		}
+
+		c.AbortWithStatusJSON(200, gin.H{"code": 9, "msg": "Password change required"})
+	}
 }
 
 func defineRouter() {

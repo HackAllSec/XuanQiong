@@ -64,9 +64,12 @@ async function changePassword() {
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('username')
                 sessionStorage.removeItem('avatar')
+                sessionStorage.removeItem('force_password_change')
                 location.reload()
         } else if (response.data.code == 1) {
+            sessionStorage.removeItem('force_password_change')
             ElMessage.success(t('app.webui.modifysucc'))
+            location.reload()
         } else if (response.data.code == 3) {
             ElMessage.error(t('app.webui.oldpassworderr'))
         } else {

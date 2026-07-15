@@ -112,6 +112,11 @@
                 } else {
                     sessionStorage.setItem('avatar', '/download/file?id=' + response.data.avatar);
                 }
+                if (response.data.force_password_change) {
+                    sessionStorage.setItem('force_password_change', '1');
+                } else {
+                    sessionStorage.removeItem('force_password_change');
+                }
                 router.push('/')
             } else if (response.data.code == 0){
                 ElMessage.error(t('app.webui.loginerr3'));

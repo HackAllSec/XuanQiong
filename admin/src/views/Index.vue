@@ -132,7 +132,7 @@
 import { User, Compass, TrophyBase, Histogram, Menu as IconMenu, Place, Setting, Fold, Expand } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 import Dashboard from '../pages/Dashboard.vue';
 import Userlist from '../pages/Userlist.vue';
@@ -159,23 +159,42 @@ const avatar = sessionStorage.getItem('avatar');
 const enumid = ref('1')
 const isCollapse = ref(false)
 const token = sessionStorage.getItem('token')
+const forcePasswordChange = () => sessionStorage.getItem('force_password_change') === '1'
 
 function handleCollapse() {
   isCollapse.value = !isCollapse.value
 }
 function handleMenuClick(index: string) {
+      if (forcePasswordChange()) {
+        enumid.value = ''
+        showprofile.value = false
+        changepwd.value = true
+        return
+      }
       enumid.value = index
 }
 
-const router = useRoute()
+const router = useRouter()
 onMounted(performAction);
 function performAction() {
   if (!token) {
     router.push('/login')
+    return
+  }
+  if (forcePasswordChange()) {
+    enumid.value = ''
+    showprofile.value = false
+    changepwd.value = true
   }
 }
 
 function handleCommand(command: number) {
+    if (forcePasswordChange() && command !== 2 && command !== 3) {
+      enumid.value = ''
+      showprofile.value = false
+      changepwd.value = true
+      return
+    }
     if (command == 1) {
       enumid.value = ''
       changepwd.value = false

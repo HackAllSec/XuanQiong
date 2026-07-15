@@ -85,7 +85,13 @@
                 } else {
                     sessionStorage.setItem('avatar', '/avatar.svg');
                 }
-                router.push('/')
+                if (response.data.force_password_change) {
+                    sessionStorage.setItem('force_password_change', '1');
+                    router.push('/modifypwd')
+                } else {
+                    sessionStorage.removeItem('force_password_change');
+                    router.push('/')
+                }
             }
             if (response.data.code == 2) {
                 ElMessage.error(t('app.webui.inputformaterror'));

@@ -83,14 +83,15 @@ func CreateUser(username string, password string, email string, phone string, ro
 	if res == 0 {
 		passwdHash := utils.GenPasswordHash(password)
 		userData := types.XqUser{
-			Username:   username,
-			Password:   passwdHash,
-			Email:      email,
-			Phone:      phone,
-			Role:       role,
-			CreateTime: time.Now(),
-			UpdateTime: time.Now(),
-			Status:     1,
+			Username:            username,
+			Password:            passwdHash,
+			Email:               email,
+			Phone:               phone,
+			Role:                role,
+			ForcePasswordChange: false,
+			CreateTime:          time.Now(),
+			UpdateTime:          time.Now(),
+			Status:              1,
 		}
 		db.Create(&userData)
 		return nil
@@ -127,6 +128,8 @@ func UpdateUser(userid uint64, role int64, username string, password string, ema
 	if password != "" {
 		password = utils.GenPasswordHash(password)
 		updates["password"] = password
+		updates["token"] = ""
+		updates["force_password_change"] = false
 	}
 	if email != "" && user.Email != email && IsEmailValid(email) {
 		updates["email"] = email
@@ -231,6 +234,8 @@ func UpdateUserPassword(userid uint64, oldpassword string, newpassword string) e
 	}
 	newpassword = utils.GenPasswordHash(newpassword)
 	updates["password"] = newpassword
+	updates["token"] = ""
+	updates["force_password_change"] = false
 	updates["update_time"] = time.Now()
 	db.Model(&user).Where("id = ?", userid).Updates(updates)
 	return nil
@@ -264,14 +269,15 @@ func Register(username, password, email, phone, captcha string) int64 {
 		}
 	}
 	userData := types.XqUser{
-		Username:   username,
-		Password:   utils.GenPasswordHash(password),
-		Email:      email,
-		Phone:      phone,
-		Role:       0,
-		Status:     1,
-		CreateTime: time.Now(),
-		UpdateTime: time.Now(),
+		Username:            username,
+		Password:            utils.GenPasswordHash(password),
+		Email:               email,
+		Phone:               phone,
+		Role:                0,
+		ForcePasswordChange: false,
+		Status:              1,
+		CreateTime:          time.Now(),
+		UpdateTime:          time.Now(),
 	}
 	db.Create(&userData)
 	db.Model(&verifycode).Updates(map[string]interface{}{
@@ -301,6 +307,8 @@ func ForgetPassword(email, captcha, password string) error {
 		return fmt.Errorf("User not found")
 	}
 	user.Password = utils.GenPasswordHash(password)
+	user.Token = ""
+	user.ForcePasswordChange = false
 	user.UpdateTime = time.Now()
 	db.Save(&user)
 	db.Model(&verifycode).Updates(map[string]interface{}{

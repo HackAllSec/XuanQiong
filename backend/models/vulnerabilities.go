@@ -299,8 +299,14 @@ func getVdbid() string {
 func InsertVuln(vuln types.XqVulnerability) error {
 	var attachment types.XqAttachment
 	err := checkVulnData(vuln)
+	if err != nil {
+		return err
+	}
 	if vuln.AttachmentID != "" {
-		db.Where("id = ?", vuln.AttachmentID).First(&attachment)
+		res := db.Where("id = ? AND user_id = ?", vuln.AttachmentID, vuln.UserID).First(&attachment)
+		if res.RowsAffected == 0 {
+			return fmt.Errorf("附件不存在或无权限引用")
+		}
 		vuln.AttachmentName = attachment.Name
 	}
 	vuln.VulnType = ""
@@ -339,7 +345,14 @@ func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
 		return err
 	}
 	if vuln.AttachmentID != "" {
-		db.Where("id = ?", vuln.AttachmentID).First(&attachment)
+		query := db.Where("id = ?", vuln.AttachmentID)
+		if roleid != 1 {
+			query = query.Where("user_id = ?", userid)
+		}
+		res = query.First(&attachment)
+		if res.RowsAffected == 0 {
+			return fmt.Errorf("附件不存在或无权限引用")
+		}
 		vuln.AttachmentName = attachment.Name
 	}
 	vuln.ReviewComments = vulnerability.ReviewComments
@@ -473,6 +486,32 @@ func GetFileContent(attachmentID string) (types.XqAttachment, error) {
 	var attachment types.XqAttachment
 	err := db.Where("id = ?", attachmentID).First(&attachment).Error
 	return attachment, err
+}
+
+func CanAccessAttachment(attachmentID string, userid uint64, roleid int64) (types.XqAttachment, error) {
+	attachment, err := GetFileContent(attachmentID)
+	if err != nil {
+		return attachment, err
+	}
+	if roleid == 1 || (userid != 0 && attachment.UserID == userid) {
+		return attachment, nil
+	}
+
+	var publicVuln types.XqVulnerability
+	if db.Select("id").
+		Where("attachment_id = ? AND is_public = ? AND status = 1", attachmentID, true).
+		First(&publicVuln).RowsAffected == 1 {
+		return attachment, nil
+	}
+
+	var avatarUser types.XqUser
+	if db.Select("id").
+		Where("avatar = ? AND status = 1", attachmentID).
+		First(&avatarUser).RowsAffected == 1 {
+		return attachment, nil
+	}
+
+	return types.XqAttachment{}, fmt.Errorf("Permission denied")
 }
 
 // 删除文件

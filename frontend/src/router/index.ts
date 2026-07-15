@@ -29,6 +29,14 @@ const router: Router = createRouter(options)
 router.beforeEach((to, from, next) => {
     // 每次路由变化时调用
     to.redirectedFrom = from
+    if (!sessionStorage.getItem('token')) {
+      sessionStorage.removeItem('force_password_change')
+    }
+    const forcePasswordChange = sessionStorage.getItem('force_password_change') === '1'
+    if (forcePasswordChange && to.path !== '/modifypwd' && to.path !== '/login' && to.path !== '/forgotpwd') {
+      next('/modifypwd')
+      return
+    }
     next();
   });
 export default router

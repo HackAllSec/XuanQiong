@@ -10,6 +10,10 @@ export function formatDate(datetime) {
 
 export function checkLogin() {
   const router = useRouter();
+  if (sessionStorage.getItem('force_password_change') === '1') {
+    router.push('/');
+    return;
+  }
   const token = sessionStorage.getItem('token');
   if (token) {
       try {
@@ -31,6 +35,7 @@ export function checkLogin() {
         return;
       }
   } else {
+    sessionStorage.removeItem('force_password_change')
     router.push('/login');
   }
 }
