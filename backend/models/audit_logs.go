@@ -19,7 +19,7 @@ const auditReadLimit = 4096
 
 func maskSensitiveValue(key string, value string) string {
 	lowerKey := strings.ToLower(key)
-	sensitiveKeywords := []string{"password", "token", "secret", "authorization", "jwt", "captcha", "cookie"}
+	sensitiveKeywords := []string{"password", "token", "secret", "authorization", "jwt", "captcha", "cookie", "key"}
 	for _, keyword := range sensitiveKeywords {
 		if strings.Contains(lowerKey, keyword) {
 			return "***"

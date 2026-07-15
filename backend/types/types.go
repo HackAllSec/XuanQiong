@@ -160,6 +160,32 @@ type XqAuditLog struct {
 	CreateTime    time.Time `json:"create_time"`
 }
 
+type XqMessage struct {
+	ID         uint64     `gorm:"primaryKey" json:"id"`
+	UserID     uint64     `json:"user_id"`
+	Title      string     `json:"title"`
+	Content    string     `gorm:"type:text" json:"content"`
+	Type       string     `json:"type"`
+	RelatedID  string     `json:"related_id"`
+	IsRead     bool       `json:"is_read"`
+	CreateTime time.Time  `json:"create_time"`
+	ReadTime   *time.Time `json:"read_time"`
+}
+
+type XqAPIKey struct {
+	ID         uint64     `gorm:"primaryKey" json:"id"`
+	UserID     uint64     `json:"user_id"`
+	Name       string     `json:"name"`
+	KeyPrefix  string     `json:"key_prefix"`
+	KeyHash    string     `json:"-"`
+	Scopes     string     `json:"scopes"`
+	Status     int64      `json:"status"`
+	LastUsedAt *time.Time `json:"last_used_at"`
+	ExpiresAt  *time.Time `json:"expires_at"`
+	CreateTime time.Time  `json:"create_time"`
+	UpdateTime time.Time  `json:"update_time"`
+}
+
 // 漏洞类型表
 type XqVulnType struct {
 	ID         uint64    `gorm:"primaryKey" json:"id"`
@@ -286,4 +312,13 @@ type RolePayload struct {
 	Description     string   `json:"description"`
 	Status          int64    `json:"status"`
 	PermissionCodes []string `json:"permission_codes"`
+}
+
+type CreateAPIKeyPayload struct {
+	Name      string `json:"name"`
+	ExpiresAt string `json:"expires_at"`
+}
+
+type MessagePayload struct {
+	ID uint64 `json:"id"`
 }

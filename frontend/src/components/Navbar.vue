@@ -35,8 +35,10 @@
             <el-dropdown-menu>
               <el-dropdown-item command=1>{{ t('app.webui.myprofile') }}</el-dropdown-item>
               <el-dropdown-item command=2>{{ t('app.webui.mysubmitvuln')}}</el-dropdown-item>
-              <el-dropdown-item command=3>{{ t('app.webui.modifypassword') }}</el-dropdown-item>
-              <el-dropdown-item command=4>{{ t('app.webui.logout') }}</el-dropdown-item>
+              <el-dropdown-item command=3>{{ t('app.webui.messages') }}</el-dropdown-item>
+              <el-dropdown-item command=4>{{ t('app.webui.apikeymanager') }}</el-dropdown-item>
+              <el-dropdown-item command=5>{{ t('app.webui.modifypassword') }}</el-dropdown-item>
+              <el-dropdown-item command=6>{{ t('app.webui.logout') }}</el-dropdown-item>
             </el-dropdown-menu>
           </template>
           </el-dropdown>
@@ -75,9 +77,15 @@
       router.push('/myvulns');
     }
     if (command == 3) {
-      router.push('/modifypwd');
+      router.push('/messages');
     }
     if (command == 4) {
+      router.push('/apikeys');
+    }
+    if (command == 5) {
+      router.push('/modifypwd');
+    }
+    if (command == 6) {
       logout();
     }
   }

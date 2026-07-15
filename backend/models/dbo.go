@@ -36,7 +36,8 @@ func initDatabase() {
 	db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
 		&types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
 		&types.XqRankingDetail{}, &types.XqScoreRule{}, &types.XqVerifyCode{}, &types.XqRole{},
-		&types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{})
+		&types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{},
+		&types.XqMessage{}, &types.XqAPIKey{})
 	res := db.First(&types.XqSystemConfig{})
 	if res.RowsAffected == 0 {
 		db.Create(&types.XqSystemConfig{
@@ -248,6 +249,8 @@ func init() {
 		&types.XqRolePermission{},
 		&types.XqUserRole{},
 		&types.XqAuditLog{},
+		&types.XqMessage{},
+		&types.XqAPIKey{},
 		&types.XqAttachment{},
 		&types.XqVulnerability{},
 		&types.XqScoreRule{},

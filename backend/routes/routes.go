@@ -12,7 +12,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"xuanqiong/backend/config"
 	"xuanqiong/backend/controllers"
-	"xuanqiong/backend/models"
 )
 
 var (
@@ -71,14 +70,12 @@ func passwordChangeRequiredMiddleware() gin.HandlerFunc {
 	}
 
 	return func(c *gin.Context) {
-		token := c.Request.Header.Get("Authorization")
-		if token == "" {
+		currentUser := currentUserFromContext(c)
+		if currentUser == nil {
 			c.Next()
 			return
 		}
-
-		currentUser := models.GetUserByToken(token)
-		if currentUser == nil || !currentUser.ForcePasswordChange || allowedPaths[c.Request.URL.Path] {
+		if !currentUser.ForcePasswordChange || allowedPaths[c.Request.URL.Path] {
 			c.Next()
 			return
 		}
@@ -114,6 +111,12 @@ func defineRouter() {
 	route.POST(apiuri+"/updateavatar", protectedRoute([]string{"profile.avatar.update"}, "profile.avatar.update", controllers.UpdateAvatar)...)
 	route.POST(apiuri+"/updateuserinfo", protectedRoute([]string{"profile.update"}, "profile.update", controllers.UpdateUserInfo)...)
 	route.POST(apiuri+"/updatepassword", protectedRoute([]string{"password.update"}, "password.update", controllers.UpdateUserPassword)...)
+	route.GET(apiuri+"/messages", protectedRoute([]string{"message.read"}, "message.read", controllers.GetMessages)...)
+	route.POST(apiuri+"/readmessage", protectedRoute([]string{"message.update"}, "message.read_one", controllers.MarkMessageRead)...)
+	route.POST(apiuri+"/readallmessages", protectedRoute([]string{"message.update"}, "message.read_all", controllers.MarkAllMessagesRead)...)
+	route.GET(apiuri+"/apikeys", protectedRoute([]string{"api.key.read"}, "api_key.read", controllers.GetAPIKeys)...)
+	route.POST(apiuri+"/addapikey", protectedRoute([]string{"api.key.manage"}, "api_key.create", controllers.CreateAPIKey)...)
+	route.POST(apiuri+"/delapikey", protectedRoute([]string{"api.key.manage"}, "api_key.delete", controllers.DeleteAPIKey)...)
 
 	// 管理员权限
 	route.POST(apiuri+"/adduser", protectedRoute([]string{"user.create"}, "user.create", controllers.CreateUser)...)
@@ -145,6 +148,10 @@ func defineRouter() {
 	route.POST(apiuri+"/delrole", protectedRoute([]string{"role.delete"}, "role.delete", controllers.DeleteRole)...)
 	route.GET(apiuri+"/getpermissions", protectedRoute([]string{"role.read", "role.create", "role.update"}, "permission.read", controllers.GetPermissions)...)
 	route.GET(apiuri+"/getauditlogs", protectedRoute([]string{"audit.log.read"}, "audit.read", controllers.GetAuditLogs)...)
+	route.GET(apiuri+"/exportvulns", protectedRoute([]string{"vuln.export"}, "vuln.export", controllers.ExportVulns)...)
+	route.POST(apiuri+"/importvulns", protectedRoute([]string{"vuln.import"}, "vuln.import", controllers.ImportVulns)...)
+	route.GET(apiuri+"/exportbackup", protectedRoute([]string{"backup.manage"}, "backup.export", controllers.ExportBackup)...)
+	route.POST(apiuri+"/restorebackup", protectedRoute([]string{"backup.manage"}, "backup.restore", controllers.RestoreBackup)...)
 }
 
 // 前后端分离的路由
@@ -156,6 +163,9 @@ func api() {
 	corsConfig.AllowHeaders = strings.Split(config.Config.Server.AllowHeaders, ",")
 	if !containsHeader(corsConfig.AllowHeaders, "X-Auth-Token") {
 		corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "X-Auth-Token")
+	}
+	if !containsHeader(corsConfig.AllowHeaders, "X-API-Key") {
+		corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "X-API-Key")
 	}
 
 	route.Use(cors.New(corsConfig))

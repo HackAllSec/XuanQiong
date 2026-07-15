@@ -200,7 +200,25 @@ export default {
             forgotnotice: '您可以使用以下步骤重置 admin 账户的密码：',
             fstep1: '1. 删除 xq_users 表中的 admin 账户',
             fstep2: '2. 重新启动服务程序',
-            forgotnotice2: '此时系统将重新初始化 admin 用户的密码。'
+            forgotnotice2: '此时系统将重新初始化 admin 用户的密码。',
+            opscenter: '集成与运维',
+            apikeymanager: 'API Key 管理',
+            apikeyname: 'API Key 名称',
+            apikeyprefix: 'Key 前缀',
+            apikeyshownonce: 'API Key 明文仅显示一次，请立即妥善保存。',
+            expiresat: '过期时间',
+            lastusedat: '最后使用时间',
+            vulnimportexport: '漏洞导入导出',
+            importvulns: '导入漏洞 CSV',
+            exportvulns: '导出漏洞 CSV',
+            csvnotice: 'CSV 导入会创建待审核漏洞，不会直接公开。',
+            backuprestore: '数据备份和恢复',
+            exportbackup: '导出备份',
+            restorebackup: '恢复备份',
+            restorenotice: '恢复备份会覆盖当前核心数据，请确认备份来源可信且内容正确。',
+            restoresuccess: '恢复成功',
+            restorefail: '恢复失败',
+            imported: '已导入'
         }
     }
 };

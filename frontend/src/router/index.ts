@@ -16,6 +16,8 @@ const routes: RouteRecordRaw[] = [
  { path: '/profile', name: 'Profile', component: () => import('../views/Profile.vue') },
  { path: '/modifypwd', name: 'Modifypwd', component: () => import('../views/Modifypasswd.vue') },
  { path: '/myvulns', name: 'Myvulns', component: () => import('../views/Myvulns.vue') },
+ { path: '/messages', name: 'Messages', component: () => import('../views/Messages.vue') },
+ { path: '/apikeys', name: 'APIKeys', component: () => import('../views/APIKeys.vue') },
 ]
 
 // RouterOptions是路由选项类型

@@ -128,7 +128,28 @@ export default {
             captchasucc: 'Captcha Successful',
             captchafail: 'Captcha Failed',
             captchaerr: 'Captcha Error',
-            restfail: 'Reset Password Failed, please check and try again'
+            restfail: 'Reset Password Failed, please check and try again',
+            messages: 'Messages',
+            title: 'Title',
+            content: 'Content',
+            unread: 'Unread',
+            read: 'Read',
+            markread: 'Mark Read',
+            markallread: 'Mark All Read',
+            operate: 'Operations',
+            apikeymanager: 'API Key Manager',
+            apikeyname: 'API Key Name',
+            apikeyprefix: 'Key Prefix',
+            apikeyshownonce: 'The API key plaintext is shown only once. Store it immediately.',
+            expiresat: 'Expires At',
+            lastusedat: 'Last Used At',
+            add: 'Add',
+            addsuccess: 'Add Successful',
+            addfail: 'Add Failed',
+            delete: 'Delete',
+            confirmdelete: 'Are you sure to delete?',
+            delsuccess: 'Delete Successful',
+            delfail: 'Delete Failed'
         }
     }
 };

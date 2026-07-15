@@ -33,8 +33,15 @@ func setupModelTestDB(t *testing.T) {
 		&types.XqPermission{},
 		&types.XqRolePermission{},
 		&types.XqUserRole{},
+		&types.XqVulnType{},
+		&types.XqVulnerability{},
+		&types.XqAttachment{},
+		&types.XqScoreRule{},
+		&types.XqRankingDetail{},
 		&types.XqVerifyCode{},
 		&types.XqAuditLog{},
+		&types.XqMessage{},
+		&types.XqAPIKey{},
 	); err != nil {
 		t.Fatalf("migrate test database: %v", err)
 	}

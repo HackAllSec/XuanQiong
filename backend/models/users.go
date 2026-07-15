@@ -60,6 +60,9 @@ func GetUserByToken(token string) *types.XqUser {
 	var jwt types.XqJwtConfig
 	db.First(&jwt)
 	if token != "" {
+		if strings.HasPrefix(token, "ApiKey ") {
+			return GetUserByAPIKey(strings.TrimPrefix(token, "ApiKey "))
+		}
 		token = strings.TrimPrefix(token, "Bearer ")
 		res := db.Raw("SELECT * FROM xq_users WHERE token = ? AND status = 1", token).Scan(&user).RowsAffected
 		if res == 0 {
@@ -400,7 +403,9 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
 	if status != 1 && status != 2 {
 		return fmt.Errorf("Invalid status")
 	}
-	return db.Transaction(func(tx *gorm.DB) error {
+	var auditedVuln types.XqVulnerability
+	var totalScore int64
+	err := db.Transaction(func(tx *gorm.DB) error {
 		var vuln types.XqVulnerability
 		res := tx.Where("id = ? AND status = 0", vulnid).First(&vuln)
 		if res.RowsAffected != 1 {
@@ -419,6 +424,9 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
 			if result.RowsAffected != 1 {
 				return fmt.Errorf("Vuln has been audited.")
 			}
+			auditedVuln = vuln
+			auditedVuln.Status = 2
+			auditedVuln.ReviewComments = review
 			return nil
 		}
 
@@ -463,7 +471,7 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
 		if err != nil {
 			return err
 		}
-		totalScore := int64(math.Round(cvss*10)) + pocScore + expScore + incidenceScore + otherScore
+		totalScore = int64(math.Round(cvss*10)) + pocScore + expScore + incidenceScore + otherScore
 
 		updates["status"] = 1
 		updates["cvss"] = cvss
@@ -487,13 +495,37 @@ func AuditVuln(vulnid string, status int64, review string, cvss float64, prid ui
 		if err := tx.Create(&rankdetail).Error; err != nil {
 			return err
 		}
-		return tx.Model(&types.XqUser{}).
+		if err := tx.Model(&types.XqUser{}).
 			Where("id = ?", vuln.UserID).
 			Updates(map[string]interface{}{
 				"ranking":     gorm.Expr("ranking + ?", totalScore),
 				"update_time": time.Now(),
-			}).Error
+			}).Error; err != nil {
+			return err
+		}
+		auditedVuln = vuln
+		auditedVuln.Status = 1
+		auditedVuln.CVSS = cvss
+		auditedVuln.VulnLevel = vulnLevel
+		return nil
 	})
+	if err != nil {
+		return err
+	}
+	_ = createAuditResultMessage(auditedVuln)
+	noticeContent := fmt.Sprintf("漏洞 %s（%s）审核完成，状态：%d", auditedVuln.ID, auditedVuln.VulnName, auditedVuln.Status)
+	if totalScore > 0 {
+		noticeContent += fmt.Sprintf("，积分：%d", totalScore)
+	}
+	if auditedVuln.ReviewComments != "" {
+		noticeContent += "，审核意见：" + auditedVuln.ReviewComments
+	}
+	_ = SendEventNotice(EventNotice{
+		Title:   "漏洞审核通知",
+		Content: noticeContent,
+		Type:    "vuln_audit",
+	})
+	return nil
 }
 
 // 获取用户积分Top10

@@ -44,7 +44,15 @@ func currentUserMiddleware() gin.HandlerFunc {
 		if token != "" {
 			if currentUser := models.GetUserByToken(token); currentUser != nil {
 				c.Set(currentUserContextKey, currentUser)
+				c.Next()
+				return
 			}
+		}
+		if apiKey := c.GetHeader("X-API-Key"); apiKey != "" {
+			c.Request.Header.Set("Authorization", "ApiKey "+apiKey)
+		}
+		if currentUser := models.GetUserByAPIKey(c.GetHeader("X-API-Key")); currentUser != nil {
+			c.Set(currentUserContextKey, currentUser)
 		}
 		c.Next()
 	}

@@ -128,7 +128,28 @@ export default {
             captchasucc: '验证码获取成功',
             captchafail: '验证码获取失败',
             captchaerr: '验证码错误',
-            restfail: '重置密码失败，请检查后重试'
+            restfail: '重置密码失败，请检查后重试',
+            messages: '消息中心',
+            title: '标题',
+            content: '内容',
+            unread: '未读',
+            read: '已读',
+            markread: '标记已读',
+            markallread: '全部标记已读',
+            operate: '操作',
+            apikeymanager: 'API Key 管理',
+            apikeyname: 'API Key 名称',
+            apikeyprefix: 'Key 前缀',
+            apikeyshownonce: 'API Key 明文仅显示一次，请立即妥善保存。',
+            expiresat: '过期时间',
+            lastusedat: '最后使用时间',
+            add: '添加',
+            addsuccess: '添加成功',
+            addfail: '添加失败',
+            delete: '删除',
+            confirmdelete: '确定删除吗？',
+            delsuccess: '删除成功',
+            delfail: '删除失败'
         }
     }
 };

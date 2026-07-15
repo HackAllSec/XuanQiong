@@ -200,7 +200,25 @@ export default {
             forgotnotice: 'You can use the following steps to reset the password of your admin account:',
             fstep1: '1. Delete the admin account from the xq_users table',
             fstep2: '2. Restart the service program',
-            forgotnotice2: 'At this point, the system will reinitialize the password for the admin user.'
+            forgotnotice2: 'At this point, the system will reinitialize the password for the admin user.',
+            opscenter: 'Integrations & Ops',
+            apikeymanager: 'API Key Manager',
+            apikeyname: 'API Key Name',
+            apikeyprefix: 'Key Prefix',
+            apikeyshownonce: 'The API key plaintext is shown only once. Store it immediately.',
+            expiresat: 'Expires At',
+            lastusedat: 'Last Used At',
+            vulnimportexport: 'Vulnerability Import/Export',
+            importvulns: 'Import Vulnerability CSV',
+            exportvulns: 'Export Vulnerability CSV',
+            csvnotice: 'CSV import creates unaudited vulnerabilities and does not publish them directly.',
+            backuprestore: 'Data Backup and Restore',
+            exportbackup: 'Export Backup',
+            restorebackup: 'Restore Backup',
+            restorenotice: 'Restoring a backup overwrites current core data. Confirm the backup source and content first.',
+            restoresuccess: 'Restore Successful',
+            restorefail: 'Restore Failed',
+            imported: 'Imported'
         }
     }
 };

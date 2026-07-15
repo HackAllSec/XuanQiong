@@ -79,13 +79,14 @@ import {
   Files,
   DataBoard,
   Tickets,
+  Tools,
 } from '@element-plus/icons-vue'
 import { computed, markRaw, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import api from '../api'
 import { brandingState as branding, loadBranding } from '../branding'
-import { clearAuthSession, getStoredPermissions, hasPermission } from '../auth'
+import { clearAuthSession, getStoredPermissions, hasAnyPermission, hasPermission } from '../auth'
 import Dashboard from '../pages/Dashboard.vue'
 import Userlist from '../pages/Userlist.vue'
 import RoleManager from '../pages/RoleManager.vue'
@@ -98,6 +99,7 @@ import VulnType from '../pages/VulnType.vue'
 import Profile from '../pages/Profile.vue'
 import Modifypasswd from '../pages/Modifypasswd.vue'
 import AuditLogs from '../pages/AuditLogs.vue'
+import OpsCenter from '../pages/OpsCenter.vue'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -120,6 +122,7 @@ const menuComponents: Record<string, any> = {
   audited: markRaw(Audited),
   scoreRule: markRaw(ScoreRule),
   auditLogs: markRaw(AuditLogs),
+  opsCenter: markRaw(OpsCenter),
 }
 
 const topLevelMenus = computed(() => {
@@ -141,6 +144,9 @@ const topLevelMenus = computed(() => {
   }
   if (hasPermission('audit.log.read')) {
     items.push({ key: 'auditLogs', label: t('app.webui.auditlogs'), icon: markRaw(Files) })
+  }
+  if (hasAnyPermission(['api.key.read', 'vuln.import', 'vuln.export', 'backup.manage'])) {
+    items.push({ key: 'opsCenter', label: t('app.webui.opscenter'), icon: markRaw(Tools) })
   }
   return items
 })
