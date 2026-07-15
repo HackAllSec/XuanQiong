@@ -99,6 +99,10 @@ func CreateUser(c *gin.Context) {
 		password, _ := data["password"].(string)
 		email, _ := data["email"].(string)
 		phone, _ := data["phone"].(string)
+		if username == "" || password == "" {
+			c.JSON(200, gin.H{"code": 3, "msg": "Username and password cannot be empty"})
+			return
+		}
 		roleIDs := parseRoleIDs(data["role_ids"])
 		err := models.CreateUserWithRoles(username, password, email, phone, roleIDs)
 		if err == nil {
@@ -394,6 +398,12 @@ func MultiDeleteUsers(c *gin.Context) {
 			return
 		}
 		ids, _ := data["ids"].([]interface{})
+		for _, id := range ids {
+			if userID, ok := id.(float64); ok && uint64(userID) == currentUser.ID {
+				c.JSON(200, gin.H{"code": 0, "msg": "You can't delete yourself"})
+				return
+			}
+		}
 		err := models.MultiDelete("user", ids)
 		if err != nil {
 			c.JSON(200, gin.H{"code": 3, "msg": err.Error()})

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"gorm.io/gorm"
 	"xuanqiong/backend/types"
 	"xuanqiong/backend/utils"
 )
@@ -16,6 +17,10 @@ import (
 func CheckLogin(username string, password string) *types.XqUser {
 	var user types.XqUser
 	var jwt types.XqJwtConfig
+	username = strings.TrimSpace(username)
+	if username == "" || password == "" {
+		return nil
+	}
 	db.First(&jwt)
 	res := db.Raw("SELECT * FROM xq_users WHERE username = ? AND status = 1", username).Scan(&user).RowsAffected
 	if res == 0 {
@@ -26,8 +31,14 @@ func CheckLogin(username string, password string) *types.XqUser {
 	}
 	if utils.IsHashEqual(user.Password, password) {
 		expires_in := time.Now().Add(time.Second * time.Duration(jwt.JwtExpires)).Unix()
-		token, _ := utils.GenJWTToken(user.Username, user.Role, expires_in, jwt.JwtSecret)
-		db.Model(&user).Update("token", token)
+		token, err := utils.GenJWTToken(user.Username, user.Role, expires_in, jwt.JwtSecret)
+		if err != nil {
+			return nil
+		}
+		if err := db.Model(&user).Update("token", token).Error; err != nil {
+			return nil
+		}
+		user.Token = token
 		return &user
 	}
 	return nil
@@ -79,6 +90,15 @@ func CleanToken(username string) error {
 // 创建用户
 func CreateUser(username string, password string, email string, phone string, role int64) error {
 	var user types.XqUser
+	username = strings.TrimSpace(username)
+	email = strings.TrimSpace(email)
+	phone = strings.TrimSpace(phone)
+	if username == "" || password == "" {
+		return fmt.Errorf("username and password cannot be empty")
+	}
+	if email != "" && !IsEmailValid(email) {
+		return fmt.Errorf("invalid email address")
+	}
 	res := db.Raw("SELECT * FROM xq_users WHERE username = ?", username).Scan(&user).RowsAffected
 	if res == 0 {
 		passwdHash := utils.GenPasswordHash(password)
@@ -93,7 +113,9 @@ func CreateUser(username string, password string, email string, phone string, ro
 			UpdateTime:          time.Now(),
 			Status:              1,
 		}
-		db.Create(&userData)
+		if err := db.Create(&userData).Error; err != nil {
+			return err
+		}
 		if role == 1 {
 			_ = AssignRoleByCode(userData.ID, "super_admin")
 		}
@@ -365,9 +387,8 @@ func ForgetPassword(email, captcha, password string) error {
 func GetUserVulnList(userid uint64, page string, pageSize string) (int64, []types.XqVulnerability) {
 	var vulnDatas []types.XqVulnerability
 	var totalCount int64
-	pageNum, _ := strconv.Atoi(page)
-	pageSizeNum, _ := strconv.Atoi(pageSize)
-	db.Model(&vulnDatas).Where("user_id = ? AND status = 1", userid).Count(&totalCount)
+	pageNum, pageSizeNum := normalizePagination(page, pageSize)
+	db.Model(&vulnDatas).Where("user_id = ?", userid).Count(&totalCount)
 	db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
 		Where("user_id = ?", userid).Limit(pageSizeNum).Offset((pageNum - 1) * pageSizeNum).Order("create_time DESC").
 		Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
@@ -376,72 +397,103 @@ func GetUserVulnList(userid uint64, page string, pageSize string) (int64, []type
 
 // 审核漏洞-管理员
 func AuditVuln(vulnid string, status int64, review string, cvss float64, prid uint64, erid uint64, irid uint64, orid uint64) error {
-	var vuln types.XqVulnerability
-	updates := make(map[string]interface{})
-	res := db.Where("id = ?", vulnid).First(&vuln)
-	if res.RowsAffected != 1 {
-		return fmt.Errorf("Vuln is not exits.")
+	if status != 1 && status != 2 {
+		return fmt.Errorf("Invalid status")
 	}
-	if vuln.Status != 0 {
-		return fmt.Errorf("Vuln has been audited.")
-	}
-	if status == 1 {
-		var scoreRule types.XqScoreRule
-		var vulnScore int64
-		updates["status"] = 1
-		if cvss != vuln.CVSS {
-			updates["cvss"] = cvss
+	return db.Transaction(func(tx *gorm.DB) error {
+		var vuln types.XqVulnerability
+		res := tx.Where("id = ? AND status = 0", vulnid).First(&vuln)
+		if res.RowsAffected != 1 {
+			return fmt.Errorf("Vuln is not exits or has been audited.")
 		}
-		fmt.Println(cvss)
-		if cvss > 0 && cvss <= 3.9 {
-			updates["vuln_level"] = "Low"
-		} else if cvss >= 4 && cvss <= 6.9 {
-			updates["vuln_level"] = "Medium"
-		} else if cvss >= 7 && cvss <= 8.9 {
-			updates["vuln_level"] = "High"
-		} else if cvss >= 9 && cvss <= 10 {
-			updates["vuln_level"] = "Critical"
-		} else {
+
+		updates := make(map[string]interface{})
+		if status == 2 {
+			updates["status"] = 2
+			updates["review_comments"] = review
+			updates["update_time"] = time.Now()
+			result := tx.Model(&types.XqVulnerability{}).Where("id = ? AND status = 0", vulnid).Updates(updates)
+			if result.Error != nil {
+				return result.Error
+			}
+			if result.RowsAffected != 1 {
+				return fmt.Errorf("Vuln has been audited.")
+			}
+			return nil
+		}
+
+		var vulnLevel string
+		switch {
+		case cvss > 0 && cvss <= 3.9:
+			vulnLevel = "Low"
+		case cvss >= 4 && cvss <= 6.9:
+			vulnLevel = "Medium"
+		case cvss >= 7 && cvss <= 8.9:
+			vulnLevel = "High"
+		case cvss >= 9 && cvss <= 10:
+			vulnLevel = "Critical"
+		default:
 			return fmt.Errorf("Invalid cvss")
 		}
-		vulnScore = int64(math.Round(cvss * 10))
-		db.Where("id = ?", prid).First(&scoreRule)
-		pocScore := int64(math.Round(scoreRule.Score * scoreRule.Coefficient))
-		db.Where("id = ?", erid).First(&scoreRule)
-		expScore := int64(math.Round(scoreRule.Score * scoreRule.Coefficient))
-		db.Where("id = ?", irid).First(&scoreRule)
-		incidenceScore := int64(math.Round(scoreRule.Score * scoreRule.Coefficient))
-		db.Where("id = ?", orid).First(&scoreRule)
-		otherScore := int64(math.Round(scoreRule.Score * scoreRule.Coefficient))
-		totalScore := vulnScore + pocScore + expScore + incidenceScore + otherScore
-		// 更新漏洞信息
+
+		getScore := func(id uint64, ruleType int64) (int64, error) {
+			if id == 0 {
+				return 0, nil
+			}
+			var scoreRule types.XqScoreRule
+			if tx.Where("id = ? AND type = ?", id, ruleType).First(&scoreRule).RowsAffected != 1 {
+				return 0, fmt.Errorf("invalid score rule")
+			}
+			return int64(math.Round(scoreRule.Score * scoreRule.Coefficient)), nil
+		}
+
+		pocScore, err := getScore(prid, 1)
+		if err != nil {
+			return err
+		}
+		expScore, err := getScore(erid, 2)
+		if err != nil {
+			return err
+		}
+		incidenceScore, err := getScore(irid, 3)
+		if err != nil {
+			return err
+		}
+		otherScore, err := getScore(orid, 4)
+		if err != nil {
+			return err
+		}
+		totalScore := int64(math.Round(cvss*10)) + pocScore + expScore + incidenceScore + otherScore
+
+		updates["status"] = 1
+		updates["cvss"] = cvss
+		updates["vuln_level"] = vulnLevel
 		updates["update_time"] = time.Now()
-		db.Model(&vuln).Where("id = ?", vulnid).Updates(updates)
-		// 插入积分明细表
+		result := tx.Model(&types.XqVulnerability{}).Where("id = ? AND status = 0", vulnid).Updates(updates)
+		if result.Error != nil {
+			return result.Error
+		}
+		if result.RowsAffected != 1 {
+			return fmt.Errorf("Vuln has been audited.")
+		}
+
 		rankdetail := types.XqRankingDetail{
 			UserID:     vuln.UserID,
 			VulnID:     vulnid,
 			Ranking:    totalScore,
 			CreateTime: time.Now(),
+			UpdateTime: time.Now(),
 		}
-		db.Create(&rankdetail)
-		// 更新用户总积分
-		var user types.XqUser
-		db.Where("id = ?", vuln.UserID).First(&user)
-		updates = make(map[string]interface{})
-		updates["ranking"] = user.Ranking + totalScore
-		updates["update_time"] = time.Now()
-		db.Model(&user).Where("id = ?", vuln.UserID).Updates(updates)
-		return nil
-	} else if status == 2 {
-		updates["status"] = 2
-		updates["review_comments"] = review
-		updates["update_time"] = time.Now()
-		db.Model(&vuln).Where("id = ?", vulnid).Updates(updates)
-		return nil
-	} else {
-		return fmt.Errorf("Invalid status")
-	}
+		if err := tx.Create(&rankdetail).Error; err != nil {
+			return err
+		}
+		return tx.Model(&types.XqUser{}).
+			Where("id = ?", vuln.UserID).
+			Updates(map[string]interface{}{
+				"ranking":     gorm.Expr("ranking + ?", totalScore),
+				"update_time": time.Now(),
+			}).Error
+	})
 }
 
 // 获取用户积分Top10

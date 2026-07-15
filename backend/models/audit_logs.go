@@ -15,6 +15,7 @@ import (
 )
 
 const auditPayloadLimit = 2048
+const auditReadLimit = 4096
 
 func maskSensitiveValue(key string, value string) string {
 	lowerKey := strings.ToLower(key)
@@ -148,9 +149,11 @@ func ShouldCaptureRequestBody(request *http.Request) bool {
 	if strings.Contains(contentType, "multipart/form-data") {
 		return false
 	}
+	if request.ContentLength < 0 || request.ContentLength > auditReadLimit {
+		return false
+	}
 	return strings.Contains(contentType, "application/json") ||
-		strings.Contains(contentType, "application/x-www-form-urlencoded") ||
-		contentType == ""
+		strings.Contains(contentType, "application/x-www-form-urlencoded")
 }
 
 func CaptureRequestBody(request *http.Request) ([]byte, error) {

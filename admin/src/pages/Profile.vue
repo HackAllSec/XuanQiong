@@ -20,7 +20,7 @@
     import { ref, onMounted } from 'vue'
     import { useI18n } from 'vue-i18n';
     import api from '../api'
-    import { getUploadHeaders } from '../auth'
+    import { clearAuthSession, getUploadHeaders } from '../auth'
 
     const { t } = useI18n();
     const token = sessionStorage.getItem('token')
@@ -39,10 +39,9 @@
             const response = await api.get('/api/v1/userinfo')
             userinfo.value = response.data.data
             if (token && response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
+                return
             }
         } catch (error) {
             // 处理请求错误
@@ -53,6 +52,10 @@
         avatar.value = URL.createObjectURL(file)
     }
     const handleSuccess = (response) => {
+        if (response?.code !== 1 || !response?.data) {
+            ElMessage.error(t('app.webui.modifyfail'))
+            return
+        }
         ElMessage.success(t('app.webui.uploadsucc'))
         sessionStorage.setItem('avatar', '/download/file?id=' + response.data)
         location.reload()
@@ -76,7 +79,6 @@
     }
 
     const modifyUserInfo = async () => {
-        console.log(userinfo.value)
         try {
             const data = {
                 "username": userinfo.value.username,
@@ -85,9 +87,7 @@
             }
             const response = await api.post('/api/v1/updateuserinfo', data)
             if (response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
             } else if (response.data.code == 1) {
                 ElMessage.success(t('app.webui.modifysucc'))
@@ -96,7 +96,7 @@
             }
         } catch (error) {
             // 处理请求错误
-            console.error(error);
+            ElMessage.error(t('app.webui.modifyfail'))
         }
     }
 </script>

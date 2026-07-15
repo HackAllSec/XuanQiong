@@ -4,13 +4,15 @@
 <script lang="ts" setup>
     import { ref } from 'vue'
     import { UploadFilled } from '@element-plus/icons-vue'
-    import { useRoute } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
     import { onMounted } from 'vue';
     import { useI18n } from 'vue-i18n';
     import api from '../api'
+    import { clearAuthSession } from '../auth'
 
     const { t } = useI18n()
-    const router = useRoute();
+    const route = useRoute();
+    const router = useRouter();
     const token = sessionStorage.getItem('token')
     const url = ref('/api/v1/addvuln')
     const poc = ref('xray')
@@ -161,15 +163,16 @@ Connection: close
         });
     });
     function checkFrom () {
-        const id = router.query.id
-        if (router.redirectedFrom.path === '/myvulns') {
-            const data = JSON.parse(localStorage.getItem('form'))
+        const id = route.query.id
+        if (route.redirectedFrom?.path === '/myvulns') {
+            const data = JSON.parse(sessionStorage.getItem('edit_vuln_form') || '{}')
+            sessionStorage.removeItem('edit_vuln_form')
             if (data.id === id) {
                 form.value = data
                 url.value = '/api/v1/editvuln'
             }
         } else {
-            localStorage.removeItem('form')
+            sessionStorage.removeItem('edit_vuln_form')
         }
     }
     async function getVulnTypes() {
@@ -248,7 +251,10 @@ Connection: close
     }
     
     const handleSuccess = (response) => {
-        //console.log(response.file_id)
+        if (response?.code !== 1 || !response?.file_id) {
+            ElMessage.error(t('app.webui.modifyfail'))
+            return
+        }
         form.value.attachment_id = response.file_id
     }
     const handleRemove = async () => {
@@ -266,18 +272,16 @@ Connection: close
         try {
             const response = await api.post(url.value, form.value)
             if (response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
             } else if (response.data.code == 1) {
                 submitSuccess()
             } else {
                 ElMessage.error(t('app.webui.submitfailnotice'))
             }
-        } catch (error) {
+        } catch {
             // 处理请求错误
-            console.error(error);
+            ElMessage.error(t('app.webui.submitfailnotice'))
         }
     }
 </script>

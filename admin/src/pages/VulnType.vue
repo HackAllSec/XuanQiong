@@ -283,10 +283,10 @@ async function addVulnType() {
         //ElMessage.error(t('app.webui.loginerr2'));
     }
 }
-const editVulnType = () => {
+const editVulnType = async () => {
     //console.log(vulntypeForm.value)
     try {
-        const response = api.post("/api/v1/updatevulntype", vulntypeForm.value)
+        const response = await api.post("/api/v1/updatevulntype", vulntypeForm.value)
         //console.log(response)
         if (response.data.code == 1) {
             ElMessage({

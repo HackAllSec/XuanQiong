@@ -110,9 +110,8 @@
             } else if (response.data.code == 3) {
                 ElMessage.error(t('app.webui.loginerr4') + ' ' + response.data.times + ' ' + t('app.webui.times'))
             } else {}
-        } catch (error) {
+        } catch {
             // 处理请求错误
-            console.error(error);
             ElMessage.error('登录请求失败');
         }
     }

@@ -32,7 +32,7 @@
                 <el-input v-model="form.nvd" />
             </el-form-item>
             <el-form-item :label="t('app.webui.edbid')" style="width: 29%">
-                <el-input v-model="form.edbid" />
+                <el-input v-model="form.edb" />
             </el-form-item>
             <el-form-item :label="t('app.webui.cnnvdid')" style="width: 29%">
                 <el-input v-model="form.cnnvd" />
@@ -105,7 +105,7 @@
             </el-form-item>
             <el-form-item style="width: 100%;  margin-left: 35%;">
                 <el-button v-if="showback" size="large" @click="goBack" style="width: 30%; font-size: 16px;" auto-insert-space>{{ t('app.webui.back') }}</el-button>
-                <el-button type="primary" size="large" @click="onSubmit" style="width: 30%; font-size: 16px;" auto-insert-space>{{ t('app.webui.submitvuln') }}</el-button>
+                <el-button type="primary" size="large" :loading="submitting" :disabled="submitting" @click="onSubmit" style="width: 30%; font-size: 16px;" auto-insert-space>{{ t('app.webui.submitvuln') }}</el-button>
             </el-form-item>
             </el-form>
         </div>
@@ -118,7 +118,7 @@
     import { onMounted } from 'vue';
     import { useI18n } from 'vue-i18n';
     import api from '../api'
-    import { getUploadHeaders } from '../auth'
+    import { clearAuthSession, getUploadHeaders } from '../auth'
     import { checkLogin } from '../utils'
 
     const { t } = useI18n()
@@ -128,6 +128,7 @@
     const uploadHeaders = getUploadHeaders()
     const url = ref('/api/v1/addvuln')
     const showback = ref(false)
+    const submitting = ref(false)
     const poc = ref('xray')
     const exp = ref('xray')
     const vulntype = ref([])
@@ -275,22 +276,19 @@ Connection: close
             fn();
         });
     });
-    function checkFrom () {
+    async function checkFrom () {
         const id = route.query.id
-        if (route.redirectedFrom.path === '/myvulns') {
-            const data = JSON.parse(localStorage.getItem('form'))
-            if (data.id === id) {
-                form.value = data
+        if (route.redirectedFrom?.path === '/myvulns' && id) {
+            const response = await api.get('/api/v1/getvulndtl?id=' + id)
+            if (response.data.code === 1 && response.data.data?.id === id) {
+                form.value = response.data.data
                 url.value = '/api/v1/editvuln'
             }
             showback.value = true
-        } else {
-            localStorage.removeItem('form')
         }
     }
     
     function goBack() {
-        localStorage.removeItem('form')
         router.back()
         //router.push('/myvulns')
     }
@@ -370,7 +368,10 @@ Connection: close
     }
     
     const handleSuccess = (response) => {
-        //console.log(response.file_id)
+        if (response?.code !== 1 || !response?.file_id) {
+            ElMessage.error(t('app.webui.submitfail'))
+            return
+        }
         form.value.attachment_id = response.file_id
     }
     const handleRemove = async () => {
@@ -384,13 +385,14 @@ Connection: close
         }
     }
     const onSubmit = async () => {
-        //console.log(form.value)
+        if (submitting.value) {
+            return
+        }
+        submitting.value = true
         try {
             const response = await api.post(url.value, form.value)
             if (response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
             } else if (response.data.code == 1) {
                 submitSuccess()
@@ -399,7 +401,9 @@ Connection: close
             }
         } catch (error) {
             // 处理请求错误
-            console.error(error);
+            ElMessage.error(t('app.webui.submitfailnotice'))
+        } finally {
+            submitting.value = false
         }
     }
 </script>

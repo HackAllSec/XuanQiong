@@ -71,7 +71,8 @@ func GetVulnDetail(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
 	currentUser := models.GetUserByToken(token)
 	if currentUser != nil {
-		res := models.GetVulnDetailAuthed(id, currentUser.ID, currentUser.Role)
+		canReadSensitive := models.UserHasAnyPermission(currentUser.ID, "vuln.read", "vuln.audit.read")
+		res := models.GetVulnDetailAuthed(id, currentUser.ID, canReadSensitive)
 		c.JSON(200, gin.H{"code": 1, "data": res})
 		return
 	}
@@ -111,7 +112,8 @@ func EditVuln(c *gin.Context) {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input:" + err.Error()})
 			return
 		}
-		err := models.EditVuln(vulnerabilities, currentUser.ID, currentUser.Role)
+		canEditAny := models.UserHasAnyPermission(currentUser.ID, "vuln.edit.any")
+		err := models.EditVuln(vulnerabilities, currentUser.ID, canEditAny)
 		if err != nil {
 			c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
 			return
@@ -196,6 +198,10 @@ func UploadFile(c *gin.Context) {
 			c.JSON(400, gin.H{"code": 2, "msg": "Invalid Input"})
 			return
 		}
+		if file.Size <= 0 || file.Size > 10<<20 {
+			c.JSON(400, gin.H{"code": 3, "msg": "File size exceeds limit"})
+			return
+		}
 		res, err := models.StoreFile(file, currentUser.ID)
 		if err != nil {
 			c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
@@ -216,9 +222,11 @@ func DownloadFile(c *gin.Context) {
 	var roleid int64
 	if currentUser != nil {
 		userid = currentUser.ID
-		roleid = currentUser.Role
+		if models.UserHasAnyPermission(currentUser.ID, "attachment.read.all") {
+			roleid = 1
+		}
 	}
-	file, err := models.CanAccessAttachment(fileId, userid, roleid)
+	file, err := models.CanAccessAttachment(fileId, userid, roleid == 1)
 	if err != nil {
 		c.JSON(400, gin.H{"code": 3, "msg": err.Error()})
 		return

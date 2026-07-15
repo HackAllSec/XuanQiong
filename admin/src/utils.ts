@@ -25,8 +25,7 @@ export function checkLogin() {
             location.reload();
             return;
         }
-      } catch (error) {
-        console.log(error)
+      } catch {
         clearAuthSession()
         location.reload();
         return;

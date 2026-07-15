@@ -22,6 +22,7 @@ const (
 	captchaIPCooldown   = 30 * time.Second
 	captchaGlobalWindow = time.Minute
 	captchaGlobalLimit  = 20
+	MaskedSecretValue   = "******"
 )
 
 // 获取系统配置
@@ -109,14 +110,17 @@ func UpdateSystemConfig(configData types.SystemConfigData) error {
 	res := db.First(&emailConfig).RowsAffected
 	if res != 0 {
 		configData.EmailConfig.UpdateTime = time.Now()
-		err = db.Model(&emailConfig).Updates(map[string]interface{}{
-			"email_host":     configData.EmailConfig.EmailHost,
-			"email_port":     configData.EmailConfig.EmailPort,
-			"email_user":     configData.EmailConfig.EmailUser,
-			"email_password": configData.EmailConfig.EmailPassword,
-			"email_sender":   configData.EmailConfig.EmailSender,
-			"update_time":    configData.EmailConfig.UpdateTime,
-		}).Error
+		emailUpdates := map[string]interface{}{
+			"email_host":   configData.EmailConfig.EmailHost,
+			"email_port":   configData.EmailConfig.EmailPort,
+			"email_user":   configData.EmailConfig.EmailUser,
+			"email_sender": configData.EmailConfig.EmailSender,
+			"update_time":  configData.EmailConfig.UpdateTime,
+		}
+		if configData.EmailConfig.EmailPassword != MaskedSecretValue {
+			emailUpdates["email_password"] = configData.EmailConfig.EmailPassword
+		}
+		err = db.Model(&emailConfig).Updates(emailUpdates).Error
 		if err != nil {
 			return err
 		}
@@ -129,23 +133,29 @@ func UpdateSystemConfig(configData types.SystemConfigData) error {
 	}
 
 	db.First(&jwtConfig)
-	err = db.Model(&jwtConfig).Updates(map[string]interface{}{
-		"jwt_secret":  configData.JwtConfig.JwtSecret,
+	jwtUpdates := map[string]interface{}{
 		"jwt_expires": configData.JwtConfig.JwtExpires,
 		"update_time": configData.JwtConfig.UpdateTime,
-	}).Error
+	}
+	if configData.JwtConfig.JwtSecret != MaskedSecretValue {
+		jwtUpdates["jwt_secret"] = configData.JwtConfig.JwtSecret
+	}
+	err = db.Model(&jwtConfig).Updates(jwtUpdates).Error
 	if err != nil {
 		return err
 	}
 	res = db.First(&noticeConfig).RowsAffected
 	if res != 0 {
 		configData.NoticeConfig.UpdateTime = time.Now()
-		err = db.Model(&noticeConfig).Updates(map[string]interface{}{
+		noticeUpdates := map[string]interface{}{
 			"type":        configData.NoticeConfig.Type,
-			"secret":      configData.NoticeConfig.Secret,
 			"webhook":     configData.NoticeConfig.Webhook,
 			"update_time": configData.NoticeConfig.UpdateTime,
-		}).Error
+		}
+		if configData.NoticeConfig.Secret != MaskedSecretValue {
+			noticeUpdates["secret"] = configData.NoticeConfig.Secret
+		}
+		err = db.Model(&noticeConfig).Updates(noticeUpdates).Error
 		if err != nil {
 			return err
 		}

@@ -202,11 +202,19 @@ async function cancelEdit() {
 }
 
 function handleLogoUpload(response: any) {
-  data.value.sysconf.logo_attachment_id = response.file_id || ''
+  if (response?.code !== 1 || !response?.file_id) {
+    ElMessage.error(t('app.webui.savefail'))
+    return
+  }
+  data.value.sysconf.logo_attachment_id = response.file_id
 }
 
 function handleFaviconUpload(response: any) {
-  data.value.sysconf.favicon_attachment_id = response.file_id || ''
+  if (response?.code !== 1 || !response?.file_id) {
+    ElMessage.error(t('app.webui.savefail'))
+    return
+  }
+  data.value.sysconf.favicon_attachment_id = response.file_id
 }
 
 onMounted(loadSystemConfig)

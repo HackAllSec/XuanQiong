@@ -15,6 +15,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n';
 import api from '../api';
+import { clearAuthSession } from '../auth';
 
 const { t } = useI18n();
 const buttonstatus = ref(true)
@@ -48,7 +49,6 @@ const changeButtonstatus = () => {
 }
     
 async function changePassword() {
-    console.log(oldpassword,newpassword,confirmpassword)
     try {
         const data = {
             "oldpassword": oldpassword.value,
@@ -56,10 +56,7 @@ async function changePassword() {
         }
         const response = await api.post('/api/v1/updatepassword', data)
         if (response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
-                sessionStorage.removeItem('force_password_change')
+                clearAuthSession()
                 location.reload()
         } else if (response.data.code == 1) {
             sessionStorage.removeItem('force_password_change')

@@ -26,7 +26,7 @@ server:
   admin_static_url: "/static"         # 后台静态资源访问路径
   allow_origins: "http://localhost:3000,http://example.com"             # 允许跨域的域名，多个域名用逗号隔开
   allow_methods: "GET,POST,HEAD"                                        # 允许的请求方法，多个请求方法用逗号隔开
-  allow_headers: "Origin,Content-Length,Content-Type,Authorization"     # 允许的请求头，多个请求头用逗号隔开
+  allow_headers: "Origin,Content-Length,Content-Type,X-Auth-Token"     # 允许的请求头，多个请求头用逗号隔开
 
 # 日志配置
 log:

@@ -52,8 +52,7 @@ export async function loadBranding(force = false) {
         loaded: true,
       })
     }
-  } catch (error) {
-    console.error(error)
+  } catch {
   }
   applyAdminBranding()
   return brandingState

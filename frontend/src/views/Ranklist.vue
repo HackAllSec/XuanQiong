@@ -42,9 +42,7 @@ async function getRankingList() {
             });
         });
     data.value = rankings
-    console.log(data.value)
 }
-console.log(data.value)
 </script>
 <style scoped>
     

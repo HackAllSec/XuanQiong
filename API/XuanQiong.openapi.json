@@ -53,7 +53,7 @@
               },
               "example": {
                 "username": "admin",
-                "password": "Qwer1234"
+                "password": "ExamplePassw0rd!"
               }
             }
           }
@@ -89,7 +89,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -110,7 +110,7 @@
               },
               "example": {
                 "username": "test2",
-                "password": "Qwer!234",
+                "password": "ExamplePassw0rd!",
                 "email": "aab@qq.ca",
                 "phone": "13888888889",
                 "role": 1
@@ -158,7 +158,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -214,7 +214,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -284,7 +284,7 @@
             }
           },
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -379,7 +379,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -400,7 +400,7 @@
               },
               "example": {
                 "username": "admin",
-                "password": "Admin@123",
+                "password": "ExamplePassw0rd!",
                 "role": -1,
                 "status": -1
               }
@@ -548,7 +548,7 @@
         "x-apifox-folder": "无需登录",
         "x-apifox-status": "released",
         "deprecated": false,
-        "description": "Authorization有效时返回全部信息",
+        "description": "X-Auth-Token有效时返回全部信息",
         "tags": [
           "无需登录"
         ],
@@ -564,7 +564,7 @@
             }
           },
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -696,7 +696,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -937,7 +937,7 @@
             }
           },
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -1072,7 +1072,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -1268,7 +1268,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -1366,7 +1366,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -1488,7 +1488,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -1579,7 +1579,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -1613,8 +1613,8 @@
                 "x-apifox-ignore-properties": []
               },
               "example": {
-                "oldpassword": ",?JdFy?P*D@h",
-                "newpassword": "123456"
+                "oldpassword": ExampleOldPassw0rd!",
+                "newpassword": "ExampleNewPassw0rd!"
               }
             }
           }
@@ -1707,7 +1707,7 @@
               },
               "example": {
                 "username": "test",
-                "password": "123456",
+                "password": "ExamplePassw0rd!",
                 "email": "",
                 "phone": "",
                 "captcha": ""
@@ -2020,7 +2020,7 @@
             }
           },
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -2172,7 +2172,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -2249,7 +2249,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -2385,7 +2385,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -2476,7 +2476,7 @@
             }
           },
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -2746,7 +2746,7 @@
             }
           },
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -2996,7 +2996,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -3236,7 +3236,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -3261,14 +3261,14 @@
                   "email_host": "1234",
                   "email_port": 1234,
                   "email_user": "1234",
-                  "email_password": "1234124",
+                  "email_password": "******",
                   "email_sender": "12341234",
                   "create_time": "0001-01-01T00:00:00Z",
                   "update_time": "0001-01-01T00:00:00Z"
                 },
                 "jwtconf": {
                   "id": 1,
-                  "jwt_secret": "bkhMEIfdgt7Pvxy52fzZCI2xKhOVhk_K7jEWjnmsC5Y=+",
+                  "jwt_secret": "******",
                   "jwt_expires": "1200",
                   "create_time": "2024-10-16T17:31:15.1146947+08:00",
                   "update_time": "0001-01-01T00:00:00Z"
@@ -3379,7 +3379,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,
@@ -3655,7 +3655,7 @@
                 "x-apifox-ignore-properties": []
               },
               "example": {
-                "password": "Test1234",
+                "password": "ExamplePassw0rd!",
                 "email": "aa@qq.com",
                 "captcha": "123456"
               }
@@ -3918,7 +3918,7 @@
         ],
         "parameters": [
           {
-            "name": "Authorization",
+            "name": "X-Auth-Token",
             "in": "header",
             "description": "",
             "required": false,

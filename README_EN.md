@@ -24,8 +24,7 @@ Support JWT, Webhook, email notifications, etc.
 View the built-in vulnerability types, vulnerability rating rules, and point calculation rules [Score Rules](ScoreRules.md).
 
 Demo：[https://demo.hackall.cn](https://demo.hackall.cn)  
-Administrator Account：admin/Admin@123  
-Ordinary user accounts：test/123456  
+Demo credentials are provided by maintainers when needed.  
 
 ### User UI functions
 

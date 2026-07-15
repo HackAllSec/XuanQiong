@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { clearAuthSession } from './auth';
 
 const api = axios.create({
   baseURL: '',
@@ -28,5 +29,30 @@ api.interceptors.request.use((config) => {
   config.headers = headers;
   return config;
 });
+
+function rejectSanitized(error: any) {
+  return Promise.reject({
+    status: error?.response?.status,
+    code: error?.response?.data?.code,
+    message: error?.response?.data?.msg || error?.message || 'Request failed',
+  });
+}
+
+api.interceptors.response.use(
+  (response) => {
+    const code = response.data?.code;
+    const msg = String(response.data?.msg || '').toLowerCase();
+    if (code === 9 || (code === 0 && msg.includes('permission'))) {
+      clearAuthSession();
+    }
+    return response;
+  },
+  (error) => {
+    if (error?.response?.status === 401 || error?.response?.status === 403) {
+      clearAuthSession();
+    }
+    return rejectSanitized(error);
+  },
+);
 
 export default api;

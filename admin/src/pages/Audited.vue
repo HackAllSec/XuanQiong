@@ -166,6 +166,7 @@ import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
 import { DocumentCopy } from '@element-plus/icons-vue'
+import { clearAuthSession } from '../auth'
 
 const { t } = useI18n()
 const showvulndetail = ref(false)
@@ -197,7 +198,6 @@ const currentData = computed(() => {
     const start = 0;
     const end = start + pageSize.value;
     //console.log(start, end)
-    console.log(data.value)
     if (search.value.trim() != '') {
         // 过滤数据
         return data.value.data.filter(item => {
@@ -248,10 +248,9 @@ const cellClick = async (row, cell) => {
         try {
             const response = await api.get('/api/v1/getvulndtl?id=' + row.id)
             if (token && response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
+                return
             }
             vulndetail.value = response.data
             showvulndetail.value = true
@@ -293,7 +292,7 @@ const typefilterHandler = (value: string, row: any) => {
     return row.vuln_type === value
 }
 const levelfilterHandler = (value: string, row: any) => {
-    return row.level === value
+    return row.vuln_level === value
 }
 const statusfilterHandler = (value: string, row: any) => {
     if (value === 'Poc') {

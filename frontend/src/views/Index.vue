@@ -131,7 +131,7 @@ onMounted(() => {
   });
 });
 function performAction() {
-  if (router.redirectedFrom.path === '/login') {
+  if (router.redirectedFrom?.path === '/login') {
     location.reload();
   }
 }

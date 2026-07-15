@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
 	"time"
 
 	"github.com/natefinch/lumberjack"
@@ -19,31 +20,39 @@ import (
 )
 
 var (
-	db *gorm.DB
+	db                  *gorm.DB
+	databaseNamePattern = regexp.MustCompile(`^[A-Za-z0-9_]+$`)
 )
+
+func validateDatabaseName(name string) error {
+	if !databaseNamePattern.MatchString(name) {
+		return fmt.Errorf("invalid database name")
+	}
+	return nil
+}
 
 func initDatabase() {
 	log.Println("Initializing Database...")
-        db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
-                &types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
-                &types.XqRankingDetail{}, &types.XqScoreRule{}, &types.XqVerifyCode{}, &types.XqRole{},
-                &types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{})
+	db.AutoMigrate(&types.XqSystemConfig{}, &types.XqJwtConfig{}, &types.XqEmailConfig{}, &types.XqNoticeConfig{}, &types.XqUser{},
+		&types.XqVulnType{}, &types.XqVulnerability{}, &types.XqLockip{}, &types.XqAttachment{},
+		&types.XqRankingDetail{}, &types.XqScoreRule{}, &types.XqVerifyCode{}, &types.XqRole{},
+		&types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{})
 	res := db.First(&types.XqSystemConfig{})
 	if res.RowsAffected == 0 {
-                db.Create(&types.XqSystemConfig{
-                        UserRegister:       false,
-                        UserDisplay:        "佚名",
-                        MaxAttempts:        5,
-                        LockoutDuration:    3600,
-                        SiteName:           "玄穹漏洞库平台",
-                        FrontendTitle:      "玄穹漏洞库平台",
-                        AdminTitle:         "玄穹后台管理系统",
-                        FooterText:         "Copyright © 2024. Hack All Sec rights reserved.",
-                        HelpURL:            "https://github.com/HackAllSec/XuanQiong",
-                        SuggestURL:         "https://github.com/HackAllSec/XuanQiong/issues",
-                        CreateTime:         time.Now(),
-                        UpdateTime:         time.Now(),
-                })
+		db.Create(&types.XqSystemConfig{
+			UserRegister:    false,
+			UserDisplay:     "佚名",
+			MaxAttempts:     5,
+			LockoutDuration: 3600,
+			SiteName:        "玄穹漏洞库平台",
+			FrontendTitle:   "玄穹漏洞库平台",
+			AdminTitle:      "玄穹后台管理系统",
+			FooterText:      "Copyright © 2024. Hack All Sec rights reserved.",
+			HelpURL:         "https://github.com/HackAllSec/XuanQiong",
+			SuggestURL:      "https://github.com/HackAllSec/XuanQiong/issues",
+			CreateTime:      time.Now(),
+			UpdateTime:      time.Now(),
+		})
 	}
 	res = db.First(&types.XqJwtConfig{})
 	if res.RowsAffected == 0 {
@@ -90,9 +99,9 @@ func initDatabase() {
 		db.Create(&types.XqScoreRule{Type: 3, Rule: "互联网资产数介于 1000 到 5000", Score: 20, Coefficient: 1.0, CreateTime: time.Now(), UpdateTime: time.Now()})
 		db.Create(&types.XqScoreRule{Type: 3, Rule: "互联网资产数小于 1000", Score: 10, Coefficient: 1.0, CreateTime: time.Now(), UpdateTime: time.Now()})
 	}
-        if err := syncRBACDefaults(); err != nil {
-                log.Fatalf("Error syncing RBAC defaults: %v", err)
-        }
+	if err := syncRBACDefaults(); err != nil {
+		log.Fatalf("Error syncing RBAC defaults: %v", err)
+	}
 	log.Println("Database initialized successfully!")
 	initAdminPassword()
 }
@@ -148,6 +157,9 @@ func init() {
 	dsn := generateDSN(config.Config)
 	switch config.Config.Database.Type {
 	case "mysql":
+		if err := validateDatabaseName(config.Config.Database.Connection.Name); err != nil {
+			log.Fatalf("Invalid database name: %v", err)
+		}
 		// 检测和创建数据库
 		dbSQL, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%d)/", config.Config.Database.Connection.User, config.Config.Database.Connection.Password, config.Config.Database.Connection.Host, config.Config.Database.Connection.Port))
 		if err != nil {
@@ -171,6 +183,9 @@ func init() {
 		}
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{Logger: gormLogger})
 	case "postgres":
+		if err := validateDatabaseName(config.Config.Database.Connection.Name); err != nil {
+			log.Fatalf("Invalid database name: %v", err)
+		}
 		dbSQL, err := sql.Open("postgres", fmt.Sprintf("postgresql://%s:%s@%s:%d/", config.Config.Database.Connection.User, config.Config.Database.Connection.Password, config.Config.Database.Connection.Host, config.Config.Database.Connection.Port))
 		if err != nil {
 			log.Fatalf("Error opening database connection: %v", err)
@@ -197,6 +212,9 @@ func init() {
 			log.Fatalf("Error connecting to database: %v", err)
 		}
 	case "sqlserver":
+		if err := validateDatabaseName(config.Config.Database.Connection.Name); err != nil {
+			log.Fatalf("Invalid database name: %v", err)
+		}
 		dbSQL, err := sql.Open("sqlserver", fmt.Sprintf("server=%s,%d;user id=%s;password=%s;", config.Config.Database.Connection.Host, config.Config.Database.Connection.Port, config.Config.Database.Connection.User, config.Config.Database.Connection.Password))
 		if err != nil {
 			log.Fatalf("Error opening database connection: %v", err)
@@ -225,11 +243,11 @@ func init() {
 		&types.XqEmailConfig{},
 		&types.XqNoticeConfig{},
 		&types.XqUser{},
-                &types.XqRole{},
-                &types.XqPermission{},
-                &types.XqRolePermission{},
-                &types.XqUserRole{},
-                &types.XqAuditLog{},
+		&types.XqRole{},
+		&types.XqPermission{},
+		&types.XqRolePermission{},
+		&types.XqUserRole{},
+		&types.XqAuditLog{},
 		&types.XqAttachment{},
 		&types.XqVulnerability{},
 		&types.XqScoreRule{},
@@ -243,12 +261,12 @@ func init() {
 	if !allTablesExist {
 		initDatabase()
 	}
-        if err := db.AutoMigrate(&types.XqRole{}, &types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{}); err != nil {
-                log.Fatalf("Error migrating RBAC tables: %v", err)
-        }
-        if err := syncRBACDefaults(); err != nil {
-                log.Fatalf("Error syncing RBAC defaults: %v", err)
-        }
+	if err := db.AutoMigrate(&types.XqRole{}, &types.XqPermission{}, &types.XqRolePermission{}, &types.XqUserRole{}, &types.XqAuditLog{}); err != nil {
+		log.Fatalf("Error migrating RBAC tables: %v", err)
+	}
+	if err := syncRBACDefaults(); err != nil {
+		log.Fatalf("Error syncing RBAC defaults: %v", err)
+	}
 	res := db.Where("username = 'admin'").First(&types.XqUser{}).RowsAffected
 	if res == 0 {
 		log.Println("Resetting admin password...")

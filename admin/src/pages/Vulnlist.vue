@@ -33,7 +33,7 @@
                 <el-input v-model="form.nvd" />
             </el-form-item>
             <el-form-item :label="t('app.webui.edbid')" style="width: 29%">
-                <el-input v-model="form.edbid" />
+                <el-input v-model="form.edb" />
             </el-form-item>
             <el-form-item :label="t('app.webui.cnnvdid')" style="width: 29%">
                 <el-input v-model="form.cnnvd" />
@@ -284,11 +284,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
-import { getUploadHeaders, hasPermission } from '../auth'
+import { clearAuthSession, getUploadHeaders, hasPermission } from '../auth'
 import { DocumentCopy, UploadFilled } from '@element-plus/icons-vue'
 
 const { t } = useI18n()
 const token = sessionStorage.getItem('token')
+const uploadHeaders = getUploadHeaders()
+const canEdit = hasPermission('vuln.edit.any')
+const canDelete = hasPermission('vuln.delete')
 const poc = ref('xray')
 const exp = ref('xray')
 const vulntype = ref([])
@@ -375,6 +378,10 @@ const handleSelectionChange = (val) => {
     }
 }
 const handleSuccess = (response) => {
+    if (response?.code !== 1 || !response?.file_id) {
+        ElMessage.error(t('app.webui.modifyfail'))
+        return
+    }
     ElMessage.success(t('app.webui.uploadsucc'))
     form.value.attachment_id = response.file_id
 }
@@ -460,16 +467,12 @@ const goBack = () => {
 
 async function getVulnDetail(id) {
     const token = sessionStorage.getItem('token')
-    const uploadHeaders = getUploadHeaders()
-const canEdit = hasPermission('vuln.edit')
-const canDelete = hasPermission('vuln.delete')
         try {
             const response = await api.get('/api/v1/getvulndtl?id=' + id)
             if (token && response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
+                return
             }
             vulndetail.value = response.data
         } catch (error) {
@@ -528,8 +531,7 @@ function multiDeleteVulns() {
         } catch (error) {
         }
     })
-    .catch((error) => {
-        console.log(error)
+    .catch(() => {
     })
 }
 const handleEdit = async (index, row) => {
@@ -621,7 +623,7 @@ const typefilterHandler = (value: string, row: any) => {
     return row.vuln_type === value
 }
 const levelfilterHandler = (value: string, row: any) => {
-    return row.level === value
+    return row.vuln_level === value
 }
 const statusfilterHandler = (value: string, row: any) => {
     if (value === 'Poc') {

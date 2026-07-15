@@ -6,10 +6,29 @@ import (
 	"mime/multipart"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 	"xuanqiong/backend/types"
 	"xuanqiong/backend/utils"
 )
+
+const maxAttachmentSize = 10 << 20
+
+var vulnIDMu sync.Mutex
+
+const publicVulnListSelect = "xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN '1' ELSE '' END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN '1' ELSE '' END AS exp, xq_vulnerabilities.create_time, xq_vulnerabilities.update_time"
+
+func normalizePagination(page string, pageSize string) (int, int) {
+	pageNum, _ := strconv.Atoi(page)
+	pageSizeNum, _ := strconv.Atoi(pageSize)
+	if pageNum < 1 {
+		pageNum = 1
+	}
+	if pageSizeNum < 1 || pageSizeNum > 100 {
+		pageSizeNum = 15
+	}
+	return pageNum, pageSizeNum
+}
 
 // 获取漏洞摘要
 func GetVulnAbstract() (int64, int64, int64, int64, int64, int64, int64, int64, []types.XqVulnerability) {
@@ -50,7 +69,7 @@ func GetVulnAbstract() (int64, int64, int64, int64, int64, int64, int64, int64, 
 		*/
 	//db.Preload("VulnType").Where("status = 1").Order("create_time DESC").Limit(10).Find(&vulnDatas)
 	db.Table("xq_vulnerabilities").
-		Select("xq_vulnerabilities.*, xq_vuln_types.name as vuln_type").
+		Select(publicVulnListSelect).
 		Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
 		Where("status = 1 AND is_public = true").
 		Order("create_time DESC").
@@ -63,8 +82,7 @@ func GetVulnAbstract() (int64, int64, int64, int64, int64, int64, int64, int64, 
 func GetVulnList(page string, pageSize string) (int64, []types.XqVulnerability) {
 	var vulnDatas []types.XqVulnerability
 	var totalCount int64
-	pageNum, _ := strconv.Atoi(page)
-	pageSizeNum, _ := strconv.Atoi(pageSize)
+	pageNum, pageSizeNum := normalizePagination(page, pageSize)
 	db.Model(&vulnDatas).Where("status = 1 AND is_public = true").Count(&totalCount)
 	/*
 	   db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
@@ -72,7 +90,7 @@ func GetVulnList(page string, pageSize string) (int64, []types.XqVulnerability) 
 	   Omit("user_id, attachment_id, attachment_name, update_time").Find(&vulnDatas)
 	*/
 	db.Table("xq_vulnerabilities").
-		Select("xq_vulnerabilities.id, xq_vulnerabilities.vuln_name, xq_vuln_types.name as vuln_type, xq_vulnerabilities.vuln_level, xq_vulnerabilities.cvss, xq_vulnerabilities.is_public, xq_vulnerabilities.status, CASE WHEN xq_vulnerabilities.poc <> '' THEN true ELSE false END AS poc, CASE WHEN xq_vulnerabilities.exp <> '' THEN true ELSE false END AS exp, xq_vulnerabilities.create_time, xq_vulnerabilities.update_time").
+		Select(publicVulnListSelect).
 		Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
 		Where("xq_vulnerabilities.status = 1 AND xq_vulnerabilities.is_public = true").
 		Limit(pageSizeNum).
@@ -87,8 +105,7 @@ func GetVulnList(page string, pageSize string) (int64, []types.XqVulnerability) 
 func GetUnauditList(page string, pageSize string) (int64, []types.XqVulnerability) {
 	var vulnDatas []types.XqVulnerability
 	var totalCount int64
-	pageNum, _ := strconv.Atoi(page)
-	pageSizeNum, _ := strconv.Atoi(pageSize)
+	pageNum, pageSizeNum := normalizePagination(page, pageSize)
 	db.Model(&vulnDatas).Where("status = 0").Count(&totalCount)
 	/*
 	   db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
@@ -111,8 +128,7 @@ func GetUnauditList(page string, pageSize string) (int64, []types.XqVulnerabilit
 func GetAuditedList(page string, pageSize string) (int64, []types.XqVulnerability) {
 	var vulnDatas []types.XqVulnerability
 	var totalCount int64
-	pageNum, _ := strconv.Atoi(page)
-	pageSizeNum, _ := strconv.Atoi(pageSize)
+	pageNum, pageSizeNum := normalizePagination(page, pageSize)
 	db.Model(&vulnDatas).Where("status <> 0").Count(&totalCount)
 	/*
 	   db.Select("id, vuln_name, vuln_type, vuln_level, cvss, is_public, status, CASE WHEN poc <> '' THEN true ELSE false END AS poc, CASE WHEN exp <> '' THEN true ELSE false END AS exp, create_time").
@@ -156,7 +172,7 @@ func GetVulnDetail(id string) types.XqVulnerability {
 }
 
 // 获取漏洞详情，已登录时，返回漏洞全部信息
-func GetVulnDetailAuthed(id string, userid uint64, roleid int64) types.XqVulnerability {
+func GetVulnDetailAuthed(id string, userid uint64, canReadSensitive bool) types.XqVulnerability {
 	var vulnerabilities types.XqVulnerability
 	//var user types.XqUser
 	//var vulntype types.XqVulnType
@@ -171,17 +187,17 @@ func GetVulnDetailAuthed(id string, userid uint64, roleid int64) types.XqVulnera
 		Joins("left join xq_vuln_types as vt on v.vuln_type_id = vt.id").
 		Where("v.id = ?", id).
 		First(&vulnerabilities)
-	if vulnerabilities.UserID == userid || roleid == 1 {
+	if vulnerabilities.UserID == userid || canReadSensitive {
 		return vulnerabilities
 	}
 	if vulnerabilities.IsPublic && vulnerabilities.Status == 1 {
-		return vulnerabilities
+		return GetVulnDetail(id)
 	}
 	return types.XqVulnerability{}
 }
 
 // 检查漏洞数据
-func checkVulnData(vuln types.XqVulnerability) error {
+func checkVulnData(vuln types.XqVulnerability, excludeID string) error {
 	var vulnerability types.XqVulnerability
 	if vuln.VulnName == "" {
 		return fmt.Errorf("漏洞名称不能为空")
@@ -213,7 +229,7 @@ func checkVulnData(vuln types.XqVulnerability) error {
 		if parts := strings.Split(vuln.CVE, "-"); len(parts) != 3 || parts[0] != "CVE" || len(parts[1]) != 4 || len(parts[2]) < 4 {
 			return fmt.Errorf("CVE格式不正确")
 		}
-		result := db.Where("cve = ?", vuln.CVE).First(&vulnerability)
+		result := db.Where("cve = ? AND id <> ?", vuln.CVE, excludeID).First(&vulnerability)
 		if result.RowsAffected != 0 {
 			return fmt.Errorf("漏洞已存在")
 		}
@@ -223,7 +239,7 @@ func checkVulnData(vuln types.XqVulnerability) error {
 		if parts := strings.Split(vuln.NVD, "-"); len(parts) != 3 || parts[0] != "NVD" || len(parts[1]) != 4 || len(parts[2]) < 4 {
 			return fmt.Errorf("NVD格式不正确")
 		}
-		result := db.Where("nvd = ?", vuln.NVD).First(&vulnerability)
+		result := db.Where("nvd = ? AND id <> ?", vuln.NVD, excludeID).First(&vulnerability)
 		if result.RowsAffected != 0 {
 			return fmt.Errorf("漏洞已存在")
 		}
@@ -233,7 +249,7 @@ func checkVulnData(vuln types.XqVulnerability) error {
 		if _, err := strconv.Atoi(vuln.EDB); err != nil {
 			return fmt.Errorf("EDBID格式不正确")
 		}
-		result := db.Where("edb = ?", vuln.EDB).First(&vulnerability)
+		result := db.Where("edb = ? AND id <> ?", vuln.EDB, excludeID).First(&vulnerability)
 		if result.RowsAffected != 0 {
 			return fmt.Errorf("漏洞已存在")
 		}
@@ -243,7 +259,7 @@ func checkVulnData(vuln types.XqVulnerability) error {
 		if parts := strings.Split(vuln.CNNVD, "-"); len(parts) != 3 || parts[0] != "CNNVD" || len(parts[1]) != 6 || len(parts[2]) < 4 {
 			return fmt.Errorf("CNNVD格式不正确")
 		}
-		result := db.Where("cnnvd = ?", vuln.CNNVD).First(&vulnerability)
+		result := db.Where("cnnvd = ? AND id <> ?", vuln.CNNVD, excludeID).First(&vulnerability)
 		if result.RowsAffected != 0 {
 			return fmt.Errorf("漏洞已存在")
 		}
@@ -253,7 +269,7 @@ func checkVulnData(vuln types.XqVulnerability) error {
 		if parts := strings.Split(vuln.CNVD, "-"); len(parts) != 3 || parts[0] != "CNVD" || len(parts[1]) != 4 || len(parts[2]) < 4 {
 			return fmt.Errorf("CNVD格式不正确")
 		}
-		result := db.Where("cnvd = ?", vuln.CNVD).First(&vulnerability)
+		result := db.Where("cnvd = ? AND id <> ?", vuln.CNVD, excludeID).First(&vulnerability)
 		if result.RowsAffected != 0 {
 			return fmt.Errorf("漏洞已存在")
 		}
@@ -298,7 +314,7 @@ func getVdbid() string {
 // 插入漏洞信息
 func InsertVuln(vuln types.XqVulnerability) error {
 	var attachment types.XqAttachment
-	err := checkVulnData(vuln)
+	err := checkVulnData(vuln, "")
 	if err != nil {
 		return err
 	}
@@ -311,28 +327,24 @@ func InsertVuln(vuln types.XqVulnerability) error {
 	}
 	vuln.VulnType = ""
 	vuln.Submitter = ""
-	hvdid := getVdbid()
-	vuln.ID = hvdid
+	vulnIDMu.Lock()
+	defer vulnIDMu.Unlock()
+	vuln.ID = getVdbid()
 	vuln.Status = 0
 	vuln.CreateTime = time.Now()
 	vuln.UpdateTime = time.Now()
-	err = db.Create(&vuln).Error
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return db.Create(&vuln).Error
 }
 
 // 编辑漏洞
-func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
+func EditVuln(vuln types.XqVulnerability, userid uint64, canEditAny bool) error {
 	var vulnerability types.XqVulnerability
 	var attachment types.XqAttachment
 	res := db.Where("id = ?", vuln.ID).First(&vulnerability)
 	if res.RowsAffected == 0 {
 		return fmt.Errorf("漏洞不存在")
 	}
-	if roleid != 1 {
+	if !canEditAny {
 		if vulnerability.UserID != userid {
 			return fmt.Errorf("你没有权限编辑该漏洞")
 		}
@@ -340,13 +352,13 @@ func EditVuln(vuln types.XqVulnerability, userid uint64, roleid int64) error {
 			return fmt.Errorf("漏洞已审核通过，无法编辑")
 		}
 	}
-	err := checkVulnData(vuln)
+	err := checkVulnData(vuln, vuln.ID)
 	if err != nil {
 		return err
 	}
 	if vuln.AttachmentID != "" {
 		query := db.Where("id = ?", vuln.AttachmentID)
-		if roleid != 1 {
+		if !canEditAny {
 			query = query.Where("user_id = ?", userid)
 		}
 		res = query.First(&attachment)
@@ -377,15 +389,17 @@ func DeleteVuln(id string) error {
 func SearchVuln(keyword string, page string, pageSize string) (int64, []types.XqVulnerability) {
 	var vulnDatas []types.XqVulnerability
 	var totalCount int64
-	pageNum, _ := strconv.Atoi(page)
-	pageSizeNum, _ := strconv.Atoi(pageSize)
+	pageNum, pageSizeNum := normalizePagination(page, pageSize)
 	db.Model(&vulnDatas).
 		Where("status = 1 AND is_public = true").
 		Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
 			"%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").
 		Count(&totalCount)
-	db.Where("status = 1 AND is_public = true").
-		Where("id LIKE ? OR cve LIKE ? OR cnnvd LIKE ? OR cnvd LIKE ? OR vuln_name LIKE ? OR description LIKE ? OR affected_product LIKE ?",
+	db.Table("xq_vulnerabilities").
+		Select(publicVulnListSelect).
+		Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+		Where("xq_vulnerabilities.status = 1 AND xq_vulnerabilities.is_public = true").
+		Where("xq_vulnerabilities.id LIKE ? OR xq_vulnerabilities.cve LIKE ? OR xq_vulnerabilities.cnnvd LIKE ? OR xq_vulnerabilities.cnvd LIKE ? OR xq_vulnerabilities.vuln_name LIKE ? OR xq_vulnerabilities.description LIKE ? OR xq_vulnerabilities.affected_product LIKE ?",
 			"%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%", "%"+keyword+"%").
 		Limit(pageSizeNum).
 		Offset((pageNum - 1) * pageSizeNum).
@@ -433,18 +447,33 @@ func SearchVulnAdv(data map[string]interface{}) (int64, []types.XqVulnerability)
 	}
 	exp, _ := data["exp"].(bool)
 	if exp {
-		conditions = append(conditions, "poc IS NOT NULL AND exp <> ''")
+		conditions = append(conditions, "exp IS NOT NULL AND exp <> ''")
 	}
 	page, _ := data["page"].(float64)
 	limit, _ := data["limit"].(float64)
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 || limit > 100 {
+		limit = 15
+	}
 	query := strings.Join(conditions, " AND ")
 	db.Model(&vulnDatas).Where(query, values...).Count(&totalCount)
-	db.Where(query, values...).Limit(int(limit)).Offset((int(page) - 1) * int(limit)).Find(&vulnDatas)
+	db.Table("xq_vulnerabilities").
+		Select(publicVulnListSelect).
+		Joins("left join xq_vuln_types on xq_vulnerabilities.vuln_type_id = xq_vuln_types.id").
+		Where(query, values...).
+		Limit(int(limit)).
+		Offset((int(page) - 1) * int(limit)).
+		Find(&vulnDatas)
 	return totalCount, vulnDatas
 }
 
 // 存储文件到数据库
 func StoreFile(file *multipart.FileHeader, userid uint64) (string, error) {
+	if file.Size <= 0 || file.Size > maxAttachmentSize {
+		return "", fmt.Errorf("file size exceeds limit")
+	}
 	// 打开文件
 	src, err := file.Open()
 	if err != nil {
@@ -453,9 +482,12 @@ func StoreFile(file *multipart.FileHeader, userid uint64) (string, error) {
 	defer src.Close()
 
 	// 读取文件内容
-	bytes, err := io.ReadAll(src)
+	bytes, err := io.ReadAll(io.LimitReader(src, maxAttachmentSize+1))
 	if err != nil {
 		return "", err
+	}
+	if int64(len(bytes)) > maxAttachmentSize {
+		return "", fmt.Errorf("file size exceeds limit")
 	}
 
 	// 生成唯一的文件ID
@@ -488,12 +520,12 @@ func GetFileContent(attachmentID string) (types.XqAttachment, error) {
 	return attachment, err
 }
 
-func CanAccessAttachment(attachmentID string, userid uint64, roleid int64) (types.XqAttachment, error) {
+func CanAccessAttachment(attachmentID string, userid uint64, canReadAll bool) (types.XqAttachment, error) {
 	attachment, err := GetFileContent(attachmentID)
 	if err != nil {
 		return attachment, err
 	}
-	if roleid == 1 || (userid != 0 && attachment.UserID == userid) {
+	if canReadAll || (userid != 0 && attachment.UserID == userid) {
 		return attachment, nil
 	}
 
@@ -523,7 +555,14 @@ func CanAccessAttachment(attachmentID string, userid uint64, roleid int64) (type
 
 // 删除文件
 func DeleteFile(attachmentID string, userid uint64) error {
-	return db.Where("id = ? AND user_id = ?", attachmentID, userid).Delete(&types.XqAttachment{}).Error
+	res := db.Where("id = ? AND user_id = ?", attachmentID, userid).Delete(&types.XqAttachment{})
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return fmt.Errorf("附件不存在或无权限删除")
+	}
+	return nil
 }
 
 // 获取漏洞类型列表

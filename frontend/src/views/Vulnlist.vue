@@ -151,6 +151,7 @@ import { useI18n } from 'vue-i18n';
 import api from '../api'
 import { formatDate } from '../utils'
 import { DocumentCopy } from '@element-plus/icons-vue'
+import { clearAuthSession } from '../auth'
 
 const { t } = useI18n()
 const data = ref({})
@@ -288,10 +289,9 @@ const cellClick = async (row, cell) => {
         try {
             const response = await api.get('/api/v1/getvulndtl?id=' + row.id)
             if (token && response.data.code == 0) {
-                sessionStorage.removeItem('token')
-                sessionStorage.removeItem('username')
-                sessionStorage.removeItem('avatar')
+                clearAuthSession()
                 location.reload()
+                return
             }
             if (response.data.data.id == '') {
                 ElMessage.error(t('app.webui.notpublic'));
@@ -314,7 +314,7 @@ const typefilterHandler = (value: string, row: any) => {
     return row.vuln_type === value
 }
 const levelfilterHandler = (value: string, row: any) => {
-    return row.level === value
+    return row.vuln_level === value
 }
 const statusfilterHandler = (value: string, row: any) => {
     if (value === 'Poc') {

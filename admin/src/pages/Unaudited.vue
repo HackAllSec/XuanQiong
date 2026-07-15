@@ -207,7 +207,7 @@ import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
 import { DocumentCopy } from '@element-plus/icons-vue'
-import { hasPermission } from '../auth'
+import { clearAuthSession, hasPermission } from '../auth'
 
 const { t } = useI18n()
 const canAuditWrite = hasPermission('vuln.audit.write')
@@ -259,7 +259,6 @@ const currentData = computed(() => {
     const start = 0;
     const end = start + pageSize.value;
     //console.log(start, end)
-    console.log(data.value)
     if (search.value.trim() != '') {
         // 过滤数据
         return data.value.data.filter(item => {
@@ -300,14 +299,12 @@ const goBack = () => {
     vulndetail.value = {}
 }
 const handleAudit = async (index, row) => {
-    console.log(index, row);
     try {
         const response = await api.get('/api/v1/getvulndtl?id=' + row.id)
         if (token && response.data.code == 0) {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('username')
-            sessionStorage.removeItem('avatar')
+            clearAuthSession()
             location.reload()
+            return
         }
         vulndetail.value = response.data
         audit.value.id = row.id
@@ -324,15 +321,15 @@ async function submitAudit() {
         audit.value.cvss = Number(audit.value.cvss)
         const response = await api.post("/api/v1/auditvuln", audit.value)
         if (response.data.code == 0) {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('username')
-            sessionStorage.removeItem('avatar')
+            clearAuthSession()
             location.reload()
-        } else {
+        } else if (response.data.code == 1) {
             ElMessage.success(t('app.webui.audited'))
             vulndetail.value = {}
             showvulndetail.value = false
             getUnauthVulns()
+        } else {
+            ElMessage.error(t('app.webui.modifyfail'))
         }
     } catch (error) {
         // 处理请求错误
@@ -361,10 +358,9 @@ async function getRules() {
     try {
         const response = await api.get("/api/v1/getallscorerules")
         if (response.data.code == 0) {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('username')
-            sessionStorage.removeItem('avatar')
+            clearAuthSession()
             location.reload()
+            return
         }
         pocrules.value = response.data.data.pocrules
         exprules.value = response.data.data.exprules
@@ -388,7 +384,7 @@ const typefilterHandler = (value: string, row: any) => {
     return row.vuln_type === value
 }
 const levelfilterHandler = (value: string, row: any) => {
-    return row.level === value
+    return row.vuln_level === value
 }
 const statusfilterHandler = (value: string, row: any) => {
     if (value === 'Poc') {

@@ -24,6 +24,15 @@ func GetSystemConfig(c *gin.Context) {
 	currentUser := models.GetUserByToken(token)
 	if currentUser != nil {
 		sysconf, emailconf, jwtconf, noticeconf := models.GetSystemConfig()
+		if emailconf.EmailPassword != "" {
+			emailconf.EmailPassword = models.MaskedSecretValue
+		}
+		if jwtconf.JwtSecret != "" {
+			jwtconf.JwtSecret = models.MaskedSecretValue
+		}
+		if noticeconf.Secret != "" {
+			noticeconf.Secret = models.MaskedSecretValue
+		}
 		c.JSON(200, gin.H{"code": 1, "data": gin.H{"sysconf": sysconf, "emailconf": emailconf, "jwtconf": jwtconf, "noticeconf": noticeconf}})
 		return
 	}

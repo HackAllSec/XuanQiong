@@ -24,8 +24,7 @@
 内置漏洞类型，漏洞评分规则，积分计算规则查看[积分规则](ScoreRules.md)。
 
 演示环境：[https://demo.hackall.cn](https://demo.hackall.cn)  
-管理员账号：admin/Admin@123  
-普通用户账号：test/123456  
+演示环境账号请联系维护者获取。  
 
 ### 用户界面功能
 

@@ -130,6 +130,7 @@
   import { ref, onMounted } from 'vue';
   import { useRouter } from 'vue-router'
   import api from '../api'
+  import { clearAuthSession } from '../auth'
 
   const { t } = useI18n();
   const router = useRouter();
@@ -157,9 +158,7 @@
       if (response.data.code != 1) {
         clearInterval(intervalId);
         // 返回登录页
-        sessionStorage.removeItem('token')
-        sessionStorage.removeItem('username')
-        sessionStorage.removeItem('avatar')
+        clearAuthSession()
         router.push('/login')
       }
       sysdata.value = response.data.data

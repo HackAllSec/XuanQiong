@@ -114,7 +114,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n';
 import { formatDate } from '../utils'
 import api from '../api'
-import { hasPermission } from '../auth'
+import { clearAuthSession, hasPermission } from '../auth'
 
 const { t } = useI18n()
 const canManage = hasPermission('score.rule.manage')
@@ -172,7 +172,7 @@ const currentData = computed(() => {
         // 过滤数据
         return data.value.data.filter(item => {
             return (
-                item.name.toLowerCase().includes(search.value.toLowerCase())
+                item.rule.toLowerCase().includes(search.value.toLowerCase())
             );
         });
     }
@@ -207,9 +207,9 @@ async function fetchScoreRules() {
         const response = await api.get(`/api/v1/getscorerules?page=${currentPage.value}&limit=${pageSize.value}`)
         if (response.data.code != 1) {
             // 清空token，返回登录页
-            sessionStorage.removeItem("token")
-            sessionStorage.removeItem("username")
-
+            clearAuthSession()
+            location.reload()
+            return
         }
         data.value = response.data
         totalItems.value = response.data.total
