@@ -42,7 +42,7 @@ api.interceptors.response.use(
   (response) => {
     const code = response.data?.code;
     const msg = String(response.data?.msg || '').toLowerCase();
-    if (code === 9 || (code === 0 && msg.includes('permission'))) {
+    if (code === 0 && msg.includes('permission')) {
       clearAuthSession();
     }
     return response;
