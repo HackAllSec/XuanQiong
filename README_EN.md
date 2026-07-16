@@ -2,7 +2,7 @@
 
 ## English | [简体中文](README.md)
 
-**XuanQiong（玄穹）**——A high-performance open-source vulnerability library platform, suitable for small and medium-sized teams to build their own vulnerability libraries. It supports vulnerability submission, vulnerability review, vulnerability search, vulnerability rankings, RBAC permission management, operation audit logs, and brand customization.
+**XuanQiong（玄穹）** is a high-performance open-source vulnerability library platform for small and medium-sized teams that need to build an internal vulnerability knowledge base, retain vulnerability assets, and manage review workflows. It supports vulnerability submission, review, search, rankings, action-level RBAC, operation audit logs, in-site messages, Webhook pushes, API keys, data backup/restore, and brand customization.
 
 ## Technology stack and functionality
 
@@ -11,7 +11,7 @@
 - Vite
 - Vue3
 - Element Plus
-- Typescript
+- TypeScript
 
 ### Backend
 
@@ -19,12 +19,20 @@
 - GORM
 - JWT
 
-Supports databases such as MySQL, PostgreSQL, SQLite3, SQL Server, etc. Please refer to the databases supported by GORM for details.
-Support JWT, `X-Auth-Token` application authentication, email captcha, Webhook configuration, etc.
-View the built-in vulnerability types, vulnerability rating rules, and point calculation rules [Score Rules](ScoreRules.md).
+Supports databases such as MySQL, PostgreSQL, SQLite3, and SQL Server. See the GORM documentation for the full database compatibility list.
+Browser application sessions use `X-Auth-Token`, automation integrations use `X-API-Key`, and `Authorization` is reserved for proxy-layer capabilities such as reverse proxy Basic Auth.
+See [Score Rules](ScoreRules.md) for built-in vulnerability types, scoring rules, and point calculation rules.
 
-Demo：[https://demo.hackall.cn](https://demo.hackall.cn)  
-Demo credentials are provided by maintainers when needed.  
+Demo: [https://demo.hackall.cn](https://demo.hackall.cn)  
+Administrator Account：admin/Admin@123  
+Ordinary user accounts：test/123456  
+
+### v1.1.0 Highlights
+
+- Added action-level RBAC, dynamic permission menus, operation audit logs, and brand customization.
+- Added in-site messages, Webhook event pushes, vulnerability CSV import/export, API keys, and data backup/restore.
+- Hardened authentication header isolation, attachment access control, captcha rate limiting, audit log redaction, import/export, and backup/restore workflows.
+- First startup now generates a random administrator password and requires password change after first login. Fixed default public credentials are no longer documented.
 
 ### User UI functions
 
@@ -32,7 +40,7 @@ Demo credentials are provided by maintainers when needed.
 |-|-|-|-|
 |View Vulnerabilities|View vulnerability summary and details, paginated view|✅|✅|
 |Register|User Register|✅|✅|
-|Login/Logout|USer Login/Logout|✅|✅|
+|Login/Logout|User login and logout|✅|✅|
 |Forgot Password|Forgot Password and Reset Password|✅|✅|
 |My Profile|Avatar, username, email, and phone number modification, points, vulnerability submission status display|✅|✅|
 |Modify personal information|Change username, email, phone number, password|✅|✅|
@@ -41,7 +49,7 @@ Demo credentials are provided by maintainers when needed.
 |API keys / personal access tokens|Create, view, and delete personal API keys for automation integrations|✅|✅|
 |Get vulnerabilities|Get vulnerability summary and details|✅|✅|
 |Submit vulnerabilities|Submit vulnerabilities details|✅|✅|
-|Edit vulnerabilities|Unauthorized vulnerability information modification|✅|✅|
+|Edit vulnerabilities|Edit vulnerabilities that have not been approved yet|✅|✅|
 |Attachment upload|Upload vulnerability information attachment|✅|✅|
 |Attachment download|Download attachments based on vulnerability visibility, submitter, and permissions|✅|✅|
 |Simple Search|fuzzy search|✅|✅|
@@ -132,26 +140,26 @@ XuanQiong/
 
 ## Deployment method
 
-Support `front and backend integrated` and `front and backend separation`. It has been tested in MySQL and SQLite, it is recommended to use MySQL. If you encounter any problems, please refer to the [FAQ](FAQ.md).
+XuanQiong supports both integrated frontend/backend deployment and separated frontend/backend deployment. It has been tested with MySQL and SQLite; MySQL is recommended for production. If you encounter problems, refer to the [FAQ](FAQ.md).
 
-When using SQLite, you need to set the environment variable `CGO-ENABLED=1`, and then rebuild. The binary files in Releases are compiled using `CGO-ENABLED=0`.
+When using SQLite, set `CGO_ENABLED=1` and rebuild. Release binaries are compiled with `CGO_ENABLED=0`.
 
-### Front and backend integrated
+### Integrated frontend/backend
 
-Start using this mode by default, the steps are as follows:
-- Modify the database configuration in `config. yaml`, change the database name, and automatically create the database during initialization.
-- Just run the binary files in releases or `go run main.go`.
+This is the default startup mode:
+- Modify the database configuration in `config.yaml`; the database is created automatically during initialization when supported by the selected database type.
+- Run `go run main.go` or use a release binary.
 
 After startup, an admin password will be randomly generated. After logging in with that password for the first time, the administrator is forced to change it.
 
-### Front and backend separation
+### Separated frontend/backend
 
-User front-end files and administrator front-end files are independent and can be deployed separately in different web directories. The backend service switches the startup mode through the `start_made` parameter in `config.yaml`.
+The user frontend and admin frontend are independent and can be deployed to different web directories. The backend service switches startup mode through the `start_mode` parameter in `config.yaml`.
 
-- Configure the `baseURL` address in `src/api.ts` for the frontend, and then compile it.
-- The compiled user frontend files are located in the `frontend/dist` directory. Simply copy the files from the directory to the web directory.
-- The compiled admin frontend files are located in the `admin/dist` directory. Simply copy the files from the directory to the web directory.
-- Backend configuration CORS and start_mode, modify the `start_made`, `allow_origins`, `allow_methods`, and `allow_headers` parameters in `config.yaml`, and then run it.
+- Configure the frontend `baseURL` in `src/api.ts`, then build the frontend.
+- The compiled user frontend files are located in `frontend/dist`; copy the files to the target web directory.
+- The compiled admin frontend files are located in `admin/dist`; copy the files to the target web directory.
+- Configure backend CORS and startup mode by setting `start_mode`, `allow_origins`, `allow_methods`, and `allow_headers` in `config.yaml`, then start the backend.
 
 ## ChangeLog
 

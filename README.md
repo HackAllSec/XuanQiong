@@ -2,7 +2,7 @@
 
 ## 简体中文 | [English](README_EN.md)
 
-**XuanQiong（玄穹）**——一款高性能的开源漏洞库平台，中小型团队自建漏洞库的合适之选。支持漏洞提交、漏洞审核、漏洞搜索、漏洞排行榜、RBAC 权限管理、操作审计和品牌定制等功能。
+**XuanQiong（玄穹）**——一款高性能的开源漏洞库平台，适合中小型团队自建漏洞知识库、沉淀漏洞资产和管理审核流程。支持漏洞提交、漏洞审核、漏洞搜索、漏洞排行榜、动作级 RBAC、操作审计、站内消息、Webhook 推送、API Key、数据备份恢复和品牌定制等功能。
 
 ## 技术栈和功能
 
@@ -11,7 +11,7 @@
 - Vite
 - Vue3
 - Element Plus
-- Typescript
+- TypeScript
 
 ### 后端
 
@@ -19,12 +19,20 @@
 - GORM
 - JWT
 
-支持MySQL、PostgreSQL、SQLite3、SQL Server等数据库，具体查看GORM支持的数据库。  
-支持 JWT、`X-Auth-Token` 应用鉴权、邮件验证码、Webhook 配置等。
-内置漏洞类型，漏洞评分规则，积分计算规则查看[积分规则](ScoreRules.md)。
+支持 MySQL、PostgreSQL、SQLite3、SQL Server 等数据库，具体查看 GORM 支持的数据库。
+应用层浏览器会话使用 `X-Auth-Token`，自动化集成使用 `X-API-Key`，`Authorization` 保留给反向代理 Basic Auth 等代理层能力。
+内置漏洞类型、漏洞评分规则和积分计算规则，详情查看[积分规则](ScoreRules.md)。
 
 演示环境：[https://demo.hackall.cn](https://demo.hackall.cn)  
-演示环境账号请联系维护者获取。  
+管理员账号：admin/Admin@123  
+普通用户账号：test/123456  
+
+### v1.1.0 发布重点
+
+- 完成动作级 RBAC、动态权限菜单、操作审计日志和品牌定制。
+- 新增站内消息中心、Webhook 事件推送、漏洞 CSV 导入/导出、API Key 和数据备份恢复。
+- 加固认证头隔离、附件访问控制、验证码频控、审计日志脱敏、导入导出和备份恢复流程。
+- 首次启动随机生成管理员密码，首次登录后强制修改，不再在文档中提供固定默认凭据。
 
 ### 用户界面功能
 
@@ -161,7 +169,3 @@ XuanQiong/
 - [HTML格式](API/XuanQiong.html)
 - [Apifox格式](API/XuanQiong.apifox.json)
 - [Openapi格式](API/XuanQiong.openapi.json)
-
-## Star History
-
-![](https://api.star-history.com/svg?repos=HackAllSec/XuanQiong&type=Date)
