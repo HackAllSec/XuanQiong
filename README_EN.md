@@ -20,17 +20,19 @@
 - JWT (internal session token signing and validation)
 
 Supports databases such as MySQL, PostgreSQL, SQLite3, and SQL Server. See the GORM documentation for the full database compatibility list.
+Browser application sessions use `X-Auth-Token`, automation integrations use `X-API-Key`, and `Authorization` is reserved for proxy-layer capabilities such as reverse proxy Basic Auth.
 See [Score Rules](ScoreRules.md) for built-in vulnerability types, scoring rules, and point calculation rules.
 
 Demo: [https://demo.hackall.cn](https://demo.hackall.cn)  
 Administrator Account：admin/Admin@123  
-Ordinary user accounts：test/123456  
+Ordinary user accounts：test/123456
 
-### v1.1.0 Highlights
+### v1.1.1 Highlights
 
 - Added action-level RBAC, dynamic permission menus, operation audit logs, and brand customization.
 - Added in-site messages, Webhook event pushes, vulnerability CSV import/export, API keys, and data backup/restore.
-- Hardened authentication header isolation, attachment access control, captcha rate limiting, audit log redaction, import/export, and backup/restore workflows.
+- Hardened authentication header isolation, attachment access control, captcha rate limiting, audit log redaction, import/export, backup/restore, and API key scope controls.
+- Fixed frontend navigation branding, login footer placement, admin sidebar collapse control, and empty-state layout.
 - First startup now generates a random administrator password and requires password change after first login. Fixed default public credentials are no longer documented.
 
 ### User UI functions

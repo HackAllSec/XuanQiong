@@ -13,7 +13,7 @@ import (
 var (
 	configFile = "config.yaml"
 	Config     types.Config
-	Version    = "v1.1.0"
+	Version    = "v1.1.1"
 )
 
 func init() {
