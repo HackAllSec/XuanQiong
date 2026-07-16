@@ -1,0 +1,35 @@
+README_EN.md
+  s_b45ad150a87eb3::t_74076745c19d43 5,14,24,30-35,43,52,143,145,147,149-151,155,157,159-162
+  s_b45ad150a87eb3::t_746eecec663678 22-23,26
+  s_b45ad150a87eb3::t_ccb97a96ce58e3 27-29
+CHANGELOG.md
+  s_b45ad150a87eb3::t_0949e2c2edc1fa 3-9
+backend/config/config.go
+  s_b45ad150a87eb3::t_79ff4681b8a429 16
+README.md
+  s_b45ad150a87eb3::t_1f98485e14da0a 22-23
+  s_b45ad150a87eb3::t_6051dafe24704b 5,14,24,27-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7047effcab2f001e25702c0dbadc4654b003f2af",
+  "prompts": {},
+  "humans": {
+    "h_fe1e3da9c56e36": {
+      "author": "NHP <1749115565@qq.com>"
+    }
+  },
+  "sessions": {
+    "s_b45ad150a87eb3": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a574808ed8a61d69d2c9495",
+        "model": "gpt-5.5__dev"
+      },
+      "human_author": "NHP <1749115565@qq.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
