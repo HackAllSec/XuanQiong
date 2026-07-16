@@ -10,23 +10,23 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
-    "@vueuse/core": "^11.0.3",
+    "@vueuse/core": "^14.3.0",
     "axios": "^1.18.1",
-    "element-plus": "^2.8.3",
+    "element-plus": "^2.14.3",
     "jwt-decode": "^4.0.0",
-    "vue": "^3.4.37",
-    "vue-i18n": "^10.0.8",
-    "vue-router": "^4.4.5"
+    "vue": "^3.5.39",
+    "vue-i18n": "^11.4.6",
+    "vue-router": "^5.2.0"
   },
   "devDependencies": {
-    "@types/node": "^22.5.5",
-    "@vitejs/plugin-vue": "^6.0.7",
-    "typescript": "^5.5.3",
-    "unplugin-auto-import": "^0.18.3",
-    "unplugin-icons": "^0.19.3",
-    "unplugin-vue-components": "^0.27.4",
-    "vite": "^6.4.3",
-    "vue-tsc": "^2.0.29"
+    "@types/node": "^26.1.1",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "typescript": "^5.9.3",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-icons": "^23.0.1",
+    "unplugin-vue-components": "^32.1.0",
+    "vite": "^8.1.4",
+    "vue-tsc": "^3.3.7"
   },
   "pnpm": {
     "overrides": {

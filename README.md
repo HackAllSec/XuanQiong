@@ -17,10 +17,9 @@
 
 - Gin
 - GORM
-- JWT
+- JWT（内部会话令牌签发与校验）
 
 支持 MySQL、PostgreSQL、SQLite3、SQL Server 等数据库，具体查看 GORM 支持的数据库。
-应用层浏览器会话使用 `X-Auth-Token`，自动化集成使用 `X-API-Key`，`Authorization` 保留给反向代理 Basic Auth 等代理层能力。
 内置漏洞类型、漏洞评分规则和积分计算规则，详情查看[积分规则](ScoreRules.md)。
 
 演示环境：[https://demo.hackall.cn](https://demo.hackall.cn)  

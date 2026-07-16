@@ -17,10 +17,9 @@
 
 - Gin
 - GORM
-- JWT
+- JWT (internal session token signing and validation)
 
 Supports databases such as MySQL, PostgreSQL, SQLite3, and SQL Server. See the GORM documentation for the full database compatibility list.
-Browser application sessions use `X-Auth-Token`, automation integrations use `X-API-Key`, and `Authorization` is reserved for proxy-layer capabilities such as reverse proxy Basic Auth.
 See [Score Rules](ScoreRules.md) for built-in vulnerability types, scoring rules, and point calculation rules.
 
 Demo: [https://demo.hackall.cn](https://demo.hackall.cn)  

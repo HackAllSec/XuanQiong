@@ -1,0 +1,1 @@
+import"./vue-i18n-BKgRhgnc.js";import"./css-BUjqT8Yz.js";import"./css-qNgTJlwC.js";
