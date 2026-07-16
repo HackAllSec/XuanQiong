@@ -1,9 +1,9 @@
 <template>
-    <el-menu class="el-menu" mode="horizontal" :ellipsis="false">
-      <el-menu-item index="0">
-        <img style="width: 50px" :src="branding.logoUrl" alt="logo" />
+    <el-menu class="site-navbar" mode="horizontal" :ellipsis="false">
+      <el-menu-item index="0" class="brand-menu-item" @click="GotoIndex">
+        <img class="brand-logo" :src="branding.logoUrl" alt="logo" />
+        <span class="brand-name">{{ branding.siteName }}</span>
       </el-menu-item>
-      <span class="brand-name">{{ branding.siteName }}</span>
       <el-menu-item index="1" @click="GotoIndex">{{ t('app.webui.home') }}</el-menu-item>
       <el-menu-item index="2" @click="SubmitVuln">{{ t('app.webui.submitvuln') }}</el-menu-item>
       <el-menu-item index="3" @click="Ranklist">{{ t('app.webui.rankinglist') }}</el-menu-item>
@@ -23,7 +23,7 @@
         <el-menu-item index="5-2" @click="changelanguage('en-US')">English</el-menu-item>
       </el-sub-menu>
       <el-menu-item index="6" @click="Searchvuln">{{ t('app.webui.search') }}</el-menu-item>
-      <div style="margin-left: auto; cursor: pointer; color: var(--el-menu-text-color); ">
+      <div class="navbar-account">
         <div v-if="!username" @click="Login" style="display: flex; align-items: center;">
           <el-icon style="margin-right: 10px;"><UserFilled /></el-icon>
           <span>{{ t('app.webui.login') }}</span>
@@ -124,21 +124,36 @@
   }
   </script>
   
-  <style>
-  .el-menu {
+  <style scoped>
+  .site-navbar {
     align-items: center;
     width: 100%;
     --el-menu-bg-color: #383737;
     --el-menu-text-color: #fff;
     padding-inline: 1%;
 }
-  .el-menu--horizontal > .el-menu-item:nth-child(1) {
-    margin-right: auto;
+  .brand-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-right: 20px;
+    padding-inline: 12px;
+  }
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
   }
   .brand-name {
     color: #fff;
     font-weight: bold;
-    margin-right: 16px;
+    font-size: 18px;
+    white-space: nowrap;
+  }
+  .navbar-account {
+    margin-left: auto;
+    cursor: pointer;
+    color: var(--el-menu-text-color);
   }
   </style>
   

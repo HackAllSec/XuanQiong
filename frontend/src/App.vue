@@ -1,10 +1,10 @@
 <template>
   <el-config-provider :locale="elementPlusLocale">
-    <el-container>
+    <el-container class="app-shell">
     <el-header>
       <Navbar />
     </el-header>
-    <el-main>
+    <el-main class="app-main">
       <router-view />
     </el-main>
     <Footer />
@@ -51,10 +51,15 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.el-container {
-  /*background-color: #383737;*/
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 .el-header {
   --el-header-padding: 0 0;
+}
+.app-main {
+  flex: 1;
 }
 </style>

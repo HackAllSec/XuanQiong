@@ -281,21 +281,35 @@ onMounted(async () => {
 }
 
 .layout-aside {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 60px);
   border-right: 1px solid var(--el-border-color-light);
   background: #fff;
 }
 
 .menu {
-  min-height: calc(100vh - 60px);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   border-right: none;
 }
 
 .collapse-trigger {
   display: flex;
   justify-content: center;
-  padding: 12px 0;
+  align-items: center;
+  flex: 0 0 56px;
+  border-top: 1px solid var(--el-border-color-light);
+  background: #fff;
   cursor: pointer;
   color: var(--el-color-primary);
+  font-size: 24px;
+  transition: background-color 0.2s ease;
+}
+
+.collapse-trigger:hover {
+  background: var(--el-fill-color-light);
 }
 
 .layout-main {
