@@ -12,6 +12,10 @@
         />
         <el-button v-if="canManageAPIKeys" type="primary" :loading="creatingAPIKey" @click="createAPIKey">{{ t('app.webui.add') }}</el-button>
       </div>
+      <el-checkbox-group v-if="canManageAPIKeys" v-model="selectedAPIKeyScopes" class="scope-group">
+        <el-checkbox v-for="scope in availableAPIKeyScopes" :key="scope" :label="scope" :value="scope" />
+      </el-checkbox-group>
+      <el-alert v-if="canManageAPIKeys" :title="t('app.webui.apikeyscopenotice')" type="info" show-icon :closable="false" class="key-alert" />
       <el-alert
         v-if="generatedKey"
         type="warning"
@@ -24,6 +28,9 @@
       <el-table :data="apiKeys" border>
         <el-table-column prop="name" :label="t('app.webui.name')" />
         <el-table-column prop="key_prefix" :label="t('app.webui.apikeyprefix')" width="160" />
+        <el-table-column :label="t('app.webui.apikeyscopes')" min-width="220">
+          <template #default="{ row }">{{ (row.scope_list || []).join(', ') }}</template>
+        </el-table-column>
         <el-table-column :label="t('app.webui.expiresat')" width="180">
           <template #default="{ row }">{{ row.expires_at ? formatDate(row.expires_at) : '-' }}</template>
         </el-table-column>
@@ -93,6 +100,8 @@ const apiKeyName = ref('')
 const apiKeyExpiresAt = ref('')
 const generatedKey = ref('')
 const creatingAPIKey = ref(false)
+const availableAPIKeyScopes = ref<string[]>([])
+const selectedAPIKeyScopes = ref<string[]>([])
 const uploadHeaders = getUploadHeaders()
 
 const canReadAPIKeys = computed(() => hasPermission('api.key.read'))
@@ -102,11 +111,12 @@ const canExportVulns = computed(() => hasPermission('vuln.export'))
 const canManageBackup = computed(() => hasPermission('backup.manage'))
 
 async function loadAPIKeys() {
-  if (!canReadAPIKeys.value) {
+  if (!canReadAPIKeys.value && !canManageAPIKeys.value) {
     return
   }
   const response = await api.get('/api/v1/apikeys')
   apiKeys.value = response.data.data || []
+  availableAPIKeyScopes.value = response.data.available_scopes || []
 }
 
 async function createAPIKey() {
@@ -115,14 +125,20 @@ async function createAPIKey() {
   }
   creatingAPIKey.value = true
   try {
+    if (selectedAPIKeyScopes.value.length === 0) {
+      ElMessage.error(t('app.webui.apikeyscoperequired'))
+      return
+    }
     const response = await api.post('/api/v1/addapikey', {
       name: apiKeyName.value,
       expires_at: apiKeyExpiresAt.value,
+      scopes: selectedAPIKeyScopes.value,
     })
     if (response.data.code === 1) {
       generatedKey.value = response.data.api_key
       apiKeyName.value = ''
       apiKeyExpiresAt.value = ''
+      selectedAPIKeyScopes.value = []
       ElMessage.success(t('app.webui.addsuccess'))
       await loadAPIKeys()
       return
@@ -210,6 +226,13 @@ onMounted(loadAPIKeys)
 
 .toolbar-input {
   max-width: 260px;
+}
+
+.scope-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 12px;
 }
 
 .key-alert {

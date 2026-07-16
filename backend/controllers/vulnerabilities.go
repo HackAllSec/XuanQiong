@@ -68,6 +68,11 @@ func GetVulnDetail(c *gin.Context) {
 	id := c.Query("id")
 	currentUser := currentUserFromRequest(c)
 	if currentUser != nil {
+		if !requestHasAPIKeyScope(c, "vuln.self.read", "vuln.read", "vuln.audit.read") {
+			res := models.GetVulnDetail(id)
+			c.JSON(200, gin.H{"code": 0, "data": res})
+			return
+		}
 		canReadSensitive := models.UserHasAnyPermission(currentUser.ID, "vuln.read", "vuln.audit.read")
 		res := models.GetVulnDetailAuthed(id, currentUser.ID, canReadSensitive)
 		c.JSON(200, gin.H{"code": 1, "data": res})
@@ -212,8 +217,10 @@ func DownloadFile(c *gin.Context) {
 	var userid uint64
 	var roleid int64
 	if currentUser != nil {
-		userid = currentUser.ID
-		if models.UserHasAnyPermission(currentUser.ID, "attachment.read.all") {
+		if requestHasAPIKeyScope(c, "vuln.self.read", "vuln.read", "vuln.audit.read") {
+			userid = currentUser.ID
+		}
+		if requestHasAPIKeyScope(c, "vuln.read", "vuln.audit.read") && models.UserHasAnyPermission(currentUser.ID, "attachment.read.all") {
 			roleid = 1
 		}
 	}

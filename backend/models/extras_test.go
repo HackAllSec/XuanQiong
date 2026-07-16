@@ -13,6 +13,9 @@ import (
 
 func TestAPIKeyLifecycle_BitsUT(t *testing.T) {
 	setupModelTestDB(t)
+	if err := syncRBACDefaults(); err != nil {
+		t.Fatalf("sync default rbac data: %v", err)
+	}
 	user := types.XqUser{
 		Username:   "api-user",
 		Password:   "hash",
@@ -23,8 +26,18 @@ func TestAPIKeyLifecycle_BitsUT(t *testing.T) {
 	if err := db.Create(&user).Error; err != nil {
 		t.Fatalf("create user: %v", err)
 	}
+	if err := AssignRoleByCode(user.ID, "user"); err != nil {
+		t.Fatalf("assign user role: %v", err)
+	}
 
-	record, plaintext, err := GenerateAPIKey(user.ID, "integration", "")
+	if _, _, err := GenerateAPIKey(user.ID, "empty", "", nil); err == nil {
+		t.Fatalf("api key without scopes should be rejected")
+	}
+	if _, _, err := GenerateAPIKey(user.ID, "overreach", "", []string{"backup.manage"}); err == nil {
+		t.Fatalf("api key with disallowed scope should be rejected")
+	}
+
+	record, plaintext, err := GenerateAPIKey(user.ID, "integration", "", []string{"vuln.submit", "vuln.self.read"})
 	if err != nil {
 		t.Fatalf("generate api key: %v", err)
 	}
@@ -41,6 +54,9 @@ func TestAPIKeyLifecycle_BitsUT(t *testing.T) {
 	}
 	if keys[0].KeyHash != "" {
 		t.Fatalf("list api keys should not expose hash")
+	}
+	if strings.Join(keys[0].ScopeList, ",") != "vuln.submit,vuln.self.read" {
+		t.Fatalf("list api keys scope list = %#v", keys[0].ScopeList)
 	}
 	var backupBuffer bytes.Buffer
 	if err := CreateSystemBackup(&backupBuffer); err != nil {
@@ -67,6 +83,23 @@ func TestAPIKeyLifecycle_BitsUT(t *testing.T) {
 	}
 	if currentUser := GetUserByToken("ApiKey " + plaintext); currentUser != nil {
 		t.Fatalf("api key must not authenticate through Authorization token path")
+	}
+	injectedKey := "xqk_injectedStoredScope000000000000000000"
+	if err := db.Create(&types.XqAPIKey{
+		UserID:     user.ID,
+		Name:       "injected",
+		KeyPrefix:  "xqk_injecte",
+		KeyHash:    hashAPIKey(injectedKey),
+		Scopes:     `["backup.manage"]`,
+		Status:     1,
+		ExpiresAt:  record.ExpiresAt,
+		CreateTime: time.Now(),
+		UpdateTime: time.Now(),
+	}).Error; err != nil {
+		t.Fatalf("create injected api key: %v", err)
+	}
+	if currentUser := GetUserByAPIKey(injectedKey); currentUser != nil {
+		t.Fatalf("api key with stored disallowed scope should not authenticate")
 	}
 	if err := DeleteAPIKey(user.ID, record.ID); err != nil {
 		t.Fatalf("delete api key: %v", err)

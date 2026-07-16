@@ -101,7 +101,7 @@ func defineRouter() {
 	route.POST(apiuri+"/forgetpassword", auditedPublicRoute("auth.forget_password", controllers.ForgetPassword)...)
 	route.GET(apiuri+"/getbrandconfig", controllers.GetBrandConfig)
 	// 需要登录
-	route.GET(apiuri+"/logout", protectedRoute(nil, "auth.logout", controllers.Logout)...)
+	route.GET(apiuri+"/logout", protectedSessionRoute(nil, "auth.logout", controllers.Logout)...)
 	route.GET(apiuri+"/userinfo", protectedRoute([]string{"profile.read"}, "profile.read", controllers.GetUserInfo)...)
 	route.GET(apiuri+"/uservulnlist", protectedRoute([]string{"vuln.self.read"}, "vuln.self.read", controllers.GetUserVulnList)...)
 	route.POST(apiuri+"/upload", protectedRoute([]string{"attachment.upload"}, "attachment.upload", controllers.UploadFile)...)
@@ -114,9 +114,9 @@ func defineRouter() {
 	route.GET(apiuri+"/messages", protectedRoute([]string{"message.read"}, "message.read", controllers.GetMessages)...)
 	route.POST(apiuri+"/readmessage", protectedRoute([]string{"message.update"}, "message.read_one", controllers.MarkMessageRead)...)
 	route.POST(apiuri+"/readallmessages", protectedRoute([]string{"message.update"}, "message.read_all", controllers.MarkAllMessagesRead)...)
-	route.GET(apiuri+"/apikeys", protectedRoute([]string{"api.key.read"}, "api_key.read", controllers.GetAPIKeys)...)
-	route.POST(apiuri+"/addapikey", protectedRoute([]string{"api.key.manage"}, "api_key.create", controllers.CreateAPIKey)...)
-	route.POST(apiuri+"/delapikey", protectedRoute([]string{"api.key.manage"}, "api_key.delete", controllers.DeleteAPIKey)...)
+	route.GET(apiuri+"/apikeys", protectedSessionRoute([]string{"api.key.read", "api.key.manage"}, "api_key.read", controllers.GetAPIKeys)...)
+	route.POST(apiuri+"/addapikey", protectedSessionRoute([]string{"api.key.manage"}, "api_key.create", controllers.CreateAPIKey)...)
+	route.POST(apiuri+"/delapikey", protectedSessionRoute([]string{"api.key.manage"}, "api_key.delete", controllers.DeleteAPIKey)...)
 
 	// 管理员权限
 	route.POST(apiuri+"/adduser", protectedRoute([]string{"user.create"}, "user.create", controllers.CreateUser)...)

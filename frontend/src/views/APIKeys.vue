@@ -12,6 +12,10 @@
         />
         <el-button type="primary" :loading="creatingKey" @click="createKey">{{ t('app.webui.add') }}</el-button>
       </div>
+      <el-checkbox-group v-model="selectedScopes" class="scope-group">
+        <el-checkbox v-for="scope in availableScopes" :key="scope" :label="scope" :value="scope" />
+      </el-checkbox-group>
+      <el-alert :title="t('app.webui.apikeyscopenotice')" type="info" show-icon :closable="false" class="key-alert" />
 
       <el-alert
         v-if="generatedKey"
@@ -26,6 +30,9 @@
       <el-table :data="apiKeys" border>
         <el-table-column prop="name" :label="t('app.webui.name')" />
         <el-table-column prop="key_prefix" :label="t('app.webui.apikeyprefix')" width="160" />
+        <el-table-column :label="t('app.webui.apikeyscopes')" min-width="220">
+          <template #default="{ row }">{{ (row.scope_list || []).join(', ') }}</template>
+        </el-table-column>
         <el-table-column :label="t('app.webui.expiresat')" width="180">
           <template #default="{ row }">{{ row.expires_at ? formatDate(row.expires_at) : '-' }}</template>
         </el-table-column>
@@ -56,10 +63,13 @@ const name = ref('')
 const expiresAt = ref('')
 const generatedKey = ref('')
 const creatingKey = ref(false)
+const availableScopes = ref<string[]>([])
+const selectedScopes = ref<string[]>([])
 
 async function loadKeys() {
   const response = await api.get('/api/v1/apikeys')
   apiKeys.value = response.data.data || []
+  availableScopes.value = response.data.available_scopes || []
 }
 
 async function createKey() {
@@ -68,14 +78,20 @@ async function createKey() {
   }
   creatingKey.value = true
   try {
+    if (selectedScopes.value.length === 0) {
+      ElMessage.error(t('app.webui.apikeyscoperequired'))
+      return
+    }
     const response = await api.post('/api/v1/addapikey', {
       name: name.value,
       expires_at: expiresAt.value,
+      scopes: selectedScopes.value,
     })
     if (response.data.code === 1) {
       generatedKey.value = response.data.api_key
       name.value = ''
       expiresAt.value = ''
+      selectedScopes.value = []
       ElMessage.success(t('app.webui.addsuccess'))
       await loadKeys()
       return
@@ -115,6 +131,13 @@ onMounted(loadKeys)
 
 .toolbar-input {
   max-width: 260px;
+}
+
+.scope-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-bottom: 12px;
 }
 
 .key-alert {

@@ -179,6 +179,7 @@ type XqAPIKey struct {
 	KeyPrefix  string     `json:"key_prefix"`
 	KeyHash    string     `json:"-"`
 	Scopes     string     `json:"scopes"`
+	ScopeList  []string   `gorm:"-" json:"scope_list"`
 	Status     int64      `json:"status"`
 	LastUsedAt *time.Time `json:"last_used_at"`
 	ExpiresAt  *time.Time `json:"expires_at"`
@@ -315,8 +316,9 @@ type RolePayload struct {
 }
 
 type CreateAPIKeyPayload struct {
-	Name      string `json:"name"`
-	ExpiresAt string `json:"expires_at"`
+	Name      string   `json:"name"`
+	ExpiresAt string   `json:"expires_at"`
+	Scopes    []string `json:"scopes"`
 }
 
 type MessagePayload struct {

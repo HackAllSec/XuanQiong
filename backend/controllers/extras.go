@@ -21,6 +21,27 @@ func currentUserFromRequest(c *gin.Context) *types.XqUser {
 	return models.GetUserByToken(c.Request.Header.Get("Authorization"))
 }
 
+func requestHasAPIKeyScope(c *gin.Context, scopeCodes ...string) bool {
+	value, exists := c.Get("api_key_scopes")
+	if !exists {
+		return true
+	}
+	scopes, ok := value.([]string)
+	if !ok {
+		return false
+	}
+	scopeSet := map[string]bool{}
+	for _, scope := range scopes {
+		scopeSet[scope] = true
+	}
+	for _, code := range scopeCodes {
+		if scopeSet[code] {
+			return true
+		}
+	}
+	return false
+}
+
 func GetMessages(c *gin.Context) {
 	currentUser := currentUserFromRequest(c)
 	if currentUser == nil {
@@ -68,7 +89,7 @@ func GetAPIKeys(c *gin.Context) {
 		c.JSON(200, gin.H{"code": 0, "msg": "Permission denied"})
 		return
 	}
-	c.JSON(200, gin.H{"code": 1, "data": models.ListAPIKeys(currentUser.ID)})
+	c.JSON(200, gin.H{"code": 1, "data": models.ListAPIKeys(currentUser.ID), "available_scopes": models.AvailableAPIKeyScopes(currentUser.ID)})
 }
 
 func CreateAPIKey(c *gin.Context) {
@@ -82,12 +103,12 @@ func CreateAPIKey(c *gin.Context) {
 		c.JSON(400, gin.H{"code": 2, "msg": "Invalid input"})
 		return
 	}
-	record, key, err := models.GenerateAPIKey(currentUser.ID, payload.Name, payload.ExpiresAt)
+	record, key, err := models.GenerateAPIKey(currentUser.ID, payload.Name, payload.ExpiresAt, payload.Scopes)
 	if err != nil {
 		c.JSON(200, gin.H{"code": 3, "msg": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"code": 1, "data": record, "api_key": key})
+	c.JSON(200, gin.H{"code": 1, "data": record, "api_key": key, "available_scopes": models.AvailableAPIKeyScopes(currentUser.ID)})
 }
 
 func DeleteAPIKey(c *gin.Context) {

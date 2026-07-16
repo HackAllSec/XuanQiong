@@ -14,6 +14,7 @@ import (
 
 const currentUserContextKey = "current_user"
 const auditSkipResponseBodyKey = "audit_skip_response_body"
+const apiKeyScopesContextKey = "api_key_scopes"
 
 type auditResponseWriter struct {
 	gin.ResponseWriter
@@ -53,8 +54,9 @@ func currentUserMiddleware() gin.HandlerFunc {
 				return
 			}
 		}
-		if currentUser := models.GetUserByAPIKey(c.GetHeader("X-API-Key")); currentUser != nil {
+		if currentUser, scopes := models.GetUserByAPIKeyWithScopes(c.GetHeader("X-API-Key")); currentUser != nil {
 			c.Set(currentUserContextKey, currentUser)
+			c.Set(apiKeyScopesContextKey, scopes)
 		}
 		c.Next()
 	}
@@ -82,6 +84,45 @@ func requireAuthMiddleware() gin.HandlerFunc {
 	}
 }
 
+func currentRequestAPIKeyScopes(c *gin.Context) ([]string, bool) {
+	value, exists := c.Get(apiKeyScopesContextKey)
+	if !exists {
+		return nil, false
+	}
+	scopes, ok := value.([]string)
+	return scopes, ok
+}
+
+func apiKeyHasAnyPermissionScope(c *gin.Context, permissionCodes ...string) bool {
+	scopes, exists := currentRequestAPIKeyScopes(c)
+	if !exists {
+		return true
+	}
+	if len(permissionCodes) == 0 {
+		return false
+	}
+	scopeSet := map[string]bool{}
+	for _, scope := range scopes {
+		scopeSet[scope] = true
+	}
+	for _, code := range permissionCodes {
+		if scopeSet[code] {
+			return true
+		}
+	}
+	return false
+}
+
+func requireBrowserSessionMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if _, exists := currentRequestAPIKeyScopes(c); exists {
+			c.AbortWithStatusJSON(http.StatusOK, gin.H{"code": 0, "msg": "API key is not allowed for this operation"})
+			return
+		}
+		c.Next()
+	}
+}
+
 func requirePermissionMiddleware(permissionCodes ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		currentUser := currentUserFromContext(c)
@@ -90,8 +131,10 @@ func requirePermissionMiddleware(permissionCodes ...string) gin.HandlerFunc {
 			return
 		}
 		if len(permissionCodes) == 0 || models.UserHasAnyPermission(currentUser.ID, permissionCodes...) {
-			c.Next()
-			return
+			if apiKeyHasAnyPermissionScope(c, permissionCodes...) {
+				c.Next()
+				return
+			}
 		}
 		c.AbortWithStatusJSON(http.StatusOK, gin.H{"code": 0, "msg": "Permission denied"})
 	}
@@ -187,6 +230,11 @@ func protectedRoute(permissionCodes []string, auditAction string, handler gin.Ha
 	}
 	handlers = append(handlers, handler)
 	return handlers
+}
+
+func protectedSessionRoute(permissionCodes []string, auditAction string, handler gin.HandlerFunc) []gin.HandlerFunc {
+	handlers := protectedRoute(permissionCodes, auditAction, handler)
+	return append(handlers[:2], append([]gin.HandlerFunc{requireBrowserSessionMiddleware()}, handlers[2:]...)...)
 }
 
 func auditedPublicRoute(auditAction string, handler gin.HandlerFunc) []gin.HandlerFunc {

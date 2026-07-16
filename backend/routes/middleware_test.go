@@ -108,3 +108,39 @@ func TestAuditResponseWriterSkipsConfiguredResponseBody_BitsUT(t *testing.T) {
 		t.Fatalf("client response body was not written")
 	}
 }
+
+func TestAPIKeyPermissionScopeMatching_BitsUT(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	context, _ := gin.CreateTestContext(httptest.NewRecorder())
+	context.Set(apiKeyScopesContextKey, []string{"vuln.submit", "vuln.self.read"})
+
+	if !apiKeyHasAnyPermissionScope(context, "vuln.submit") {
+		t.Fatalf("api key should allow explicitly granted scope")
+	}
+	if apiKeyHasAnyPermissionScope(context, "backup.manage") {
+		t.Fatalf("api key should reject scope that was not granted")
+	}
+	if apiKeyHasAnyPermissionScope(context) {
+		t.Fatalf("api key should not allow operations without explicit permission codes")
+	}
+}
+
+func TestRequireBrowserSessionRejectsAPIKey_BitsUT(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	router := gin.New()
+	router.GET("/browser-only", func(c *gin.Context) {
+		c.Set(apiKeyScopesContextKey, []string{"vuln.submit"})
+	}, requireBrowserSessionMiddleware(), func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"code": 1})
+	})
+
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, httptest.NewRequest(http.MethodGet, "/browser-only", nil))
+
+	if response.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d", response.Code, http.StatusOK)
+	}
+	if !bytes.Contains(response.Body.Bytes(), []byte("API key is not allowed")) {
+		t.Fatalf("expected api key rejection response, got %s", response.Body.String())
+	}
+}
